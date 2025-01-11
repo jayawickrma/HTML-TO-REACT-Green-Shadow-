@@ -1,4 +1,4 @@
-export function LogPage(){
+export function DashBoard(){
     return(
         <></>
     )
