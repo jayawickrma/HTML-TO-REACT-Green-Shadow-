@@ -1,3 +1,4 @@
+import "../assets/piechart.jpg"
 export function DashBoard(){
     return(
         <>
