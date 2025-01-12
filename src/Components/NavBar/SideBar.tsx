@@ -11,42 +11,42 @@ export function SideBar(){
                 </a>
                 <hr className="text-secondary mt-2"/>
                 <ul className="nav nav-pills flex-column p-0 m-0">
-                    <li className="nav-item p-0 bg-gradient">
+                    <li className="nav-item p-0 bg-gradient text-center">
                         <a href="" className="nav-link text-white fs-5"> DashBoard</a>
                         <i className=" me-2 fs-5"></i>
                     </li>
-                    <li className="nav-item p-0 bg-gradient">
+                    <li className="nav-item p-0 bg-gradient text-center">
                         <a href="" className="nav-link text-white fs-5">Crop Management</a>
                         <i className=" me-2 fs-5"></i>
                         <span className="fs-5"></span>
                     </li>
-                    <li className="nav-item p-0 bg-gradient">
+                    <li className="nav-item p-0 bg-gradient text-center">
                         <a href="" className="nav-link text-white fs-5">Field Management</a>
                         <i className=" me-2 fs-5"></i>
                         <span className="fs-5"></span>
                     </li>
-                    <li className="nav-item p-0 bg-gradient">
+                    <li className="nav-item p-0 bg-gradient text-center">
                         <a href="" className="nav-link text-white fs-5">Log Management</a>
                         <i className=" me-2 fs-5"></i>
                         <span className="fs-5"></span>
                     </li>
-                    <li className="nav-item p-0 bg-gradient">
+                    <li className="nav-item p-0 bg-gradient text-center">
                         <a href="" className="nav-link text-white fs-5">Equipment Management</a>
                         <i className=" me-2 fs-5"></i>
                         <span className="fs-5"></span>
                     </li>
-                    <li className="nav-item p-0 bg-gradient">
+                    <li className="nav-item p-0 bg-gradient text-center">
                         <a href="" className="nav-link text-white fs-5">Staff Management</a>
                         <i className=" me-2 fs-5"></i>
                         <span className="fs-5"></span>
                     </li>
-                    <li className="nav-item p-1 bg-gradient">
+                    <li className="nav-item p-1 bg-gradient text-center">
                         <a href="" className="nav-link text-white fs-5">Vehicle Management</a>
                         <i className=" me-2 fs-5"></i>
                         <span className="fs-5"></span>
                     </li>
 
-                    <li className="nav-item p-1 bg-gradient">
+                    <li className="nav-item p-1 bg-gradient text-center">
                         <a href="" className="nav-link text-white fs-5">Settings </a>
                         <i className=" me-2 fs-5"></i>
                         <span className="fs-5"></span>
