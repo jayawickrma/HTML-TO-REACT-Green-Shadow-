@@ -1,10 +1,8 @@
 import {Link} from "react-router";
 
-
 export function Navbar(){
 return(
     <>
-    <header>
         <div className="list-group list-group-flush text-center">
           <Link to="/">DashBoard</Link>
             <Link to="">Crop Management</Link>
@@ -15,8 +13,6 @@ return(
             <Link to="">Vehicle Management</Link>
             <Link to="">Settings</Link>
     </div>
-    </header>
-
 </>
 )
 }
