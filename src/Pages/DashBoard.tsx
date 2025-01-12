@@ -48,20 +48,21 @@ export function DashBoard(){
                 </div>
                 <br/>
 
-                {/*<div className="card m-1 cards col-md-8" style="border-radius: 8px;*/}
-                {/*    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1); top: 17px;left: 18px;">*/}
-                {/*    <div className="card-body">*/}
-                {/*        <h5 className="card-title text-center">Monthly Crops of seasons</h5>*/}
-                {/*        <canvas id="myChart"></canvas>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
+                <div className="bg-white rounded-lg shadow-md p-4 m-4 max-w-4xl mx-auto relative"
+                     style={{top: '17px', left: '18px'}}>
+                    <div className="text-center">
+                        <h5 className="font-semibold text-gray-700">Monthly Crops of Seasons</h5>
+                    </div>
+                    <canvas id="myChart" className="w-full h-64"></canvas>
+                </div>
+
 
                 <div className="date-time-container">
                     <p id="date"></p>
                     <p id="time"></p>
                 </div>
                 <div id="piechart">
-                    <img id="imagepie" src="Asserts/piechart.jpg" alt="image"/>
+                    <img id="imagepie" src="../assets/piechart.jpg" alt="image"/>
                 </div>
             </div>
         </>
