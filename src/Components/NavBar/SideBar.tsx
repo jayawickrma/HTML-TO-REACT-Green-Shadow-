@@ -13,43 +13,51 @@ export function SideBar(){
                 <hr className="text-secondary mt-2"/>
                 <ul className="nav nav-pills flex-column p-0 m-0">
                     <li className="nav-item p-0 bg-gradient text-center">
-                        <Link to="/Home" className="nav-link text-white fs-5 "> DashBoard</Link>
-                        <i className=" me-2 fs-5"></i>
+                        <i className=" me-2 fs-5">
+                            <Link to="/" className="nav-link text-white fs-5 "> DashBoard</Link>
+                        </i>
                     </li>
                     <li className="nav-item p-0 bg-gradient text-center">
-                        <Link to="" className="nav-link text-white fs-5">Crop Management </Link>
-                        <i className=" me-2 fs-5"></i>
+                        <i className=" me-2 fs-5">
+                            <Link to="/" className="nav-link text-white fs-5">Crop Management </Link>
+                        </i>
+
+                    </li>
+                    <li className="nav-item p-0 bg-gradient text-center">
+                        <i className=" me-2 fs-5">
+                            <Link to="" className="nav-link text-white fs-5">Field Management</Link>
+                        </i>
+
+                    </li>
+                    <li className="nav-item p-0 bg-gradient text-center">
+                        <i className=" me-2 fs-5">
+                            <Link to="" className="nav-link text-white fs-5">Log Management</Link>
+                        </i>
                         <span className="fs-5"></span>
                     </li>
                     <li className="nav-item p-0 bg-gradient text-center">
-                        <Link to="" className="nav-link text-white fs-5">Field Management</Link>
-                        <i className=" me-2 fs-5"></i>
+                        <i className=" me-2 fs-5">
+                            <Link to="" className="nav-link text-white fs-5">Equipment Management</Link>
+                        </i>
                         <span className="fs-5"></span>
                     </li>
                     <li className="nav-item p-0 bg-gradient text-center">
-                        <Link to="" className="nav-link text-white fs-5">Log Management</Link>
-                        <i className=" me-2 fs-5"></i>
-                        <span className="fs-5"></span>
-                    </li>
-                    <li className="nav-item p-0 bg-gradient text-center">
-                        <Link to="" className="nav-link text-white fs-5">Equipment Management</Link>
-                        <i className=" me-2 fs-5"></i>
-                        <span className="fs-5"></span>
-                    </li>
-                    <li className="nav-item p-0 bg-gradient text-center">
-                        <Link to="" className="nav-link text-white fs-5">Staff Management</Link>
-                        <i className=" me-2 fs-5"></i>
+                        <i className=" me-2 fs-5">
+                            <Link to="" className="nav-link text-white fs-5">Staff Management</Link>
+                        </i>
                         <span className="fs-5"></span>
                     </li>
                     <li className="nav-item p-1 bg-gradient text-center">
-                        <Link to="" className="nav-link text-white fs-5">Vehicle Management</Link>
-                        <i className=" me-2 fs-5"></i>
+                        <i className=" me-2 fs-5">
+                            <Link to="" className="nav-link text-white fs-5">Vehicle Management</Link>
+                        </i>
                         <span className="fs-5"></span>
                     </li>
 
                     <li className="nav-item p-1 bg-gradient text-center">
-                        <Link to="" className="nav-link text-white fs-5">Settings </Link>
-                        <i className=" me-2 fs-5"></i>
+                        <i className=" me-2 fs-5">
+                            <Link to="" className="nav-link text-white fs-5">Settings </Link>
+                        </i>
                         <span className="fs-5"></span>
                     </li>
                 </ul>
