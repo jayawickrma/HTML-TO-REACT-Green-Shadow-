@@ -3,8 +3,7 @@ import {SideBar} from "./Components/NavBar/SideBar.tsx";
 import { Routes, Route } from 'react-router-dom';
 import {BrowserRouter} from "react-router";
 import * as React from "react";
-import {FieldComponent} from "./Components/FieldComponent.tsx";
-import {DashBoard} from "./Pages/DashBoard.tsx";
+
 
 
 const App: React.FC = () => {
@@ -18,8 +17,8 @@ const App: React.FC = () => {
                     <div>
                         <Routes>
                             <Route path="/" element={<h1>Home</h1>}/>
-                            <Route path="/dashboard" element={DashBoard}/>
-                            <Route path="/fieldManagement" element={FieldComponent}/>
+                            <Route path="/dashboard" element={<h1>DashBoard</h1>}/>
+                            <Route path="/fieldManagement" element={<h1>Field Management</h1>}/>
                             <Route path="/cropManagement" element={<h1>Crop Management</h1>}/>
                             <Route path="/logManagement" element={<h1>Log Management</h1>}/>
                             <Route path="/staffManagement" element={<h1>Staff Management</h1>}/>

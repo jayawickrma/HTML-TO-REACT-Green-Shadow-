@@ -1,6 +1,7 @@
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import {Link} from "react-router";
-// import piechart from"../../assets/piechart.jpg"
+import { Link } from 'react-router-dom';
+
+
 
 export function SideBar(){
     return(
@@ -15,12 +16,12 @@ export function SideBar(){
                     <ul className="nav nav-pills flex-column p-0 m-0">
                         <li className="nav-item p-0 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/" className="nav-link text-white fs-5 ">DashBoard</Link>
+                                <Link to="/dashboard" className="nav-link text-white fs-5 ">DashBoard</Link>
                             </i>
                         </li>
                         <li className="nav-item p-0 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/crop-management" className="nav-link text-white fs-5">Crop Management </Link>
+                                <Link to="/crop-management"  className="nav-link text-white fs-5">Crop Management </Link>
                             </i>
 
                         </li>
