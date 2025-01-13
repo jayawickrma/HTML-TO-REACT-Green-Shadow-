@@ -2,17 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 .sidebar ul{
-  padding:0px !important;
+  padding:10px !important;
 }
 .sidebar ul li:hover{
-  background-color: blue;
+  background-color: #96C9F4;
+}
+.sidebar{
+  background-color: #EEEEEE;
+  width: 190px;
+  margin-top: -15px;
+}
+.sidebar ul {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 10px; /* Gap between items */
+
 }
 
+.sidebar ul li {
+  margin-left: 10px;
+  width: 145px;
+  height: 85px;
+  background-color: #EEEEEE;
+  border-radius: 10px !important;
+  text-decoration-skip-box: none !important;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5); /* Add shadow */
+  transition: all 0.3s ease; /* Smooth transition for hover and active */
+}
+
+.sidebar ul li{
+  gap: 30px !important;
+  width: 145px;
+  height: 85px !important;
+  background-color:#EEEEEE;
+  border-radius: 10px !important;
+  text-decoration-skip-box: none !important;
+}
+
+.nav-link {
+  font-size: 1.3rem;
+  color: #10375C;
+  font-style: normal !important;
+  font-family: "Arial";
+  text-align: center;
+}
+.image{
+  width:45px !important;
+  height: 45px !important;
+  margin-top: -2% !important;
+}
 
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 1.2;
   font-weight: 400;
 
   color-scheme: light dark;

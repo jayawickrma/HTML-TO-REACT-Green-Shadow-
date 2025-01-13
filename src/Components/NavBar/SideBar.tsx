@@ -1,71 +1,140 @@
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Link } from 'react-router-dom';
+import dashboard from '../../assets/dashboard.png'
+import cropImage from '../../assets/icons8-crops-64.png'
+import fieldImage from '../../assets/field.png'
+import logImage from '../../assets/logs.png'
+import settingImage from '../../assets/settings.png'
+import staffImage from '../../assets/staff.png'
+import vahicleImage from '../../assets/icons8-vehicles-64.png'
+import equipmentImage from '../../assets/icons8-equipment-100.png'
 
 
 
 export function SideBar(){
     return(
         <>
-            <div className=" sidebar d-flex flex-column justify-content-between text-white p-2 vh-100 vw-45 bg-dark">
+            <div className="sidebar d-flex flex-column justify-content-between text-black-700  vh-100 vw-45 ">
                 <div>
-                    <a className="d-flex align-items-center p-5">
+                    {/*<a className="d-flex align-items-center p-5">*/}
 
-                        <span className="fs-4">Green Shadow</span>
-                    </a>
+                    {/*    <span className="fs-3">*/}
+                    {/*        <img*/}
+                    {/*        src={welcomeImage}*/}
+                    {/*        alt='dashboard'*/}
+                    {/*        className='image'*/}
+                    {/*        style={{width: '24px', height: '24px'}}*/}
+                    {/*    />*/}
+                    {/*    </span>*/}
+                    {/*</a>*/}
                     <hr className="text-secondary mt-2"/>
                     <ul className="nav nav-pills flex-column p-0 m-0">
                         <li className="nav-item p-0 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/dashboard" className="nav-link text-white fs-5 ">DashBoard</Link>
+
+                                <Link  to="/dashboard" className="nav-link text-black fs-6">
+
+                                    <img
+                                    src={dashboard}
+                                    alt='dashboard'
+                                    className='image'
+                                    style={{width: '24px', height: '24px'}}
+                                />
+
+                                    DashBoard</Link>
                             </i>
                         </li>
                         <li className="nav-item p-0 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/crop-management"  className="nav-link text-white fs-5">Crop Management </Link>
+                                <Link to="/crop-management" className="nav-link text-black fs-6">
+
+                                    <img
+                                    src={cropImage}
+                                    alt='crop'
+                                    className='image'
+                                    style={{width: '24px', height: '24px'}}
+                                /> <br/>
+                                    Crops </Link>
                             </i>
 
                         </li>
                         <li className="nav-item p-0 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/field-management" className="nav-link text-white fs-5">Field Management</Link>
+                                <Link to="/field-management" className="nav-link text-black fs-6 ">
+                                    <img
+                                        src={fieldImage}
+                                        alt='field'
+                                        className='image'
+                                        style={{width: '24px', height: '24px'}}
+                                    /> <br/>
+                                    Fields</Link>
                             </i>
 
                         </li>
                         <li className="nav-item p-0 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/log-management" className="nav-link text-white fs-5">Log Management</Link>
+                                <Link to="/log-management" className="nav-link text-black fs-6">
+                                    <img
+                                        src={logImage}
+                                        alt='log'
+                                        className='image'
+                                        style={{width: '24px', height: '24px'}}
+                                    /> <br/>
+                                    Logs</Link>
                             </i>
-                            <span className="fs-5"></span>
                         </li>
                         <li className="nav-item p-0 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/equipment-management" className="nav-link text-white fs-5">Equipment Management</Link>
+                                <Link to="/equipment-management" className="nav-link text-black fs-6">
+                                    <img
+                                        src={equipmentImage}
+                                        alt='log'
+                                        className='image'
+                                        style={{width: '24px', height: '24px'}}
+                                    />
+                                    Equipments</Link>
                             </i>
-                            <span className="fs-5"></span>
                         </li>
                         <li className="nav-item p-0 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/staff-management" className="nav-link text-white fs-5">Staff Management</Link>
+                                <Link to="/staff-management" className="nav-link text-black fs-6">
+                                    <img
+                                        src={staffImage}
+                                        alt='staff'
+                                        className='image'
+                                        style={{width: '24px', height: '24px'}}
+                                    /> <br/>
+                                    Staff</Link>
                             </i>
-                            <span className="fs-5"></span>
                         </li>
                         <li className="nav-item p-1 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/vehicle-management" className="nav-link text-white fs-5">Vehicle Management</Link>
+                                <Link to="/vehicle-management" className="nav-link text-black fs-6">
+                                    <img
+                                        src={vahicleImage}
+                                        alt='vehicle'
+                                        className='image'
+                                        style={{width: '24px', height: '24px'}}
+                                    /><br/>
+                                    Vehicle</Link>
                             </i>
-                            <span className="fs-5"></span>
                         </li>
 
                         <li className="nav-item p-1 bg-gradient text-center">
                             <i className=" me-2 fs-5">
-                                <Link to="/settings" className="nav-link text-white fs-5">Settings </Link>
+                                <Link to="/settings" className="nav-link text-black fs-6">
+                                    <img
+                                        src={settingImage}
+                                        alt='settings'
+                                        className='image'
+                                        style={{width: '24px', height: '24px'}}
+                                    /><br/>
+                                    Settings</Link>
                             </i>
-                            <span className="fs-5"></span>
                         </li>
                     </ul>
                 </div>
             </div>
-
 
 
             {/*/!* main page in the dashboard*!/*/}
