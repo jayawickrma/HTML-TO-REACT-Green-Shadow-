@@ -1,4 +1,4 @@
-import "../assets/piechart.jpg"
+import piechart from  "../assets/piechart.jpg"
 export function DashBoard(){
     return(
         <>
@@ -63,7 +63,7 @@ export function DashBoard(){
                     <p id="time"></p>
                 </div>
                 <div id="piechart">
-                    <img id="imagepie" src="../assets/piechart.jpg" alt="image"/>
+                    <img src={piechart} alt="piechart"/>
                 </div>
             </div>
         </>

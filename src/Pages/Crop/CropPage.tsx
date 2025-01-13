@@ -1,9 +1,6 @@
-import * as React from "react";
-
-export const CropPage :React.FC=()=>{
+export function CropPage(){
     return(
         <>
-
             <div id="cropsSection" className="content-section">
                 <div className="section">
                     <h2 className="text-center my-4">Manage Crops</h2>
