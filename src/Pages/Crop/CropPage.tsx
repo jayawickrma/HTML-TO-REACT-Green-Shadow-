@@ -1,4 +1,6 @@
-export  function  CropPage(){
+import * as React from "react";
+
+export const CropPage :React.FC=()=>{
     return(
         <>
 

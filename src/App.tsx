@@ -1,34 +1,43 @@
+// App.tsx
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {SideBar} from "./Components/NavBar/SideBar.tsx";
+import { SideBar } from "./Components/NavBar/SideBar.tsx";
 import { Routes, Route } from 'react-router-dom';
-import {BrowserRouter} from "react-router";
+import { BrowserRouter } from "react-router";
 import * as React from "react";
 
-
+// Import the page components
+import { DashBoard } from './Pages/DashBoard.tsx';
+import { FieldPage } from './pages/Field/FieldPage.tsx';
+import { CropPage } from './pages/Crop/CropPage.tsx';
+import { LogPage } from './pages/Log/LogPage.tsx';
+import { StaffPage } from './pages/Staff/StaffPage.tsx';
+import { VehiclePage } from './pages/Vehicle/VehiclePage.tsx';
+import { EquipmentPage } from './pages/Equipment/EquipmentPage.tsx';
 
 const App: React.FC = () => {
     return (
-        <>
-            <BrowserRouter>
-                <div className="d-flex">
-                    <div className="col-auto">
-                        <SideBar/>
-                    </div>
-                    <div>
-                        <Routes>
-                            <Route path="/dashboard" element={<h1>DashBoard</h1>}/>
-                            <Route path="/fieldManagement" element={<h1>Field Management</h1>}/>
-                            <Route path="/cropManagement" element={<h1>Crop Management</h1>}/>
-                            <Route path="/logManagement" element={<h1>Log Management</h1>}/>
-                            <Route path="/staffManagement" element={<h1>Staff Management</h1>}/>
-                            <Route path="/vehicleManagement" element={<h1>Vehicle Management</h1>}/>
-                            <Route path="/equipmentManagement" element={<h1>Equipment Management</h1>}/>
-                        </Routes>
-                    </div>
+        <BrowserRouter>
+            <div className="d-flex">
+                {/* Sidebar */}
+                <div className="col-auto">
+                    <SideBar />
                 </div>
-            </BrowserRouter>
-        </>
-    )
-}
 
-export default App
+                {/* Main content area */}
+                <div className="col">
+                    <Routes>
+                        <Route path="/dashboard" element={<DashBoard />} />
+                        <Route path="/fieldManagement" element={<FieldPage />} />
+                        <Route path="/cropManagement" element={<CropPage />} />
+                        <Route path="/logManagement" element={<LogPage />} />
+                        <Route path="/staffManagement" element={<StaffPage />} />
+                        <Route path="/vehicleManagement" element={<VehiclePage />} />
+                        <Route path="/equipmentManagement" element={<EquipmentPage />} />
+                    </Routes>
+                </div>
+            </div>
+        </BrowserRouter>
+    );
+};
+
+export default App;

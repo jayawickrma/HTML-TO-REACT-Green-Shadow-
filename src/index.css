@@ -5,7 +5,7 @@
   padding:10px !important;
 }
 .sidebar ul li:hover{
-  background-color: #96C9F4;
+  background-color: #00BFFF;
 }
 .sidebar{
   background-color: #EEEEEE;
@@ -28,6 +28,10 @@
   text-decoration-skip-box: none !important;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5); /* Add shadow */
   transition: all 0.3s ease; /* Smooth transition for hover and active */
+}
+.sidebar ul li.active {
+  background-color: #00BFFF; /* Active background color */
+  transform: scale(1.05); /* Slightly scale the button when active */
 }
 
 .sidebar ul li{
