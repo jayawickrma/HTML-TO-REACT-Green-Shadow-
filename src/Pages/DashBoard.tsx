@@ -1,71 +1,89 @@
-import piechart from  "../assets/piechart.jpg"
-export function DashBoard(){
-    return(
+import piechart from "../assets/piechart.jpg";
+
+export function DashBoard() {
+    return (
         <>
-            <div id="dashboardContent" className="content-section">
-
-                <div className="mt-4 mb-3">
-                    <h2 className="text-success text-center">Welcome to Green Shadow Farm Dashboard</h2>
-                    <br/>
+            <div id="dashboardContent" className="p-6 bg-gray-50 min-h-screen">
+                {/* Welcome Section */}
+                <div className="mt-6 mb-4 text-center">
+                    <h2 className="text-3xl font-bold text-green-600">
+                        Welcome to Green Shadow Farm Dashboard
+                    </h2>
+                    <br />
                 </div>
 
-
-                <div className="row text-center">
-
-                    <div className="col-md-3">
-                        <div className="card">
-                            <div className="card-body">
-                                <h5 className="card-title">Users</h5>
-                                <p className="display-4" id="liveUserCount">0</p>
-                            </div>
-                        </div>
+                {/* Stats and Buttons Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                    {/* Users Card */}
+                    <div className="bg-white shadow-md rounded-lg p-4">
+                        <h5 className="text-lg font-medium text-gray-700">Users</h5>
+                        <p className="text-4xl font-extrabold text-gray-800" id="liveUserCount">
+                            0
+                        </p>
                     </div>
 
-                    <div className="col-md-3">
-                        <div className="card">
-                            <div className="card-body">
-                                <h5 className="card-title">Members</h5>
-                                <p className="display-4" id="memberCount">0</p>
-                            </div>
-                        </div>
+                    {/* Members Card */}
+                    <div className="bg-white shadow-md rounded-lg p-4">
+                        <h5 className="text-lg font-medium text-gray-700">Members</h5>
+                        <p className="text-4xl font-extrabold text-gray-800" id="memberCount">
+                            0
+                        </p>
                     </div>
 
-                    <div className="col-md-6">
-                        <div className="row">
-                            <div className="col-md-6 mb-2">
-                                <button className="btn btn-success w-100" id="addCropBtn">Add Crop</button>
-                            </div>
-                            <div className="col-md-6 mb-2">
-                                <button className="btn btn-success w-100" id="addFieldBtn">Add Field</button>
-                            </div>
-                            <div className="col-md-6 mb-2">
-                                <button className="btn btn-success w-100" id="addStaffBtn">Add Staff</button>
-                            </div>
-                            <div className="col-md-6 mb-2">
-                                <button className="btn btn-success w-100" id="addUserBtn">Add User</button>
-                            </div>
-                        </div>
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <button
+                            className="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700"
+                            id="addCropBtn"
+                        >
+                            Add Crop
+                        </button>
+                        <button
+                            className="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700"
+                            id="addFieldBtn"
+                        >
+                            Add Field
+                        </button>
+                        <button
+                            className="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700"
+                            id="addStaffBtn"
+                        >
+                            Add Staff
+                        </button>
+                        <button
+                            className="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700"
+                            id="addUserBtn"
+                        >
+                            Add User
+                        </button>
                     </div>
                 </div>
-                <br/>
 
-                <div className="bg-white rounded-lg shadow-md p-4 m-4 max-w-4xl mx-auto relative"
-                     style={{top: '17px', left: '18px'}}>
-                    <div className="text-center">
-                        <h5 className="font-semibold text-gray-700">Monthly Crops of Seasons</h5>
+                {/* Chart Section */}
+                <div className="mt-8 bg-white shadow-lg rounded-lg p-6">
+                    <div className="text-center mb-4">
+                        <h5 className="text-xl font-semibold text-gray-800">
+                            Monthly Crops of Seasons
+                        </h5>
                     </div>
                     <canvas id="myChart" className="w-full h-64"></canvas>
                 </div>
 
-
-                <div className="date-time-container">
-                    <p id="date"></p>
-                    <p id="time"></p>
+                {/* Date and Time Section */}
+                <div className="mt-6 text-center text-gray-600">
+                    <p id="date" className="text-lg font-medium"></p>
+                    <p id="time" className="text-lg font-medium"></p>
                 </div>
-                <div id="piechart">
-                    <img src={piechart} alt="piechart"/>
+
+                {/* Pie Chart Section */}
+                <div className="mt-8 flex justify-center">
+                    <img
+                        src={piechart}
+                        alt="Pie Chart"
+                        className="w-64 h-64 object-cover rounded-lg shadow-md"
+                    />
                 </div>
             </div>
         </>
-    )
+    );
 }
