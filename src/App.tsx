@@ -7,12 +7,13 @@ import * as React from "react";
 
 // Import the page components
 import { DashBoard } from './Pages/DashBoard.tsx';
-import {FieldPage} from "./Pages/Field/FieldPage.tsx";
-import {CropPage} from "./Pages/Crop/CropPage.tsx";
-import {LogPage} from "./Pages/Log/LogPage.tsx";
-import {StaffPage} from "./Pages/Staff/StaffPage.tsx";
-import {VehiclePage} from "./Pages/Vehicle/VehiclePage.tsx";
-import {EquipmentPage} from "./Pages/Equipment/EquipmentPage.tsx";
+
+import StaffPage from "./Pages/Staff/StaffPage.tsx";
+import VehiclePage from "./Pages/Vehicle/VehiclePage.tsx";
+import FieldPage from "./Pages/Field/FieldPage.tsx";
+import CropPage from "./Pages/Crop/CropPage.tsx";
+import LogPage from "./Pages/Log/LogPage.tsx";
+import EquipmentPage from "./Pages/Equipment/EquipmentPage.tsx";
 
 
 const App: React.FC = () => {

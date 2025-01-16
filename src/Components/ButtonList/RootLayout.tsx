@@ -1,5 +1,6 @@
 import {Outlet} from "react-router";
-import {Sidebar} from "../NavBar/SideBar.tsx";
+import {Sidebar} from "lucide-react";
+
 
 
 export function RootLayout(){
