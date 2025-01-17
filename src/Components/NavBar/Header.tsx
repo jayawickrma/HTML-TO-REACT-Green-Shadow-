@@ -14,7 +14,7 @@ const Header: React.FC = () => {
                 boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
             }}
         >
-            <h1 style={{ margin: 0 }}>Farm Management System</h1>
+            <h2 style={{ margin: 0 }}>Welcome to the Green Shadow</h2>
             <div style={{ display: 'flex', gap: '15px' }}>
                 <button
                     style={{

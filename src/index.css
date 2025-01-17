@@ -42,7 +42,7 @@
 }
 
 .sidebar-text {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: #10375C;
   font-style: normal !important;
   font-family: "Arial";
@@ -50,9 +50,9 @@
 }
 
 .sidebar-icon{
-  width:45px !important;
-  height: 45px !important;
-  margin-top: -2% !important;
+  width:40px !important;
+  height: 40px !important;
+  margin-top: 5% !important;
 }
 
 .sidebar ul {
@@ -73,7 +73,7 @@
   background-color: #EEEEEE;
   border-radius: 10px !important;
   text-decoration-skip-box: none !important;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5); /* Add shadow */
+  box-shadow: 1px  4px 6px rgba(0, 0, 0, 0.5); /* Add shadow */
   transition: all 0.3s ease; /* Smooth transition for hover and active */
 }
 
