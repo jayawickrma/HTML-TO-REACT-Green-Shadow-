@@ -1,9 +1,11 @@
 import React from 'react';
+import {Crop} from "lucide-react";
 
 const CropsComponent: React.FC = () => (
     <div>
         <h2>Manage Crops</h2>
         <button>Add Crop</button>
+        <Crop/>
         <table>
             <thead>
             <tr>

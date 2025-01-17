@@ -1,5 +1,4 @@
-import piechart from "../assets/piechart.jpg";
-
+import pieChart from "../assets/piechart.jpg"
 export function DashBoard() {
     return (
         <>
@@ -45,7 +44,7 @@ export function DashBoard() {
                         {/* Pie Chart */}
                         <div className="bg-white shadow-md rounded-lg p-4">
                             <img
-                                src={piechart}
+                                src={pieChart}
                                 alt="Pie Chart"
                                 className="w-48 h-48 object-cover mx-auto"
                             />
