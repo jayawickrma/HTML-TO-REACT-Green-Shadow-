@@ -1,226 +1,45 @@
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Link } from 'react-router-dom';
-import dashboard from '../../assets/dashboard.png'
-import cropImage from '../../assets/icons8-crops-64.png'
-import fieldImage from '../../assets/field.png'
-import logImage from '../../assets/logs.png'
-import settingImage from '../../assets/settings.png'
-import staffImage from '../../assets/staff.png'
-import vahicleImage from '../../assets/icons8-vehicles-64.png'
-import equipmentImage from '../../assets/icons8-equipment-100.png'
+import React from 'react';
+import dashboard from '../../assets/dashboard.png';
+import cropImage from '../../assets/icons8-crops-64.png';
+import fieldImage from '../../assets/field.png';
+import logImage from '../../assets/logs.png';
+import settingImage from '../../assets/settings.png';
+import staffImage from '../../assets/staff.png';
+import vehicleImage from '../../assets/icons8-vehicles-64.png';
+import equipmentImage from '../../assets/icons8-equipment-100.png';
 
+type SidebarProps = {
+    onNavigate: (page: string) => void;
+};
 
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
+    const menuItems = [
+        { name: 'Dashboard', page: 'dashboard', icon: dashboard },
+        { name: 'Crops', page: 'crops', icon: cropImage },
+        { name: 'Fields', page: 'fields', icon: fieldImage },
+        { name: 'Logs', page: 'logs', icon: logImage },
+        { name: 'Equipment', page: 'equipment', icon: equipmentImage },
+        { name: 'Staff', page: 'staff', icon: staffImage },
+        { name: 'Vehicle', page: 'vehicle', icon: vehicleImage },
+        { name: 'Settings', page: 'settings', icon: settingImage },
+    ];
 
-export function SideBar(){
-    return(
-        <>
-            <div className="sidebar d-flex flex-column justify-content-between text-black-700  vh-100 vw-45 ">
-                <div>
-                    {/*<a className="d-flex align-items-center p-5">*/}
+    return (
+        <div className="sidebar">
+            <ul className="sidebar-menu">
+                {menuItems.map((item) => (
+                    <li
+                        key={item.page}
+                        className="sidebar-item"
+                        onClick={() => onNavigate(item.page)}
+                    >
+                        <img src={item.icon} alt={item.name} className="sidebar-icon" />
+                        <span className="sidebar-text">{item.name}</span>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
 
-                    {/*    <span className="fs-3">*/}
-                    {/*        <img*/}
-                    {/*        src={welcomeImage}*/}
-                    {/*        alt='dashboard'*/}
-                    {/*        className='image'*/}
-                    {/*        style={{width: '24px', height: '24px'}}*/}
-                    {/*    />*/}
-                    {/*    </span>*/}
-                    {/*</a>*/}
-                    <hr className="text-secondary mt-2"/>
-                    <ul className="nav nav-pills flex-column p-0 m-0">
-                        <li className="nav-item p-0 bg-gradient text-center">
-                            <i className=" me-2 fs-5">
-
-                                <Link  to="/dashboard" className="nav-link text-black fs-6">
-
-                                    <img
-                                    src={dashboard}
-                                    alt='dashboard'
-                                    className='image'
-                                    style={{width: '24px', height: '24px'}}
-                                />
-
-                                    DashBoard</Link>
-                            </i>
-                        </li>
-                        <li className="nav-item p-0 bg-gradient text-center">
-                            <i className=" me-2 fs-5">
-                                <Link to="/crop-management" className="nav-link text-black fs-6">
-
-                                    <img
-                                    src={cropImage}
-                                    alt='crop'
-                                    className='image'
-                                    style={{width: '24px', height: '24px'}}
-                                /> <br/>
-                                    Crops </Link>
-                            </i>
-
-                        </li>
-                        <li className="nav-item p-0 bg-gradient text-center">
-                            <i className=" me-2 fs-5">
-                                <Link to="/field-management" className="nav-link text-black fs-6 ">
-                                    <img
-                                        src={fieldImage}
-                                        alt='field'
-                                        className='image'
-                                        style={{width: '24px', height: '24px'}}
-                                    /> <br/>
-                                    Fields</Link>
-                            </i>
-
-                        </li>
-                        <li className="nav-item p-0 bg-gradient text-center">
-                            <i className=" me-2 fs-5">
-                                <Link to="/log-management" className="nav-link text-black fs-6">
-                                    <img
-                                        src={logImage}
-                                        alt='log'
-                                        className='image'
-                                        style={{width: '24px', height: '24px'}}
-                                    /> <br/>
-                                    Logs</Link>
-                            </i>
-                        </li>
-                        <li className="nav-item p-0 bg-gradient text-center">
-                            <i className=" me-2 fs-5">
-                                <Link to="/equipment-management" className="nav-link text-black fs-6">
-                                    <img
-                                        src={equipmentImage}
-                                        alt='log'
-                                        className='image'
-                                        style={{width: '24px', height: '24px'}}
-                                    />
-                                    Equipments</Link>
-                            </i>
-                        </li>
-                        <li className="nav-item p-0 bg-gradient text-center">
-                            <i className=" me-2 fs-5">
-                                <Link to="/staff-management" className="nav-link text-black fs-6">
-                                    <img
-                                        src={staffImage}
-                                        alt='staff'
-                                        className='image'
-                                        style={{width: '24px', height: '24px'}}
-                                    /> <br/>
-                                    Staff</Link>
-                            </i>
-                        </li>
-                        <li className="nav-item p-1 bg-gradient text-center">
-                            <i className=" me-2 fs-5">
-                                <Link to="/vehicle-management" className="nav-link text-black fs-6">
-                                    <img
-                                        src={vahicleImage}
-                                        alt='vehicle'
-                                        className='image'
-                                        style={{width: '24px', height: '24px'}}
-                                    /><br/>
-                                    Vehicle</Link>
-                            </i>
-                        </li>
-
-                        <li className="nav-item p-1 bg-gradient text-center">
-                            <i className=" me-2 fs-5">
-                                <Link to="/settings" className="nav-link text-black fs-6">
-                                    <img
-                                        src={settingImage}
-                                        alt='settings'
-                                        className='image'
-                                        style={{width: '24px', height: '24px'}}
-                                    /><br/>
-                                    Settings</Link>
-                            </i>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-
-            {/*/!* main page in the dashboard*!/*/}
-            {/*    <div>*/}
-
-
-            {/*    <div id="dashboardContent" className="content-section">*/}
-
-
-            {/*        <div className="mt-4 mb-3">*/}
-            {/*            <h2 className="text-green-500 text-center">Welcome to Green Shadow Farm Dashboard</h2>*/}
-            {/*            <br/>*/}
-            {/*        </div>*/}
-
-
-            {/*        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">*/}
-
-            {/*            <div className="card bg-white shadow-lg rounded-lg">*/}
-            {/*                <div className="card-body p-6">*/}
-            {/*                    <h5 className="card-title text-lg font-semibold">Users</h5>*/}
-            {/*                    <p className="text-4xl font-bold" id="liveUserCount">0</p>*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-
-
-            {/*            <div className="card bg-white shadow-lg rounded-lg">*/}
-            {/*                <div className="card-body p-6">*/}
-            {/*                    <h5 className="card-title text-lg font-semibold">Members</h5>*/}
-            {/*                    <p className="text-4xl font-bold" id="memberCount">0</p>*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-
-
-            {/*            <div className="col-span-1 md:col-span-2">*/}
-            {/*                <div className="grid grid-cols-2 gap-2">*/}
-            {/*                    <div className="mb-2">*/}
-            {/*                        <button*/}
-            {/*                            className="btn btn-success w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition"*/}
-            {/*                            id="addCropBtn">Add Crop*/}
-            {/*                        </button>*/}
-            {/*                    </div>*/}
-            {/*                    <div className="mb-2">*/}
-            {/*                        <button*/}
-            {/*                            className="btn btn-success w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition"*/}
-            {/*                            id="addFieldBtn">Add Field*/}
-            {/*                        </button>*/}
-            {/*                    </div>*/}
-            {/*                    <div className="mb-2">*/}
-            {/*                        <button*/}
-            {/*                            className="btn btn-success w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition"*/}
-            {/*                            id="addStaffBtn">Add Staff*/}
-            {/*                        </button>*/}
-            {/*                    </div>*/}
-            {/*                    <div className="mb-2">*/}
-            {/*                        <button*/}
-            {/*                            className="btn btn-success w-full py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition"*/}
-            {/*                            id="addUserBtn">Add User*/}
-            {/*                        </button>*/}
-            {/*                    </div>*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-
-
-            {/*        <div className="bg-white rounded-lg shadow-md p-6 m-4 max-w-4xl mx-auto relative"*/}
-            {/*             style={{top: '17px', left: '18px'}}>*/}
-            {/*            <div className="text-center mb-4">*/}
-            {/*                <h5 className="font-semibold text-gray-700">Monthly Crops of Seasons</h5>*/}
-            {/*            </div>*/}
-            {/*            <canvas id="myChart" className="w-full h-64"></canvas>*/}
-            {/*        </div>*/}
-
-
-            {/*        <div*/}
-            {/*            className="date-time-container absolute right-4 top-[43%] w-[300px] h-[160px] p-5 bg-[#9EDF9C] text-center rounded-xl shadow-lg">*/}
-            {/*            <p id="date" className="text-xl text-gray-800 mb-2">Date</p>*/}
-            {/*            <p id="time" className="text-2xl text-gray-800 font-bold">Time</p>*/}
-            {/*        </div>*/}
-
-
-            {/*        <div id="piechart" className="absolute right-4 top-[65%] w-[300px] h-[230px]">*/}
-            {/*            <img id="imagepie" className="w-[300px] h-[250px] rounded-3xl shadow-lg" src={piechart}*/}
-            {/*                 alt="image"/>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*    </div>*/}
-            </>
-            )
-            }
+export default Sidebar;

@@ -1,22 +1,67 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-.sidebar ul{
-  padding:10px !important;
-}
-.sidebar ul li:hover{
-  background-color: #00BFFF;
-}
-.sidebar{
+.sidebar {
   background-color: #EEEEEE;
   width: 190px;
   margin-top: -15px;
+  height: 100vh;
 }
+
+.sidebar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 10px; /* Add spacing for the list */
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 15px; /* Space between items */
+}
+
+.sidebar-item {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 10px; /* Gap between items */
+}
+
+.sidebar-item:hover {
+  background-color: #00bfff; /* Highlight color on hover */
+  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
+  transform: scale(1.05); /* Slight scaling effect */
+}
+
+.sidebar-item.active {
+  background-color: #00bfff; /* Active button color */
+  transform: scale(1.05); /* Slightly scale the active button */
+}
+
+.sidebar-icon {
+  width: 32px; /* Icon size */
+  height: 32px;
+  margin-right: 150px; /* Space between icon and text */
+}
+
+.sidebar-text {
+  font-size: 16px; /* Text size */
+  font-weight: 500;
+  color: #10375c; /* Dark blue text color */
+  text-align: center; /* Center align text */
+  font-family: Arial, sans-serif; /* Font family */
+}
+
+.sidebar-icon{
+  width:45px !important;
+  height: 45px !important;
+  margin-top: -2% !important;
+}
+
 .sidebar ul {
   display: flex;
   flex-direction: column; /* Stack items vertically */
   gap: 10px; /* Gap between items */
+}
 
+.sidebar ul li:hover {
+  background-color: #00bfff;
 }
 
 .sidebar ul li {
@@ -29,32 +74,7 @@
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5); /* Add shadow */
   transition: all 0.3s ease; /* Smooth transition for hover and active */
 }
-.sidebar ul li.active {
-  background-color: #00BFFF; /* Active background color */
-  transform: scale(1.05); /* Slightly scale the button when active */
-}
 
-.sidebar ul li{
-  gap: 30px !important;
-  width: 145px;
-  height: 85px !important;
-  background-color:#EEEEEE;
-  border-radius: 10px !important;
-  text-decoration-skip-box: none !important;
-}
-
-.nav-link {
-  font-size: 1.3rem;
-  color: #10375C;
-  font-style: normal !important;
-  font-family: "Arial";
-  text-align: center;
-}
-.image{
-  width:45px !important;
-  height: 45px !important;
-  margin-top: -2% !important;
-}
 
 
 :root {

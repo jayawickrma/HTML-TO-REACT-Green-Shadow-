@@ -1,44 +1,45 @@
-// App.tsx
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { SideBar } from "./Components/NavBar/SideBar.tsx";
-import { Routes, Route } from 'react-router-dom';
-import { BrowserRouter } from "react-router";
-import * as React from "react";
-
-// Import the page components
-import { DashBoard } from './Pages/DashBoard.tsx';
-
-import StaffPage from "./Pages/Staff/StaffPage.tsx";
-import VehiclePage from "./Pages/Vehicle/VehiclePage.tsx";
-import FieldPage from "./Pages/Field/FieldPage.tsx";
-import CropPage from "./Pages/Crop/CropPage.tsx";
-import LogPage from "./Pages/Log/LogPage.tsx";
+import React, {useState} from "react";
+import FieldsPage from "./Pages/Field/FieldPage.tsx";
+import LogsPage from "./Pages/Log/LogPage.tsx";
 import EquipmentPage from "./Pages/Equipment/EquipmentPage.tsx";
+import StaffPage from "./Pages/Staff/StaffPage.tsx";
+
+import Header from "./Components/NavBar/Header.tsx";
+import Sidebar from "./Components/NavBar/SideBar.tsx";
+import {DashBoard} from "./Pages/DashBoard.tsx";
+import CropComponent from "./Components/CropComponent.tsx";
 
 
 const App: React.FC = () => {
-    return (
-        <BrowserRouter>
-            <div className="d-flex">
-                {/* Sidebar */}
-                <div className="col-auto">
-                    <SideBar />
-                </div>
+    const [activePage, setActivePage] = useState<string>('dashboard');
 
-                {/* Main content area */}
-                <div className="col">
-                    <Routes>
-                        <Route path="/dashboard" element={<DashBoard />} />
-                        <Route path="/fieldManagement" element={<FieldPage />} />
-                        <Route path="/cropManagement" element={<CropPage />} />
-                        <Route path="/logManagement" element={<LogPage />} />
-                        <Route path="/staffManagement" element={<StaffPage />} />
-                        <Route path="/vehicleManagement" element={<VehiclePage />} />
-                        <Route path="/equipmentManagement" element={<EquipmentPage />} />
-                    </Routes>
-                </div>
+    const renderContent = () => {
+        switch (activePage) {
+            case 'dashboard':
+                return <DashBoard />;
+            case 'crops':
+                return <CropComponent />;
+            case 'fields':
+                return <FieldsPage />;
+            case 'logs':
+                return <LogsPage />;
+            case 'equipment':
+                return <EquipmentPage />;
+            case 'staff':
+                return <StaffPage />;
+            default:
+                return <DashBoard />;
+        }
+    };
+
+    return (
+        <div style={{ display: 'flex', height: '100vh' }}>
+            <Sidebar onNavigate={setActivePage} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Header />
+                <main style={{ padding: '20px', overflowY: 'auto' }}>{renderContent()}</main>
             </div>
-        </BrowserRouter>
+        </div>
     );
 };
 
