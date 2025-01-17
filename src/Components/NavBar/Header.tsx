@@ -4,7 +4,7 @@ const Header: React.FC = () => {
     return (
         <header
             style={{
-                width: '86vw',
+                width: '84vw',
                 background: '#007bff',
                 color: 'white',
                 padding: '10px 20px',
