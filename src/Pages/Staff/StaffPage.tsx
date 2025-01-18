@@ -52,7 +52,7 @@ const StaffManagement: React.FC = () => {
         { title: "Vehicle", dataIndex: "vehicle", key: "vehicle" },
         { title: "Field", dataIndex: "field", key: "field" },
         { title: "Actions", key: "actions", render: (_: any, record: Staff) => (
-                <Button onClick={() => handleDelete(record.id)} type="danger">Delete</Button>
+                <Button onClick={() => handleDelete(record.id)}>Delete</Button>
             )}
     ];
 
