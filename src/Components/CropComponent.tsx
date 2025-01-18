@@ -1,11 +1,11 @@
 import React from 'react';
-import {Crop} from "lucide-react";
+import Crops from "../Pages/Crop/CropPage.tsx";
 
 const CropsComponent: React.FC = () => (
     <div>
         <h2>Manage Crops</h2>
         <button>Add Crop</button>
-        <Crop/>
+        <Crops/>
         <table>
             <thead>
             <tr>

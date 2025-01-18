@@ -5,7 +5,7 @@
   background-color: #EEEEEE;
   width: 190px;
   margin-top: -15px;
-  height: 100vh;
+  height: 101.4vh;
 }
 
 .sidebar-menu {
@@ -149,15 +149,15 @@ button:focus-visible {
 }
 /* General Styling for Crops Section */
 #cropsSection {
-  width: 84%;
-  height: 100%;
+  margin-left: -55px;
+  width: 84vw;
+  height:94.5%;
   position: absolute;
   top: 0;
   right: 0;
   left: 16%;
   padding: 20px;
   background-color: #f9f9f9;
-  border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -170,7 +170,7 @@ button:focus-visible {
 }
 
 .table-bordered {
-  border: 1px solid #ddd;
+  border: 1px solid #333333;
   border-radius: 5px;
 }
 
@@ -188,14 +188,15 @@ button:focus-visible {
 }
 
 .table th {
-  background-color: #28a745;
+
+  background-color: #333333;
   color: #ffffff;
   font-weight: bold;
 }
 
 /* Hover Effects for Table Rows */
 .table tr:hover {
-  background-color: #e9f5e9;
+  background-color: #0000;
   cursor: pointer;
 }
 
@@ -245,12 +246,13 @@ button:focus-visible {
 
 /* Button Styling */
 .btn-success {
-  background-color: #28a745;
+  background-color: blue;
   color: white;
   font-weight: bold;
   padding: 10px 15px;
-  border-radius: 25px;
+  border-radius: 20px;
   transition: all 0.3s ease;
+  margin-left: 1150px;
 }
 
 .btn-success:hover {
