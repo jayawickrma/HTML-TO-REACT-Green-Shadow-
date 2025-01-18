@@ -1,4 +1,7 @@
-import pieChart from "../assets/piechart.jpg"
+
+import "../Dashboard.css"; // Import the CSS file
+import pieChart from "../assets/piechart.jpg";
+
 export function DashBoard() {
     return (
         <>
@@ -37,16 +40,16 @@ export function DashBoard() {
                     {/* Date and Pie Chart Section */}
                     <div className="flex flex-col items-center space-y-6">
                         {/* Date Section */}
-                        <div className="bg-green-200 shadow-md rounded-lg p-6 w-full text-center">
-                            <p className="text-lg font-medium text-gray-800">Friday</p>
-                            <p className="text-4xl font-extrabold text-gray-800">14:31:00</p>
+                        <div className="date-time-container">
+                            <p id="date">Friday</p>
+                            <p id="time">14:31:00</p>
                         </div>
                         {/* Pie Chart */}
-                        <div className="bg-white shadow-md rounded-lg p-4">
+                        <div id="piechart">
                             <img
                                 src={pieChart}
                                 alt="Pie Chart"
-                                className="w-48 h-48 object-cover mx-auto"
+                                id="imagepie"
                             />
                         </div>
                     </div>
@@ -54,16 +57,16 @@ export function DashBoard() {
 
                 {/* Action Buttons Section */}
                 <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <button className="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700">
+                    <button className="list-group-item">
                         Add Crop
                     </button>
-                    <button className="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700">
+                    <button className="list-group-item">
                         Add Field
                     </button>
-                    <button className="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700">
+                    <button className="list-group-item">
                         Add Staff
                     </button>
-                    <button className="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700">
+                    <button className="list-group-item">
                         Add User
                     </button>
                 </div>
