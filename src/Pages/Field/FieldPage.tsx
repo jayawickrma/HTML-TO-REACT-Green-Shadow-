@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Table, TableColumnsType } from "antd";
+import MainModal from "../../Components/Add/AddComponent.tsx";
+import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 
 interface Field {
     id: number;
@@ -23,6 +25,7 @@ const Fields: React.FC = () => {
         staff: "",
         crops: "",
     });
+    const [isModalOpen, setModalOpen] = useState(false);
     const [imagePopup, setImagePopup] = useState<string | null>(null);
 
     const columns: TableColumnsType<Field> = [
@@ -62,12 +65,11 @@ const Fields: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Field) => (
-                <button
+                <CustomButton
+                    label="Delete"
                     className="btn btn-danger"
                     onClick={() => handleDelete(record.id)}
-                >
-                    Delete
-                </button>
+                />
             ),
         },
     ];
@@ -93,8 +95,7 @@ const Fields: React.FC = () => {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = () => {
         const newField: Field = { id: fields.length + 1, ...formData };
         setFields([...fields, newField]);
         setFormData({
@@ -106,7 +107,7 @@ const Fields: React.FC = () => {
             staff: "",
             crops: "",
         });
-        (document.getElementById("fieldModalClose") as HTMLButtonElement)?.click();
+        setModalOpen(false);
     };
 
     const handleDelete = (id: number) => {
@@ -117,81 +118,58 @@ const Fields: React.FC = () => {
         <div id="fieldsSection" className="content-section">
             <h2 className="text-center my-4">Manage Fields</h2>
             <div className="d-flex justify-content-center mb-4">
-                <button
+                <CustomButton
+                    label="Add Field"
                     className="btn btn-success"
-                    data-bs-toggle="modal"
-                    data-bs-target="#fieldModal"
-                >
-                    Add Field
-                </button>
+                    onClick={() => setModalOpen(true)}
+                />
             </div>
             <Table<Field> columns={columns} dataSource={fields} />
-            <div
-                className="modal fade"
-                id="fieldModal"
-                tabIndex={-1}
-                aria-labelledby="fieldModalLabel"
-                aria-hidden="true"
+            <MainModal
+                isType="Add Field"
+                buttonType="Save Field"
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                onSubmit={handleSubmit}
             >
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="fieldModalLabel">
-                                Add Field
-                            </h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                data-bs-dismiss="modal"
-                                id="fieldModalClose"
-                                aria-label="Close"
-                            ></button>
+                <form>
+                    {[
+                        { label: "Field Name", id: "fieldName" },
+                        { label: "Location", id: "location" },
+                        { label: "Size (Acres)", id: "size" },
+                        { label: "Staff", id: "staff" },
+                        { label: "Crops", id: "crops" },
+                    ].map(({ label, id }) => (
+                        <div className="mb-3" key={id}>
+                            <label htmlFor={id} className="form-label">
+                                {label}
+                            </label>
+                            <input
+                                type={id === "size" ? "number" : "text"}
+                                id={id}
+                                value={(formData as any)[id]}
+                                className="form-control"
+                                onChange={handleInputChange}
+                                required
+                            />
                         </div>
-                        <div className="modal-body">
-                            <form onSubmit={handleSubmit}>
-                                {[
-                                    { label: "Field Name", id: "fieldName" },
-                                    { label: "Location", id: "location" },
-                                    { label: "Size (Acres)", id: "size" },
-                                    { label: "Staff", id: "staff" },
-                                    { label: "Crops", id: "crops" },
-                                ].map(({ label, id }) => (
-                                    <div className="mb-3" key={id}>
-                                        <label htmlFor={id} className="form-label">
-                                            {label}
-                                        </label>
-                                        <input
-                                            type={id === "size" ? "number" : "text"}
-                                            id={id}
-                                            value={(formData as any)[id]}
-                                            className="form-control"
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                ))}
-                                {["image1", "image2"].map((id) => (
-                                    <div className="mb-3" key={id}>
-                                        <label htmlFor={id} className="form-label">
-                                            {id === "image1" ? "Image 1" : "Image 2"}
-                                        </label>
-                                        <input
-                                            type="file"
-                                            id={id}
-                                            className="form-control"
-                                            accept="image/*"
-                                            onChange={(e) => handleFileChange(e, id as "image1" | "image2")}
-                                        />
-                                    </div>
-                                ))}
-                                <button type="submit" className="btn btn-primary">
-                                    Save Field
-                                </button>
-                            </form>
+                    ))}
+                    {["image1", "image2"].map((id) => (
+                        <div className="mb-3" key={id}>
+                            <label htmlFor={id} className="form-label">
+                                {id === "image1" ? "Image 1" : "Image 2"}
+                            </label>
+                            <input
+                                type="file"
+                                id={id}
+                                className="form-control"
+                                accept="image/*"
+                                onChange={(e) => handleFileChange(e, id as "image1" | "image2")}
+                            />
                         </div>
-                    </div>
-                </div>
-            </div>
+                    ))}
+                </form>
+            </MainModal>
             {imagePopup && (
                 <div
                     style={{
@@ -207,7 +185,8 @@ const Fields: React.FC = () => {
                     }}
                 >
                     <img src={imagePopup} alt="Popup" style={{ maxHeight: "80%", maxWidth: "80%" }} />
-                    <button
+                    <CustomButton
+                        label="Close"
                         className="btn btn-light"
                         onClick={() => setImagePopup(null)}
                         style={{
@@ -215,9 +194,7 @@ const Fields: React.FC = () => {
                             top: "10px",
                             right: "10px",
                         }}
-                    >
-                        Close
-                    </button>
+                    />
                 </div>
             )}
         </div>
