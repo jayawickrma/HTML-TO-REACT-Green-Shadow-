@@ -1,76 +1,65 @@
-
 import "../Dashboard.css"; // Import the CSS file
 import pieChart from "../assets/piechart.jpg";
 
 export function DashBoard() {
     return (
-        <>
-            <div id="dashboardContent" className="p-6 bg-gray-50 min-h-screen">
-                {/* Welcome Section */}
-                <div className="mt-6 mb-4 text-center">
-                    <h2 className="text-3xl font-bold text-green-600">
-                        Welcome to Green Shadow Farm Dashboard
-                    </h2>
+        <div id="dashboardContent">
+            {/* Welcome Section */}
+            <div className="welcome-section">
+                <h2>Welcome to Green Shadow Farm Dashboard</h2>
+            </div>
+
+            {/* Stats Section */}
+            <div className="stats-section">
+                <div className="stats-card">
+                    <h5>Users</h5>
+                    <p>120</p>
                 </div>
-
-                {/* Stats and Buttons Section */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Stats Section */}
-                    <div className="flex flex-col space-y-4">
-                        {/* Users Card */}
-                        <div className="bg-white shadow-md rounded-lg p-6 text-center">
-                            <h5 className="text-lg font-medium text-gray-700">Users</h5>
-                            <p className="text-4xl font-extrabold text-green-600">120</p>
-                        </div>
-                        {/* Members Card */}
-                        <div className="bg-white shadow-md rounded-lg p-6 text-center">
-                            <h5 className="text-lg font-medium text-gray-700">Members</h5>
-                            <p className="text-4xl font-extrabold text-green-600">50</p>
-                        </div>
-                    </div>
-
-                    {/* Chart Section */}
-                    <div className="bg-white shadow-lg rounded-lg p-6">
-                        <h5 className="text-xl font-semibold text-gray-800 text-center mb-4">
-                            Monthly Crops of Seasons
-                        </h5>
-                        <canvas id="myChart" className="w-full h-64"></canvas>
-                    </div>
-
-                    {/* Date and Pie Chart Section */}
-                    <div className="flex flex-col items-center space-y-6">
-                        {/* Date Section */}
-                        <div className="date-time-container">
-                            <p id="date">Friday</p>
-                            <p id="time">14:31:00</p>
-                        </div>
-                        {/* Pie Chart */}
-                        <div id="piechart">
-                            <img
-                                src={pieChart}
-                                alt="Pie Chart"
-                                id="imagepie"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Action Buttons Section */}
-                <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <button className="list-group-item">
-                        Add Crop
-                    </button>
-                    <button className="list-group-item">
-                        Add Field
-                    </button>
-                    <button className="list-group-item">
-                        Add Staff
-                    </button>
-                    <button className="list-group-item">
-                        Add User
-                    </button>
+                <div className="stats-card">
+                    <h5>Members</h5>
+                    <p>50</p>
                 </div>
             </div>
-        </>
+
+            {/* Chart Section */}
+            <div className="chart-section">
+                <div
+                    className="card m-1 cards col-md-8"
+                    style={{
+                        borderRadius: '8px',
+                        boxShadow: '0 1px 1px rgba(0, 0, 0, 0.1)',
+                        top: '17px',
+                        left: '18px',
+                    }}
+                >
+                    <div className="card-body">
+                        <h5 className="card-title text-center">Monthly Crops of Seasons</h5>
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+
+                <h5>Monthly Crops of Seasons</h5>
+                <canvas id="myChart"></canvas>
+            </div>
+
+            {/* Date and Pie Chart Section */}
+            <div className="info-section">
+                <div className="date-time-card">
+                    <p>Saturday</p>
+                    <p>22:14:05</p>
+                </div>
+                <div className="pie-chart-card">
+                    <img src={pieChart} alt="Pie Chart" />
+                </div>
+            </div>
+
+            {/* Buttons Section */}
+            <div className="buttons-section">
+                <button className="action-button">Add Crop</button>
+                <button className="action-button">Add Field</button>
+                <button className="action-button">Add Staff</button>
+                <button className="action-button">Add User</button>
+            </div>
+        </div>
     );
 }
