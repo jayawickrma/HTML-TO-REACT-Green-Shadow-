@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Table, TableColumnsType } from "antd";
 import MainModal from "../../Components/Add/AddComponent.tsx"; // Adjust the import path as needed
+import CustomButton from "../../Components/Button/CustomButonComponent.tsx"; // Adjust the import path as needed
 
 interface Crop {
     id: number;
@@ -25,7 +26,6 @@ const Crops: React.FC = () => {
     const [imagePopup, setImagePopup] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Define table columns
     const columns: TableColumnsType<Crop> = [
         {
             title: "CROP Code",
@@ -74,12 +74,12 @@ const Crops: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Crop) => (
-                <button
-                    className="btn btn-danger"
+                <CustomButton
+                    label="Delete"
+                    type="button"
+                    className="btn-danger"
                     onClick={() => handleDelete(record.id)}
-                >
-                    Delete
-                </button>
+                />
             ),
         },
     ];
@@ -133,12 +133,12 @@ const Crops: React.FC = () => {
 
                 {/* Crop Save Button */}
                 <div className="d-flex justify-content-center mb-4">
-                    <button
-                        className="btn btn-success"
+                    <CustomButton
+                        label="Add Crop"
+                        type="button"
+                        className="btn-success"
                         onClick={() => setIsModalOpen(true)}
-                    >
-                        Add Crop
-                    </button>
+                    />
                 </div>
 
                 {/* Crop Table */}

@@ -9,7 +9,9 @@ interface CustomButtonProps {
 
 const CustomButton: React.FC<CustomButtonProps> = ({ label, type = "button", onClick, className }) => {
     return (
-        <button type={type} className={`btn ${className}`} onClick={onClick}>
+        <button type={type} className={`btn ${className}`} onClick={onClick}
+            style={{backgroundColor:"blue"}}
+        >
             {label}
         </button>
     );
