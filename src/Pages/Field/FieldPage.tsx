@@ -123,7 +123,7 @@ const Fields: React.FC = () => {
                     className="btn btn-success"
                     onClick={() => setModalOpen(true)}
                 />
-            </div>
+            </div>  <br/><br/>
             <Table<Field> columns={columns} dataSource={fields} />
             <MainModal
                 isType="Add Field"

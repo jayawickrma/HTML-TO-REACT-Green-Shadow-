@@ -138,7 +138,8 @@ const Crops: React.FC = () => {
                         type="button"
                         className="btn-success"
                         onClick={() => setIsModalOpen(true)}
-                    />
+                    /> <br/>
+                    <br/> <br/>
                 </div>
 
                 {/* Crop Table */}

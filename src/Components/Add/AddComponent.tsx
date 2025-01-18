@@ -36,7 +36,7 @@ const MainModal: React.FC<ModalProps> = ({
                     token: {
                         colorBgElevated: "",
                         colorText: "#ffffff",
-                        colorPrimary: "",
+                        colorPrimary: "green",
                     },
                 }}
             >
@@ -69,7 +69,7 @@ const MainModal: React.FC<ModalProps> = ({
                         </Button>,
                     ]}
                     style={{
-                        background: "#1F2937",
+                        background: "white",
                         color: "#000000",
                         borderRadius: "12px",
                         overflow: "hidden",

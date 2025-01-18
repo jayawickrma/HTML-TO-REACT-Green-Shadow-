@@ -104,7 +104,7 @@ const Logs: React.FC = () => {
                     className="btn btn-success"
                     onClick={() => setModalOpen(true)}
                 />
-            </div>
+            </div> <br/> <br/>
             <Table<Log> columns={columns} dataSource={logs} />
             <MainModal
                 isType="Add Log"

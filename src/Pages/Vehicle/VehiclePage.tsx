@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Table, TableColumnsType } from "antd";
+import MainModal from "../../Components/Add/AddComponent.tsx";
+import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 
 interface Vehicle {
     id: number;
@@ -12,7 +14,7 @@ interface Vehicle {
     staffId: string;
 }
 
-const Vehicles: React.FC = () => {
+const VehicleManagement: React.FC = () => {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [formData, setFormData] = useState<Omit<Vehicle, "id">>({
         licensePlate: "",
@@ -23,6 +25,7 @@ const Vehicles: React.FC = () => {
         status: "",
         staffId: "",
     });
+    const [isModalOpen, setModalOpen] = useState(false);
 
     const columns: TableColumnsType<Vehicle> = [
         { title: "Vehicle Code", dataIndex: "id", key: "id" },
@@ -37,26 +40,21 @@ const Vehicles: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Vehicle) => (
-                <button
+                <CustomButton
+                    label="Delete"
                     className="btn btn-danger"
                     onClick={() => handleDelete(record.id)}
-                >
-                    Delete
-                </button>
+                />
             ),
         },
     ];
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [id]: value,
-        }));
+        setFormData((prev) => ({ ...prev, [id]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = () => {
         const newVehicle: Vehicle = { id: vehicles.length + 1, ...formData };
         setVehicles([...vehicles, newVehicle]);
         setFormData({
@@ -68,7 +66,7 @@ const Vehicles: React.FC = () => {
             status: "",
             staffId: "",
         });
-        (document.getElementById("vehicleModalClose") as HTMLButtonElement)?.click();
+        setModalOpen(false);
     };
 
     const handleDelete = (id: number) => {
@@ -79,71 +77,48 @@ const Vehicles: React.FC = () => {
         <div id="vehiclesSection" className="content-section">
             <h2 className="text-center my-4">Vehicle Management</h2>
             <div className="d-flex justify-content-center mb-4">
-                <button
+                <CustomButton
+                    label="Add Vehicle"
                     className="btn btn-success"
-                    data-bs-toggle="modal"
-                    data-bs-target="#vehicleModal"
-                >
-                    Add Vehicle
-                </button>
-            </div>
-            <Table<Vehicle> columns={columns} dataSource={vehicles} />
-            <div
-                className="modal fade"
-                id="vehicleModal"
-                tabIndex={-1}
-                aria-labelledby="vehicleModalLabel"
-                aria-hidden="true"
+                    onClick={() => setModalOpen(true)}
+                />
+            </div> <br/><br/>
+            <Table<Vehicle> columns={columns} dataSource={vehicles} rowKey="id" />
+            <MainModal
+                isType="Add Vehicle"
+                buttonType="Save Vehicle"
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                onSubmit={handleSubmit}
             >
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="vehicleModalLabel">
-                                Add Vehicle
-                            </h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                data-bs-dismiss="modal"
-                                id="vehicleModalClose"
-                                aria-label="Close"
-                            ></button>
+                <form>
+                    {[
+                        { label: "License Plate", id: "licensePlate" },
+                        { label: "Name", id: "vehicleName" },
+                        { label: "Category", id: "category" },
+                        { label: "Fuel Type", id: "fuelType" },
+                        { label: "Remark", id: "remark" },
+                        { label: "Status", id: "status" },
+                        { label: "Staff", id: "staffId" },
+                    ].map(({ label, id }) => (
+                        <div className="mb-3" key={id}>
+                            <label htmlFor={id} className="form-label">
+                                {label}
+                            </label>
+                            <input
+                                type="text"
+                                id={id}
+                                value={(formData as any)[id]}
+                                className="form-control"
+                                onChange={handleInputChange}
+                                required
+                            />
                         </div>
-                        <div className="modal-body">
-                            <form onSubmit={handleSubmit}>
-                                {[
-                                    { label: "License Plate", id: "licensePlate" },
-                                    { label: "Name", id: "vehicleName" },
-                                    { label: "Category", id: "category" },
-                                    { label: "Fuel Type", id: "fuelType" },
-                                    { label: "Remark", id: "remark" },
-                                    { label: "Status", id: "status" },
-                                    { label: "Staff", id: "staffId" },
-                                ].map(({ label, id }) => (
-                                    <div className="mb-3" key={id}>
-                                        <label htmlFor={id} className="form-label">
-                                            {label}
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id={id}
-                                            value={(formData as any)[id]}
-                                            className="form-control"
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                ))}
-                                <button type="submit" className="btn btn-primary">
-                                    Save Vehicle
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    ))}
+                </form>
+            </MainModal>
         </div>
     );
 };
 
-export default Vehicles;
+export default VehicleManagement;

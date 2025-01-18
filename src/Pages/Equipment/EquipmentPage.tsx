@@ -112,7 +112,7 @@ const ManageEquipment: React.FC = () => {
                         setEditingEquipment(null);
                     }}
                 />
-            </div>
+            </div> <br/> <br/>
             <Table columns={columns} dataSource={equipmentList} rowKey="id" />
             <MainModal
                 isType={editingEquipment ? "Edit Equipment" : "Add Equipment"}

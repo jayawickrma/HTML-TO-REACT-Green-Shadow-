@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Table, Button, Modal, Input, Form, Select } from "antd";
+import { Table, TableColumnsType } from "antd";
+import MainModal from "../../Components/Add/AddComponent.tsx";
+import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 
 interface Staff {
     id: number;
@@ -35,10 +37,9 @@ const StaffManagement: React.FC = () => {
         field: "",
         log: "",
     });
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [isModalOpen, setModalOpen] = useState(false);
 
-    const columns = [
+    const columns: TableColumnsType<Staff> = [
         { title: "Member Code", dataIndex: "id", key: "id" },
         { title: "First Name", dataIndex: "firstName", key: "firstName" },
         { title: "Last Name", dataIndex: "lastName", key: "lastName" },
@@ -51,28 +52,27 @@ const StaffManagement: React.FC = () => {
         { title: "Role", dataIndex: "role", key: "role" },
         { title: "Vehicle", dataIndex: "vehicle", key: "vehicle" },
         { title: "Field", dataIndex: "field", key: "field" },
-        { title: "Actions", key: "actions", render: (_: any, record: Staff) => (
-                <Button onClick={() => handleDelete(record.id)}>Delete</Button>
-            )}
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_: any, record: Staff) => (
+                <CustomButton
+                    label="Delete"
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(record.id)}
+                />
+            ),
+        },
     ];
 
-    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         setFormData((prev) => ({ ...prev, [id]: value }));
     };
 
-    const handleGenderChange = (value: string) => {
-        setFormData((prev) => ({ ...prev, gender: value }));
-    };
-
     const handleSubmit = () => {
-        if (editingId !== null) {
-            setStaffList(staffList.map(staff => staff.id === editingId ? { ...staff, ...formData } : staff));
-        } else {
-            const newStaff = { id: staffList.length + 1, ...formData };
-            setStaffList([...staffList, newStaff]);
-        }
-        setIsModalVisible(false);
+        const newStaff: Staff = { id: staffList.length + 1, ...formData };
+        setStaffList([...staffList, newStaff]);
         setFormData({
             firstName: "",
             lastName: "",
@@ -88,136 +88,63 @@ const StaffManagement: React.FC = () => {
             field: "",
             log: "",
         });
-        setEditingId(null);
+        setModalOpen(false);
     };
 
     const handleDelete = (id: number) => {
-        setStaffList(staffList.filter(staff => staff.id !== id));
-    };
-
-    const openModal = (id?: number) => {
-        if (id) {
-            const staff = staffList.find(staff => staff.id === id);
-            setFormData(staff ? staff : { ...formData });
-            setEditingId(id);
-        }
-        setIsModalVisible(true);
+        setStaffList(staffList.filter((staff) => staff.id !== id));
     };
 
     return (
         <div id="staffSection" className="content-section">
             <h2 className="text-center my-4">Staff Management</h2>
-            <div className="d-flex justify-content-between mb-4">
-                <Button type="primary" onClick={() => openModal()}>Add Staff</Button>
-            </div>
-            <Table columns={columns} dataSource={staffList} rowKey="id" />
-            <Modal
-                title={editingId !== null ? "Edit Staff" : "Add Staff"}
-                visible={isModalVisible}
-                onCancel={() => setIsModalVisible(false)}
-                onOk={handleSubmit}
-                okText={editingId !== null ? "Save Changes" : "Save Staff"}
+            <div className="d-flex justify-content-center mb-4">
+                <CustomButton
+                    label="Add Staff"
+                    className="btn btn-success"
+                    onClick={() => setModalOpen(true)}
+                />
+            </div> <br/> <br/>
+            <Table<Staff> columns={columns} dataSource={staffList} rowKey="id" />
+            <MainModal
+                isType="Add Staff"
+                buttonType="Save Staff"
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                onSubmit={handleSubmit}
             >
-                <Form layout="vertical">
-                    <Form.Item label="First Name">
-                        <Input
-                            id="firstName"
-                            value={formData.firstName}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Last Name">
-                        <Input
-                            id="lastName"
-                            value={formData.lastName}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Joined Date">
-                        <Input
-                            type="date"
-                            id="joinedDate"
-                            value={formData.joinedDate}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Date of Birth">
-                        <Input
-                            type="date"
-                            id="dateOfBirth"
-                            value={formData.dateOfBirth}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Gender">
-                        <Select
-                            id="gender"
-                            value={formData.gender}
-                            onChange={handleGenderChange}
-                        >
-                            <Select.Option value="Male">Male</Select.Option>
-                            <Select.Option value="Female">Female</Select.Option>
-                        </Select>
-                    </Form.Item>
-                    <Form.Item label="Designation">
-                        <Input
-                            id="designation"
-                            value={formData.designation}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Address">
-                        <Input.TextArea
-                            id="address"
-                            value={formData.address}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Contact No">
-                        <Input
-                            id="contactNo"
-                            value={formData.contactNo}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Email">
-                        <Input
-                            type="email"
-                            id="email"
-                            value={formData.email}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Role">
-                        <Input
-                            id="role"
-                            value={formData.role}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Vehicle">
-                        <Input
-                            id="vehicle"
-                            value={formData.vehicle}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Field">
-                        <Input
-                            id="field"
-                            value={formData.field}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Log">
-                        <Input
-                            id="log"
-                            value={formData.log}
-                            onChange={handleFormChange}
-                        />
-                    </Form.Item>
-                </Form>
-            </Modal>
+                <form>
+                    {[
+                        { label: "First Name", id: "firstName" },
+                        { label: "Last Name", id: "lastName" },
+                        { label: "Joined Date", id: "joinedDate" },
+                        { label: "Date of Birth", id: "dateOfBirth" },
+                        { label: "Gender", id: "gender" },
+                        { label: "Designation", id: "designation" },
+                        { label: "Address", id: "address" },
+                        { label: "Contact No", id: "contactNo" },
+                        { label: "Email", id: "email" },
+                        { label: "Role", id: "role" },
+                        { label: "Vehicle", id: "vehicle" },
+                        { label: "Field", id: "field" },
+                        { label: "Log", id: "log" },
+                    ].map(({ label, id }) => (
+                        <div className="mb-3" key={id}>
+                            <label htmlFor={id} className="form-label">
+                                {label}
+                            </label>
+                            <input
+                                type={id === "joinedDate" || id === "dateOfBirth" ? "date" : "text"}
+                                id={id}
+                                value={(formData as any)[id]}
+                                className="form-control"
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                    ))}
+                </form>
+            </MainModal>
         </div>
     );
 };

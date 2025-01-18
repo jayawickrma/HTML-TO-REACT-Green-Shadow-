@@ -6,9 +6,10 @@ import StaffPage from "./Pages/Staff/StaffPage.tsx";
 import Header from "./Components/NavBar/Header.tsx";
 import Sidebar from "./Components/NavBar/SideBar.tsx";
 import {DashBoard} from "./Pages/DashBoard.tsx";
-import CropComponent from "./Components/CropComponent.tsx";
-import FieldComponent from "./Components/FieldComponent.tsx";
-import {VehicleComponent} from "./Components/VehicleComponent.tsx";
+import Crops from "./Pages/Crop/CropPage.tsx";
+import Fields from "./Pages/Field/FieldPage.tsx";
+import VehiclePage from "./Pages/Vehicle/VehiclePage.tsx";
+
 
 
 const App: React.FC = () => {
@@ -19,9 +20,9 @@ const App: React.FC = () => {
             case 'dashboard':
                 return <DashBoard />;
             case 'crops':
-                return <CropComponent />;
+                return <Crops />;
             case 'fields':
-                return <FieldComponent />;
+                return <Fields />;
             case 'logs':
                 return <LogsPage />;
             case 'equipment':
@@ -29,7 +30,7 @@ const App: React.FC = () => {
             case 'staff':
                 return <StaffPage />;
             case 'vehicle':
-                return <VehicleComponent />;
+                return <VehiclePage />;
             default:
                 return <DashBoard />;
         }
