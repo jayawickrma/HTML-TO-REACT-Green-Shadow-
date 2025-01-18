@@ -37,9 +37,6 @@ export function DashBoard() {
                         <canvas id="myChart"></canvas>
                     </div>
                 </div>
-
-                <h5>Monthly Crops of Seasons</h5>
-                <canvas id="myChart"></canvas>
             </div>
 
             {/* Date and Pie Chart Section */}
@@ -48,7 +45,7 @@ export function DashBoard() {
                     <p>Saturday</p>
                     <p>22:14:05</p>
                 </div>
-                <div className="pie-chart-card">
+                <div className="piechart">
                     <img src={pieChart} alt="Pie Chart" />
                 </div>
             </div>
@@ -56,7 +53,7 @@ export function DashBoard() {
             {/* Buttons Section */}
             <div className="buttons-section">
                 <button className="action-button">Add Crop</button>
-                <button className="action-button">Add Field</button>
+                <button className="action-button">Add Field</button> <br/>
                 <button className="action-button">Add Staff</button>
                 <button className="action-button">Add User</button>
             </div>
