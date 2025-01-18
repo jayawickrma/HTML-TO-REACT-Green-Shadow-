@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import {Table, TableColumnsType} from "antd";
-
+import { Table, TableColumnsType } from "antd";
+import MainModal from "../../Components/Add/AddComponent.tsx"; // Adjust the import path as needed
 
 interface Crop {
     id: number;
@@ -23,6 +23,7 @@ const Crops: React.FC = () => {
         field: "",
     });
     const [imagePopup, setImagePopup] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Define table columns
     const columns: TableColumnsType<Crop> = [
@@ -104,8 +105,7 @@ const Crops: React.FC = () => {
         }
     };
 
-    const handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
+    const handleSubmit = () => {
         const newCrop: Crop = {
             id: crops.length + 1,
             ...formData,
@@ -119,7 +119,7 @@ const Crops: React.FC = () => {
             image: "",
             field: "",
         });
-        (document.getElementById("cropModalClose") as HTMLButtonElement)?.click();
+        setIsModalOpen(false);
     };
 
     const handleDelete = (id: number) => {
@@ -135,9 +135,7 @@ const Crops: React.FC = () => {
                 <div className="d-flex justify-content-center mb-4">
                     <button
                         className="btn btn-success"
-                        data-bs-toggle="modal"
-                        data-bs-target="#cropModal"
-                        id="cropSaveBtn"
+                        onClick={() => setIsModalOpen(true)}
                     >
                         Add Crop
                     </button>
@@ -147,115 +145,94 @@ const Crops: React.FC = () => {
                 <Table<Crop> columns={columns} dataSource={crops} />
 
                 {/* Modal for Adding Crop */}
-                <div
-                    className="modal fade"
-                    id="cropModal"
-                    tabIndex={-1}
-                    aria-labelledby="cropModalLabel"
-                    aria-hidden="true"
+                <MainModal
+                    isType="Add Crop"
+                    buttonType="Save"
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSubmit={handleSubmit}
                 >
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="cropModalLabel">
-                                    Add Crop
-                                </h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"
-                                    id="cropModalClose"
-                                ></button>
-                            </div>
-                            <div className="modal-body">
-                                <form id="cropForm" onSubmit={handleSubmit}>
-                                    <div className="mb-3">
-                                        <label htmlFor="cropName" className="form-label">
-                                            Crop Name
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="cropName"
-                                            value={formData.cropName}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="category" className="form-label">
-                                            Category
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="category"
-                                            value={formData.category}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="season" className="form-label">
-                                            Season
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="season"
-                                            value={formData.season}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="scientificName" className="form-label">
-                                            Scientific Name
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="scientificName"
-                                            value={formData.scientificName}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="image" className="form-label">
-                                            Image
-                                        </label>
-                                        <input
-                                            type="file"
-                                            className="form-control"
-                                            id="image"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="field" className="form-label">
-                                            Field
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="field"
-                                            value={formData.field}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <button type="submit" className="btn btn-primary">
-                                        Save Crop
-                                    </button>
-                                </form>
-                            </div>
+                    <form id="cropForm">
+                        <div className="mb-3">
+                            <label htmlFor="cropName" className="form-label">
+                                Crop Name
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="cropName"
+                                value={formData.cropName}
+                                onChange={handleInputChange}
+                                required
+                            />
                         </div>
-                    </div>
-                </div>
+                        <div className="mb-3">
+                            <label htmlFor="category" className="form-label">
+                                Category
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="category"
+                                value={formData.category}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="season" className="form-label">
+                                Season
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="season"
+                                value={formData.season}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="scientificName" className="form-label">
+                                Scientific Name
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="scientificName"
+                                value={formData.scientificName}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="image" className="form-label">
+                                Image
+                            </label>
+                            <input
+                                type="file"
+                                className="form-control"
+                                id="image"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="field" className="form-label">
+                                Field
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="field"
+                                value={formData.field}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                    </form>
+                </MainModal>
 
                 {/* Image Popup */}
                 {imagePopup && (
@@ -276,20 +253,20 @@ const Crops: React.FC = () => {
                             zIndex: 999,
                         }}
                     >
-            <span
-                className="close"
-                style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "20px",
-                    fontSize: "30px",
-                    color: "white",
-                    cursor: "pointer",
-                }}
-                onClick={() => setImagePopup(null)}
-            >
-              ×
-            </span>
+                        <span
+                            className="close"
+                            style={{
+                                position: "absolute",
+                                top: "10px",
+                                right: "20px",
+                                fontSize: "30px",
+                                color: "white",
+                                cursor: "pointer",
+                            }}
+                            onClick={() => setImagePopup(null)}
+                        >
+                            ×
+                        </span>
                         <img
                             id="popupImage"
                             src={imagePopup}
