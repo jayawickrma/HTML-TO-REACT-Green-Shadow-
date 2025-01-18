@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Table, Button, Modal, Form, Input, DatePicker, Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Table, TableColumnsType } from "antd";
+import MainModal from "../../Components/Add/AddComponent.tsx";
+import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 
 interface Log {
     id: number;
@@ -13,176 +14,171 @@ interface Log {
     field: string;
 }
 
-const ManageLogs: React.FC = () => {
+const Logs: React.FC = () => {
     const [logs, setLogs] = useState<Log[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [form] = Form.useForm();
-    const [editingLog, setEditingLog] = useState<Log | null>(null);
+    const [formData, setFormData] = useState<Omit<Log, "id">>({
+        logCode: "",
+        date: "",
+        details: "",
+        image: "",
+        staff: "",
+        crop: "",
+        field: "",
+    });
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [imagePopup, setImagePopup] = useState<string | null>(null);
 
-    const columns = [
-        {
-            title: "Log Code",
-            dataIndex: "logCode",
-            key: "logCode",
-        },
-        {
-            title: "Date",
-            dataIndex: "date",
-            key: "date",
-        },
-        {
-            title: "Details",
-            dataIndex: "details",
-            key: "details",
-        },
+    const columns: TableColumnsType<Log> = [
+        { title: "Log Code", dataIndex: "logCode", key: "logCode" },
+        { title: "Date", dataIndex: "date", key: "date" },
+        { title: "Details", dataIndex: "details", key: "details" },
         {
             title: "Image",
             dataIndex: "image",
             key: "image",
-            render: (text: string) => (
-                <img src={text} alt="Log Image" style={{ width: 50, height: 50 }} />
+            render: (image: string) => (
+                <img
+                    src={image}
+                    alt="Log Image"
+                    style={{ width: "50px", height: "50px", cursor: "pointer" }}
+                    onClick={() => setImagePopup(image)}
+                />
             ),
         },
-        {
-            title: "Staff",
-            dataIndex: "staff",
-            key: "staff",
-        },
-        {
-            title: "Crop",
-            dataIndex: "crop",
-            key: "crop",
-        },
-        {
-            title: "Field",
-            dataIndex: "field",
-            key: "field",
-        },
+        { title: "Staff", dataIndex: "staff", key: "staff" },
+        { title: "Crop", dataIndex: "crop", key: "crop" },
+        { title: "Field", dataIndex: "field", key: "field" },
         {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Log) => (
-                <div>
-                    <Button type="link" onClick={() => handleEdit(record)}>
-                        Edit
-                    </Button>
-                    <Button type="link" danger onClick={() => handleDelete(record.id)}>
-                        Delete
-                    </Button>
-                </div>
+                <CustomButton
+                    label="Delete"
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(record.id)}
+                />
             ),
         },
     ];
 
-    const handleEdit = (record: Log) => {
-        setEditingLog(record);
-        form.setFieldsValue(record);
-        setIsModalOpen(true);
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        setFormData((prev) => ({ ...prev, [id]: value }));
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                setFormData((prev) => ({ ...prev, image: reader.result as string }));
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    };
+
+    const handleSubmit = () => {
+        const newLog: Log = { id: logs.length + 1, ...formData };
+        setLogs([...logs, newLog]);
+        setFormData({
+            logCode: "",
+            date: "",
+            details: "",
+            image: "",
+            staff: "",
+            crop: "",
+            field: "",
+        });
+        setModalOpen(false);
     };
 
     const handleDelete = (id: number) => {
         setLogs(logs.filter((log) => log.id !== id));
     };
 
-    const handleSubmit = () => {
-        form
-            .validateFields()
-            .then((values) => {
-                if (editingLog) {
-                    setLogs(
-                        logs.map((log) =>
-                            log.id === editingLog.id ? { ...log, ...values } : log
-                        )
-                    );
-                } else {
-                    setLogs([
-                        ...logs,
-                        { id: logs.length + 1, ...values },
-                    ]);
-                }
-                setIsModalOpen(false);
-                form.resetFields();
-                setEditingLog(null);
-            })
-            .catch((info) => {
-                console.log("Validate Failed:", info);
-            });
-    };
-
     return (
-        <div>
-            <h2 className="text-center my-4">Log Management</h2>
-            <Button
-                type="primary"
-                onClick={() => {
-                    setIsModalOpen(true);
-                    form.resetFields();
-                    setEditingLog(null);
-                }}
-                className="mb-4"
+        <div id="logsSection" className="content-section">
+            <h2 className="text-center my-4">Manage Logs</h2>
+            <div className="d-flex justify-content-center mb-4">
+                <CustomButton
+                    label="Add Log"
+                    className="btn btn-success"
+                    onClick={() => setModalOpen(true)}
+                />
+            </div>
+            <Table<Log> columns={columns} dataSource={logs} />
+            <MainModal
+                isType="Add Log"
+                buttonType="Save Log"
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                onSubmit={handleSubmit}
             >
-                Add Log
-            </Button>
-            <Table columns={columns} dataSource={logs} rowKey="id" />
-
-            <Modal
-                title={editingLog ? "Edit Log" : "Add Log"}
-                open={isModalOpen}
-                onOk={handleSubmit}
-                onCancel={() => setIsModalOpen(false)}
-            >
-                <Form form={form} layout="vertical">
-                    <Form.Item
-                        label="Log Code"
-                        name="logCode"
-                        rules={[{ required: true, message: "Please enter the log code" }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        label="Date"
-                        name="date"
-                        rules={[{ required: true, message: "Please select a date" }]}
-                    >
-                        <DatePicker style={{ width: "100%" }} />
-                    </Form.Item>
-                    <Form.Item
-                        label="Details"
-                        name="details"
-                        rules={[{ required: true, message: "Please enter the details" }]}
-                    >
-                        <Input.TextArea />
-                    </Form.Item>
-                    <Form.Item label="Image" name="image">
-                        <Upload listType="picture" beforeUpload={() => false}>
-                            <Button icon={<UploadOutlined />}>Upload Image</Button>
-                        </Upload>
-                    </Form.Item>
-                    <Form.Item
-                        label="Staff"
-                        name="staff"
-                        rules={[{ required: true, message: "Please enter the staff name" }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        label="Crop"
-                        name="crop"
-                        rules={[{ required: true, message: "Please enter the crop" }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        label="Field"
-                        name="field"
-                        rules={[{ required: true, message: "Please enter the field" }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                </Form>
-            </Modal>
+                <form>
+                    {[
+                        { label: "Log Code", id: "logCode" },
+                        { label: "Date", id: "date" },
+                        { label: "Details", id: "details" },
+                        { label: "Staff", id: "staff" },
+                        { label: "Crop", id: "crop" },
+                        { label: "Field", id: "field" },
+                    ].map(({ label, id }) => (
+                        <div className="mb-3" key={id}>
+                            <label htmlFor={id} className="form-label">
+                                {label}
+                            </label>
+                            <input
+                                type="text"
+                                id={id}
+                                value={(formData as any)[id]}
+                                className="form-control"
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                    ))}
+                    <div className="mb-3">
+                        <label htmlFor="image" className="form-label">
+                            Upload Image
+                        </label>
+                        <input
+                            type="file"
+                            id="image"
+                            className="form-control"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
+                    </div>
+                </form>
+            </MainModal>
+            {imagePopup && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: "rgba(0, 0, 0, 0.8)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
+                >
+                    <img src={imagePopup} alt="Popup" style={{ maxHeight: "80%", maxWidth: "80%" }} />
+                    <CustomButton
+                        label="Close"
+                        className="btn btn-light"
+                        onClick={() => setImagePopup(null)}
+                        style={{
+                            position: "absolute",
+                            top: "10px",
+                            right: "10px",
+                        }}
+                    />
+                </div>
+            )}
         </div>
     );
 };
 
-export default ManageLogs;
+export default Logs;
