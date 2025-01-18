@@ -1,5 +1,4 @@
 import "../Dashboard.css"; // Import the CSS file
-import pieChart from "../assets/piechart.jpg";
 
 export function DashBoard() {
     return (
@@ -40,20 +39,21 @@ export function DashBoard() {
             </div>
 
             {/* Date and Pie Chart Section */}
-            <div className="info-section">
+            <div className="info-section" style={{ display: "flex", justifyContent: "space-around", marginTop: "20px" }}>
                 <div className="date-time-card">
                     <p>Saturday</p>
                     <p>22:14:05</p>
                 </div>
-                <div className="piechart">
-                    <img src={pieChart} alt="Pie Chart" />
+                <div className="pie-chart-card">
+                    {/*<img src={pieChart} alt="Pie Chart" style={{ width: "100%", height: "auto" }} />*/}
                 </div>
             </div>
+
 
             {/* Buttons Section */}
             <div className="buttons-section">
                 <button className="action-button">Add Crop</button>
-                <button className="action-button">Add Field</button> <br/>
+                <button className="action-button">Add Field</button>
                 <button className="action-button">Add Staff</button>
                 <button className="action-button">Add User</button>
             </div>
