@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import FieldsPage from "./Pages/Field/FieldPage.tsx";
 import LogsPage from "./Pages/Log/LogPage.tsx";
 import EquipmentPage from "./Pages/Equipment/EquipmentPage.tsx";
 import StaffPage from "./Pages/Staff/StaffPage.tsx";
@@ -8,6 +7,7 @@ import Header from "./Components/NavBar/Header.tsx";
 import Sidebar from "./Components/NavBar/SideBar.tsx";
 import {DashBoard} from "./Pages/DashBoard.tsx";
 import CropComponent from "./Components/CropComponent.tsx";
+import FieldComponent from "./Components/FieldComponent.tsx";
 
 
 const App: React.FC = () => {
@@ -20,7 +20,7 @@ const App: React.FC = () => {
             case 'crops':
                 return <CropComponent />;
             case 'fields':
-                return <FieldsPage />;
+                return <FieldComponent />;
             case 'logs':
                 return <LogsPage />;
             case 'equipment':

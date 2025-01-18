@@ -13,7 +13,7 @@ const Table = <T extends object>({ columns, dataSource }: TableProps<T>) => {
 
     // Calculate data for the current page
     const currentPageData = dataSource.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-rea
+
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };

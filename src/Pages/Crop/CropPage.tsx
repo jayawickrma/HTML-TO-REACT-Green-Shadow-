@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import {Table, TableColumnsType} from "antd";
+
 
 interface Crop {
     id: number;
@@ -20,12 +22,68 @@ const Crops: React.FC = () => {
         image: "",
         field: "",
     });
-
     const [imagePopup, setImagePopup] = useState<string | null>(null);
 
-    const handleInputChange = (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    // Define table columns
+    const columns: TableColumnsType<Crop> = [
+        {
+            title: "CROP Code",
+            dataIndex: "id",
+            key: "id",
+        },
+        {
+            title: "Crop Name",
+            dataIndex: "cropName",
+            key: "cropName",
+        },
+        {
+            title: "Category",
+            dataIndex: "category",
+            key: "category",
+        },
+        {
+            title: "Season",
+            dataIndex: "season",
+            key: "season",
+        },
+        {
+            title: "Scientific Name",
+            dataIndex: "scientificName",
+            key: "scientificName",
+        },
+        {
+            title: "Image",
+            dataIndex: "image",
+            key: "image",
+            render: (image: string, record: Crop) => (
+                <img
+                    src={image}
+                    alt={record.cropName}
+                    style={{ width: "50px", height: "50px", cursor: "pointer" }}
+                    onClick={() => setImagePopup(image)}
+                />
+            ),
+        },
+        {
+            title: "Field",
+            dataIndex: "field",
+            key: "field",
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_: any, record: Crop) => (
+                <button
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(record.id)}
+                >
+                    Delete
+                </button>
+            ),
+        },
+    ];
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = event.target;
         setFormData((prev) => ({
             ...prev,
@@ -33,9 +91,7 @@ const Crops: React.FC = () => {
         }));
     };
 
-    const handleImageChange = (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             const fileReader = new FileReader();
             fileReader.onload = () => {
@@ -88,48 +144,7 @@ const Crops: React.FC = () => {
                 </div>
 
                 {/* Crop Table */}
-                <table className="table table-bordered" id="cropTable">
-                    <thead className="table-success">
-                    <tr>
-                        <th>CROP Code</th>
-                        <th>Crop Name</th>
-                        <th>Category</th>
-                        <th>Season</th>
-                        <th>Scientific Name</th>
-                        <th>Image</th>
-                        <th>Field</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {crops.map((crop) => (
-                        <tr key={crop.id}>
-                            <td>{crop.id}</td>
-                            <td>{crop.cropName}</td>
-                            <td>{crop.category}</td>
-                            <td>{crop.season}</td>
-                            <td>{crop.scientificName}</td>
-                            <td>
-                                <img
-                                    src={crop.image}
-                                    alt={crop.cropName}
-                                    style={{ width: "50px", height: "50px", cursor: "pointer" }}
-                                    onClick={() => setImagePopup(crop.image)}
-                                />
-                            </td>
-                            <td>{crop.field}</td>
-                            <td>
-                                <button
-                                    className="btn btn-danger"
-                                    onClick={() => handleDelete(crop.id)}
-                                >
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
+                <Table<Crop> columns={columns} dataSource={crops} />
 
                 {/* Modal for Adding Crop */}
                 <div

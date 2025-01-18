@@ -2,6 +2,7 @@ import React from 'react';
 
 const LogsComponent: React.FC = () => (
     <div>
+
         <h2>Log Management</h2>
         <button>Add Log</button>
         <table>
