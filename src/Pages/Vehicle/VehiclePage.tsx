@@ -1,226 +1,149 @@
 import React, { useState } from "react";
+import { Table, TableColumnsType } from "antd";
 
 interface Vehicle {
     id: number;
     licensePlate: string;
-    name: string;
+    vehicleName: string;
     category: string;
     fuelType: string;
     remark: string;
     status: string;
-    staff: string;
+    staffId: string;
 }
 
-const VehiclePage: React.FC = () => {
+const Vehicles: React.FC = () => {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-    const [formData, setFormData] = useState<Vehicle>({
-        id: 0,
+    const [formData, setFormData] = useState<Omit<Vehicle, "id">>({
         licensePlate: "",
-        name: "",
+        vehicleName: "",
         category: "",
         fuelType: "",
         remark: "",
         status: "",
-        staff: "",
+        staffId: "",
     });
-    const [showModal, setShowModal] = useState(false);
 
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
+    const columns: TableColumnsType<Vehicle> = [
+        { title: "Vehicle Code", dataIndex: "id", key: "id" },
+        { title: "License Plate", dataIndex: "licensePlate", key: "licensePlate" },
+        { title: "Name", dataIndex: "vehicleName", key: "vehicleName" },
+        { title: "Category", dataIndex: "category", key: "category" },
+        { title: "Fuel Type", dataIndex: "fuelType", key: "fuelType" },
+        { title: "Remark", dataIndex: "remark", key: "remark" },
+        { title: "Status", dataIndex: "status", key: "status" },
+        { title: "Staff", dataIndex: "staffId", key: "staffId" },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_: any, record: Vehicle) => (
+                <button
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(record.id)}
+                >
+                    Delete
+                </button>
+            ),
+        },
+    ];
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
+        setFormData((prev) => ({
+            ...prev,
             [id]: value,
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (formData.licensePlate && formData.name) {
-            setVehicles((prevVehicles) => [
-                ...prevVehicles,
-                { ...formData, id: Date.now() },
-            ]);
-            setFormData({
-                id: 0,
-                licensePlate: "",
-                name: "",
-                category: "",
-                fuelType: "",
-                remark: "",
-                status: "",
-                staff: "",
-            });
-            setShowModal(false);
-        }
+        const newVehicle: Vehicle = { id: vehicles.length + 1, ...formData };
+        setVehicles([...vehicles, newVehicle]);
+        setFormData({
+            licensePlate: "",
+            vehicleName: "",
+            category: "",
+            fuelType: "",
+            remark: "",
+            status: "",
+            staffId: "",
+        });
+        (document.getElementById("vehicleModalClose") as HTMLButtonElement)?.click();
     };
 
     const handleDelete = (id: number) => {
-        setVehicles((prevVehicles) => prevVehicles.filter((v) => v.id !== id));
+        setVehicles(vehicles.filter((vehicle) => vehicle.id !== id));
     };
 
     return (
         <div id="vehiclesSection" className="content-section">
             <h2 className="text-center my-4">Vehicle Management</h2>
-
-            {/* Add Vehicle Button */}
             <div className="d-flex justify-content-center mb-4">
-                <button className="btn btn-success" onClick={() => setShowModal(true)}>
+                <button
+                    className="btn btn-success"
+                    data-bs-toggle="modal"
+                    data-bs-target="#vehicleModal"
+                >
                     Add Vehicle
                 </button>
             </div>
-
-            {/* Vehicle Table */}
-            <table className="table table-bordered" id="vehicleTable">
-                <thead className="table-success">
-                <tr>
-                    <th>Vehicle Code</th>
-                    <th>License Plate</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Fuel Type</th>
-                    <th>Remark</th>
-                    <th>Status</th>
-                    <th>Staff</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {vehicles.map((vehicle) => (
-                    <tr key={vehicle.id}>
-                        <td>{vehicle.id}</td>
-                        <td>{vehicle.licensePlate}</td>
-                        <td>{vehicle.name}</td>
-                        <td>{vehicle.category}</td>
-                        <td>{vehicle.fuelType}</td>
-                        <td>{vehicle.remark}</td>
-                        <td>{vehicle.status}</td>
-                        <td>{vehicle.staff}</td>
-                        <td>
+            <Table<Vehicle> columns={columns} dataSource={vehicles} />
+            <div
+                className="modal fade"
+                id="vehicleModal"
+                tabIndex={-1}
+                aria-labelledby="vehicleModalLabel"
+                aria-hidden="true"
+            >
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="vehicleModalLabel">
+                                Add Vehicle
+                            </h5>
                             <button
-                                className="btn btn-danger"
-                                onClick={() => handleDelete(vehicle.id)}
-                            >
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-
-            {/* Popup Modal */}
-            {showModal && (
-                <div className="modal show d-block" id="vehicleModal">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Add Vehicle</h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => setShowModal(false)}
-                                ></button>
-                            </div>
-                            <div className="modal-body">
-                                <form id="vehicleForm" onSubmit={handleSubmit}>
-                                    <div className="mb-3">
-                                        <label htmlFor="licensePlate" className="form-label">
-                                            License Plate
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                id="vehicleModalClose"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div className="modal-body">
+                            <form onSubmit={handleSubmit}>
+                                {[
+                                    { label: "License Plate", id: "licensePlate" },
+                                    { label: "Name", id: "vehicleName" },
+                                    { label: "Category", id: "category" },
+                                    { label: "Fuel Type", id: "fuelType" },
+                                    { label: "Remark", id: "remark" },
+                                    { label: "Status", id: "status" },
+                                    { label: "Staff", id: "staffId" },
+                                ].map(({ label, id }) => (
+                                    <div className="mb-3" key={id}>
+                                        <label htmlFor={id} className="form-label">
+                                            {label}
                                         </label>
                                         <input
                                             type="text"
+                                            id={id}
+                                            value={(formData as any)[id]}
                                             className="form-control"
-                                            id="licensePlate"
-                                            value={formData.licensePlate}
                                             onChange={handleInputChange}
                                             required
                                         />
                                     </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="name" className="form-label">
-                                            Name
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="name"
-                                            value={formData.name}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="category" className="form-label">
-                                            Category
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="category"
-                                            value={formData.category}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="fuelType" className="form-label">
-                                            Fuel Type
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="fuelType"
-                                            value={formData.fuelType}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="remark" className="form-label">
-                                            Remark
-                                        </label>
-                                        <textarea
-                                            className="form-control"
-                                            id="remark"
-                                            value={formData.remark}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="status" className="form-label">
-                                            Status
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="status"
-                                            value={formData.status}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="staff" className="form-label">
-                                            Staff
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="staff"
-                                            value={formData.staff}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    <button type="submit" className="btn btn-primary">
-                                        Save Vehicle
-                                    </button>
-                                </form>
-                            </div>
+                                ))}
+                                <button type="submit" className="btn btn-primary">
+                                    Save Vehicle
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 };
 
-export default VehiclePage;
+export default Vehicles;

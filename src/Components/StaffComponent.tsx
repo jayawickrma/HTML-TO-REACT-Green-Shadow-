@@ -1,9 +1,11 @@
 import React from 'react';
+import StaffManagement from "../Pages/Staff/StaffPage.tsx";
 
 const StaffComponent: React.FC = () => (
     <div>
         <h2>Staff Management</h2>
         <button>Add Staff</button>
+        <StaffManagement/>
         <table>
             <thead>
             <tr>
