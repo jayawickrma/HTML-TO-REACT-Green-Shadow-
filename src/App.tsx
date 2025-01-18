@@ -8,6 +8,7 @@ import Sidebar from "./Components/NavBar/SideBar.tsx";
 import {DashBoard} from "./Pages/DashBoard.tsx";
 import CropComponent from "./Components/CropComponent.tsx";
 import FieldComponent from "./Components/FieldComponent.tsx";
+import {VehicleComponent} from "./Components/VehicleComponent.tsx";
 
 
 const App: React.FC = () => {
@@ -27,6 +28,8 @@ const App: React.FC = () => {
                 return <EquipmentPage />;
             case 'staff':
                 return <StaffPage />;
+            case 'vehicle':
+                return <VehicleComponent />;
             default:
                 return <DashBoard />;
         }
