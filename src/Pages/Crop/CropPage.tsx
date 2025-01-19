@@ -291,20 +291,20 @@ const Crops: React.FC = () => {
                             zIndex: 999,
                         }}
                     >
-                        <span
-                            className="close"
-                            style={{
-                                position: "absolute",
-                                top: "10px",
-                                right: "20px",
-                                fontSize: "30px",
-                                color: "white",
-                                cursor: "pointer",
-                            }}
-                            onClick={() => setImagePopup(null)}
-                        >
-                            ×
-                        </span>
+            <span
+                className="close"
+                style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "20px",
+                    fontSize: "30px",
+                    color: "white",
+                    cursor: "pointer",
+                }}
+                onClick={() => setImagePopup(null)}
+            >
+              ×
+            </span>
                         <img
                             id="popupImage"
                             src={imagePopup}
