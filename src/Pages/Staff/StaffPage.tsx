@@ -38,6 +38,7 @@ const StaffManagement: React.FC = () => {
         log: "",
     });
     const [isModalOpen, setModalOpen] = useState(false);
+    const [currentStaffId, setCurrentStaffId] = useState<number | null>(null); // Track the staff being edited
 
     const columns: TableColumnsType<Staff> = [
         { title: "Member Code", dataIndex: "id", key: "id" },
@@ -56,11 +57,18 @@ const StaffManagement: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Staff) => (
-                <CustomButton
-                    label="Delete"
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(record.id)}
-                />
+                <div>
+                    <CustomButton
+                        label="Edit"
+                        className="btn btn-primary"
+                        onClick={() => handleEdit(record)}
+                    />
+                    <CustomButton
+                        label="Delete"
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(record.id)}
+                    />
+                </div>
             ),
         },
     ];
@@ -71,8 +79,20 @@ const StaffManagement: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        const newStaff: Staff = { id: staffList.length + 1, ...formData };
-        setStaffList([...staffList, newStaff]);
+        if (currentStaffId !== null) {
+            // Update existing staff
+            setStaffList((prevStaffList) =>
+                prevStaffList.map((staff) =>
+                    staff.id === currentStaffId ? { ...staff, ...formData, id: currentStaffId } : staff
+                )
+            );
+        } else {
+            // Add new staff
+            const newStaff: Staff = { id: staffList.length + 1, ...formData };
+            setStaffList([...staffList, newStaff]);
+        }
+
+        // Reset form and modal state
         setFormData({
             firstName: "",
             lastName: "",
@@ -88,7 +108,14 @@ const StaffManagement: React.FC = () => {
             field: "",
             log: "",
         });
+        setCurrentStaffId(null);
         setModalOpen(false);
+    };
+
+    const handleEdit = (staff: Staff) => {
+        setFormData(staff); // Prefill form with staff data
+        setCurrentStaffId(staff.id); // Set the staff being edited
+        setModalOpen(true);
     };
 
     const handleDelete = (id: number) => {
@@ -102,13 +129,31 @@ const StaffManagement: React.FC = () => {
                 <CustomButton
                     label="Add Staff"
                     className="btn btn-success"
-                    onClick={() => setModalOpen(true)}
+                    onClick={() => {
+                        setFormData({
+                            firstName: "",
+                            lastName: "",
+                            joinedDate: "",
+                            dateOfBirth: "",
+                            gender: "",
+                            designation: "",
+                            address: "",
+                            contactNo: "",
+                            email: "",
+                            role: "",
+                            vehicle: "",
+                            field: "",
+                            log: "",
+                        });
+                        setCurrentStaffId(null); // Clear edit state
+                        setModalOpen(true);
+                    }}
                 />
-            </div> <br/> <br/>
+            </div>
             <Table<Staff> columns={columns} dataSource={staffList} rowKey="id" />
             <MainModal
-                isType="Add Staff"
-                buttonType="Save Staff"
+                isType={currentStaffId ? "Edit Staff" : "Add Staff"}
+                buttonType={currentStaffId ? "Update Staff" : "Save Staff"}
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
                 onSubmit={handleSubmit}

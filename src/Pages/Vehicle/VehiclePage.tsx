@@ -26,6 +26,7 @@ const VehicleManagement: React.FC = () => {
         staffId: "",
     });
     const [isModalOpen, setModalOpen] = useState(false);
+    const [currentVehicleId, setCurrentVehicleId] = useState<number | null>(null); // For tracking the vehicle being edited
 
     const columns: TableColumnsType<Vehicle> = [
         { title: "Vehicle Code", dataIndex: "id", key: "id" },
@@ -40,11 +41,18 @@ const VehicleManagement: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Vehicle) => (
-                <CustomButton
-                    label="Delete"
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(record.id)}
-                />
+                <div>
+                    <CustomButton
+                        label="Edit"
+                        className="btn btn-primary"
+                        onClick={() => handleEdit(record)}
+                    />
+                    <CustomButton
+                        label="Delete"
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(record.id)}
+                    />
+                </div>
             ),
         },
     ];
@@ -55,8 +63,20 @@ const VehicleManagement: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        const newVehicle: Vehicle = { id: vehicles.length + 1, ...formData };
-        setVehicles([...vehicles, newVehicle]);
+        if (currentVehicleId !== null) {
+            // Update existing vehicle
+            setVehicles((prevVehicles) =>
+                prevVehicles.map((vehicle) =>
+                    vehicle.id === currentVehicleId ? { ...vehicle, ...formData, id: currentVehicleId } : vehicle
+                )
+            );
+        } else {
+            // Add new vehicle
+            const newVehicle: Vehicle = { id: vehicles.length + 1, ...formData };
+            setVehicles([...vehicles, newVehicle]);
+        }
+
+        // Reset form and modal state
         setFormData({
             licensePlate: "",
             vehicleName: "",
@@ -66,7 +86,14 @@ const VehicleManagement: React.FC = () => {
             status: "",
             staffId: "",
         });
+        setCurrentVehicleId(null);
         setModalOpen(false);
+    };
+
+    const handleEdit = (vehicle: Vehicle) => {
+        setFormData(vehicle); // Prefill form with vehicle data
+        setCurrentVehicleId(vehicle.id); // Set the vehicle being edited
+        setModalOpen(true);
     };
 
     const handleDelete = (id: number) => {
@@ -80,13 +107,27 @@ const VehicleManagement: React.FC = () => {
                 <CustomButton
                     label="Add Vehicle"
                     className="btn btn-success"
-                    onClick={() => setModalOpen(true)}
+                    onClick={() => {
+                        setFormData({
+                            licensePlate: "",
+                            vehicleName: "",
+                            category: "",
+                            fuelType: "",
+                            remark: "",
+                            status: "",
+                            staffId: "",
+                        });
+                        setCurrentVehicleId(null); // Clear edit state
+                        setModalOpen(true);
+                    }}
                 />
-            </div> <br/><br/>
+            </div>
+            <br />
+            <br />
             <Table<Vehicle> columns={columns} dataSource={vehicles} rowKey="id" />
             <MainModal
-                isType="Add Vehicle"
-                buttonType="Save Vehicle"
+                isType={currentVehicleId ? "Edit Vehicle" : "Add Vehicle"}
+                buttonType={currentVehicleId ? "Update Vehicle" : "Save Vehicle"}
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
                 onSubmit={handleSubmit}
