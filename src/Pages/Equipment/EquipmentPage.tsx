@@ -1,50 +1,49 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Table } from "antd";
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
-
-interface Equipment {
-    id: number;
-    name: string;
-    type: string;
-    status: string;
-    availableCount: number;
-    field: string;
-}
+import { RootState } from "../../store/Store.ts"; // Adjust the path to your store file
+import { addEquipment, updateEquipment, deleteEquipment } from "../../slices/EquipmentSlice";
+import EquipmentModel from "../../Model/EquipmentModel";
 
 const ManageEquipment: React.FC = () => {
-    const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
-    const [formData, setFormData] = useState<Omit<Equipment, "id">>({
-        name: "",
-        type: "",
-        status: "Available",
-        availableCount: 0,
-        field: "",
+    const equipmentList = useSelector((state: RootState) => state.equipments); // Access equipment state
+    const dispatch = useDispatch();
+
+    const [formData, setFormData] = useState<Partial<EquipmentModel>>({
+        equipmentCode: "",
+        equipmentName: "",
+        equipmentType: "",
+        equipmentStatus: "Available",
+        availableCount: "",
+        fieldList: "",
     });
+
     const [isModalOpen, setModalOpen] = useState(false);
-    const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
+    const [editingEquipment, setEditingEquipment] = useState<EquipmentModel | null>(null);
 
     const columns = [
-        { title: "Equipment ID", dataIndex: "id", key: "id" },
-        { title: "Equipment Name", dataIndex: "name", key: "name" },
-        { title: "Type", dataIndex: "type", key: "type" },
-        { title: "Status", dataIndex: "status", key: "status" },
+        { title: "Equipment Code", dataIndex: "equipmentCode", key: "equipmentCode" },
+        { title: "Equipment Name", dataIndex: "equipmentName", key: "equipmentName" },
+        { title: "Type", dataIndex: "equipmentType", key: "equipmentType" },
+        { title: "Status", dataIndex: "equipmentStatus", key: "equipmentStatus" },
         { title: "Available Count", dataIndex: "availableCount", key: "availableCount" },
-        { title: "Field", dataIndex: "field", key: "field" },
+        { title: "Field List", dataIndex: "fieldList", key: "fieldList" },
         {
             title: "Actions",
             key: "actions",
-            render: (_: any, record: Equipment) => (
-                <div>
+            render: (_: any, record: EquipmentModel) => (
+                <div style={{ display: "flex", gap: "8px" }}>
                     <CustomButton
                         label="Edit"
-                        onClick={() => handleEdit(record)}
                         className="btn btn-primary btn-sm"
+                        onClick={() => handleEdit(record)}
                     />
                     <CustomButton
                         label="Delete"
-                        onClick={() => handleDelete(record.id)}
                         className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(record.equipmentCode)}
                     />
                 </div>
             ),
@@ -55,41 +54,47 @@ const ManageEquipment: React.FC = () => {
         const { id, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [id]: id === "availableCount" ? Number(value) : value,
+            [id]: value,
         }));
     };
 
-    const handleEdit = (record: Equipment) => {
+    const handleEdit = (record: EquipmentModel) => {
         setEditingEquipment(record);
         setFormData(record);
         setModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        setEquipmentList(equipmentList.filter((equipment) => equipment.id !== id));
+    const handleDelete = (equipmentCode: string) => {
+        dispatch(deleteEquipment({ equipment_id: equipmentCode }));
     };
 
     const handleSubmit = () => {
         if (editingEquipment) {
-            setEquipmentList(
-                equipmentList.map((equipment) =>
-                    equipment.id === editingEquipment.id ? { ...equipment, ...formData } : equipment
-                )
-            );
+            dispatch(updateEquipment({ ...formData, equipment_id: editingEquipment.equipmentCode }));
         } else {
-            setEquipmentList([
-                ...equipmentList,
-                { id: equipmentList.length + 1, ...formData },
-            ]);
+            const newEquipment = new EquipmentModel(
+                `EQ${equipmentList.length + 1}`,
+                formData.equipmentName || "",
+                formData.equipmentType || "",
+                formData.equipmentStatus || "Available",
+                formData.availableCount || "",
+                formData.fieldList || ""
+            );
+            dispatch(addEquipment(newEquipment));
         }
-        setModalOpen(false);
+        resetForm();
+    };
+
+    const resetForm = () => {
         setFormData({
-            name: "",
-            type: "",
-            status: "Available",
-            availableCount: 0,
-            field: "",
+            equipmentCode: "",
+            equipmentName: "",
+            equipmentType: "",
+            equipmentStatus: "Available",
+            availableCount: "",
+            fieldList: "",
         });
+        setModalOpen(false);
         setEditingEquipment(null);
     };
 
@@ -101,31 +106,24 @@ const ManageEquipment: React.FC = () => {
                     label="Add New Equipment"
                     className="btn btn-success"
                     onClick={() => {
+                        resetForm();
                         setModalOpen(true);
-                        setFormData({
-                            name: "",
-                            type: "",
-                            status: "Available",
-                            availableCount: 0,
-                            field: "",
-                        });
-                        setEditingEquipment(null);
                     }}
                 />
             </div>
-            <Table columns={columns} dataSource={equipmentList} rowKey="id" />
+            <Table columns={columns} dataSource={equipmentList} rowKey="equipmentCode" />
             <MainModal
                 isType={editingEquipment ? "Edit Equipment" : "Add Equipment"}
                 buttonType={editingEquipment ? "Save Changes" : "Add Equipment"}
                 isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)}
+                onClose={resetForm}
                 onSubmit={handleSubmit}
             >
                 <form>
-                    {[{ label: "Equipment Name", id: "name", type: "text" },
-                        { label: "Equipment Type", id: "type", type: "text" },
-                        { label: "Available Count", id: "availableCount", type: "number" },
-                        { label: "Field", id: "field", type: "text" }].map(({ label, id, type }) => (
+                    {[{ label: "Equipment Name", id: "equipmentName", type: "text" },
+                        { label: "Equipment Type", id: "equipmentType", type: "text" },
+                        { label: "Available Count", id: "availableCount", type: "text" },
+                        { label: "Field List", id: "fieldList", type: "text" }].map(({ label, id, type }) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
                                 {label}
@@ -133,7 +131,7 @@ const ManageEquipment: React.FC = () => {
                             <input
                                 type={type}
                                 id={id}
-                                value={(formData as any)[id]}
+                                value={(formData as any)[id] || ""}
                                 className="form-control"
                                 onChange={handleInputChange}
                                 required
@@ -141,12 +139,12 @@ const ManageEquipment: React.FC = () => {
                         </div>
                     ))}
                     <div className="mb-3">
-                        <label htmlFor="status" className="form-label">
+                        <label htmlFor="equipmentStatus" className="form-label">
                             Status
                         </label>
                         <select
-                            id="status"
-                            value={formData.status}
+                            id="equipmentStatus"
+                            value={formData.equipmentStatus || ""}
                             className="form-control"
                             onChange={handleInputChange}
                             required
