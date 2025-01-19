@@ -1,62 +1,71 @@
 import React, { useState } from "react";
 import { Table, TableColumnsType } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../store/Store.ts"; // Update path to your store
+import { addStaff, updateStaff, deleteStaff } from "../../slices/StaffSlice.ts"; // Update path to staffSlice
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 
-interface Staff {
-    id: number;
+interface StaffFormData {
+    memberCode?: string;
     firstName: string;
     lastName: string;
     joinedDate: string;
     dateOfBirth: string;
     gender: string;
     designation: string;
-    address: string;
-    contactNo: string;
+    addressLine1: string;
+    addressLine2: string;
+    addressLine3: string;
+    addressLine4: string;
+    addressLine5: string;
+    contactNumber: string;
     email: string;
     role: string;
-    vehicle: string;
-    field: string;
-    log: string;
+    vehicleList: string;
+    fieldList: string;
 }
 
 const StaffManagement: React.FC = () => {
-    const [staffList, setStaffList] = useState<Staff[]>([]);
-    const [formData, setFormData] = useState<Omit<Staff, "id">>({
+    const staffList = useSelector((state: RootState) => state.staffs);
+    const dispatch = useDispatch();
+
+    const [formData, setFormData] = useState<StaffFormData>({
         firstName: "",
         lastName: "",
         joinedDate: "",
         dateOfBirth: "",
         gender: "",
         designation: "",
-        address: "",
-        contactNo: "",
+        addressLine1: "",
+        addressLine2: "",
+        addressLine3: "",
+        addressLine4: "",
+        addressLine5: "",
+        contactNumber: "",
         email: "",
         role: "",
-        vehicle: "",
-        field: "",
-        log: "",
+        vehicleList: "",
+        fieldList: "",
     });
     const [isModalOpen, setModalOpen] = useState(false);
-    const [currentStaffId, setCurrentStaffId] = useState<number | null>(null); // Track the staff being edited
+    const [currentStaffId, setCurrentStaffId] = useState<string | null>(null); // Track the staff being edited
 
-    const columns: TableColumnsType<Staff> = [
-        { title: "Member Code", dataIndex: "id", key: "id" },
+    const columns: TableColumnsType<StaffFormData> = [
+        { title: "Member Code", dataIndex: "memberCode", key: "memberCode" },
         { title: "First Name", dataIndex: "firstName", key: "firstName" },
         { title: "Last Name", dataIndex: "lastName", key: "lastName" },
         { title: "Joined Date", dataIndex: "joinedDate", key: "joinedDate" },
         { title: "Date of Birth", dataIndex: "dateOfBirth", key: "dateOfBirth" },
         { title: "Gender", dataIndex: "gender", key: "gender" },
         { title: "Designation", dataIndex: "designation", key: "designation" },
-        { title: "Contact No", dataIndex: "contactNo", key: "contactNo" },
+        { title: "Contact No", dataIndex: "contactNumber", key: "contactNumber" },
         { title: "Email", dataIndex: "email", key: "email" },
         { title: "Role", dataIndex: "role", key: "role" },
-        { title: "Vehicle", dataIndex: "vehicle", key: "vehicle" },
-        { title: "Field", dataIndex: "field", key: "field" },
         {
             title: "Actions",
             key: "actions",
-            render: (_: any, record: Staff) => (
+            render: (_, record) => (
                 <div>
                     <CustomButton
                         label="Edit"
@@ -66,7 +75,7 @@ const StaffManagement: React.FC = () => {
                     <CustomButton
                         label="Delete"
                         className="btn btn-danger"
-                        onClick={() => handleDelete(record.id)}
+                        onClick={() => handleDelete(record.memberCode!)}
                     />
                 </div>
             ),
@@ -79,17 +88,13 @@ const StaffManagement: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        if (currentStaffId !== null) {
+        if (currentStaffId) {
             // Update existing staff
-            setStaffList((prevStaffList) =>
-                prevStaffList.map((staff) =>
-                    staff.id === currentStaffId ? { ...staff, ...formData, id: currentStaffId } : staff
-                )
-            );
+            dispatch(updateStaff({ staff_id: currentStaffId, ...formData }));
         } else {
             // Add new staff
-            const newStaff: Staff = { id: staffList.length + 1, ...formData };
-            setStaffList([...staffList, newStaff]);
+            const newStaff = { ...formData, memberCode: `STAFF-${Date.now()}` }; // Generate unique memberCode
+            dispatch(addStaff(newStaff));
         }
 
         // Reset form and modal state
@@ -100,26 +105,29 @@ const StaffManagement: React.FC = () => {
             dateOfBirth: "",
             gender: "",
             designation: "",
-            address: "",
-            contactNo: "",
+            addressLine1: "",
+            addressLine2: "",
+            addressLine3: "",
+            addressLine4: "",
+            addressLine5: "",
+            contactNumber: "",
             email: "",
             role: "",
-            vehicle: "",
-            field: "",
-            log: "",
+            vehicleList: "",
+            fieldList: "",
         });
         setCurrentStaffId(null);
         setModalOpen(false);
     };
 
-    const handleEdit = (staff: Staff) => {
+    const handleEdit = (staff: StaffFormData) => {
         setFormData(staff); // Prefill form with staff data
-        setCurrentStaffId(staff.id); // Set the staff being edited
+        setCurrentStaffId(staff.memberCode || null); // Set the staff being edited
         setModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        setStaffList(staffList.filter((staff) => staff.id !== id));
+    const handleDelete = (memberCode: string) => {
+        dispatch(deleteStaff({ staff_id: memberCode }));
     };
 
     return (
@@ -137,20 +145,27 @@ const StaffManagement: React.FC = () => {
                             dateOfBirth: "",
                             gender: "",
                             designation: "",
-                            address: "",
-                            contactNo: "",
+                            addressLine1: "",
+                            addressLine2: "",
+                            addressLine3: "",
+                            addressLine4: "",
+                            addressLine5: "",
+                            contactNumber: "",
                             email: "",
                             role: "",
-                            vehicle: "",
-                            field: "",
-                            log: "",
+                            vehicleList: "",
+                            fieldList: "",
                         });
                         setCurrentStaffId(null); // Clear edit state
                         setModalOpen(true);
                     }}
                 />
             </div>
-            <Table<Staff> columns={columns} dataSource={staffList} rowKey="id" />
+            <Table<StaffFormData>
+                columns={columns}
+                dataSource={staffList}
+                rowKey="memberCode"
+            />
             <MainModal
                 isType={currentStaffId ? "Edit Staff" : "Add Staff"}
                 buttonType={currentStaffId ? "Update Staff" : "Save Staff"}
@@ -166,20 +181,23 @@ const StaffManagement: React.FC = () => {
                         { label: "Date of Birth", id: "dateOfBirth" },
                         { label: "Gender", id: "gender" },
                         { label: "Designation", id: "designation" },
-                        { label: "Address", id: "address" },
-                        { label: "Contact No", id: "contactNo" },
+                        { label: "Address Line 1", id: "addressLine1" },
+                        { label: "Address Line 2", id: "addressLine2" },
+                        { label: "Address Line 3", id: "addressLine3" },
+                        { label: "Address Line 4", id: "addressLine4" },
+                        { label: "Address Line 5", id: "addressLine5" },
+                        { label: "Contact Number", id: "contactNumber" },
                         { label: "Email", id: "email" },
                         { label: "Role", id: "role" },
-                        { label: "Vehicle", id: "vehicle" },
-                        { label: "Field", id: "field" },
-                        { label: "Log", id: "log" },
+                        { label: "Vehicle List", id: "vehicleList" },
+                        { label: "Field List", id: "fieldList" },
                     ].map(({ label, id }) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
                                 {label}
                             </label>
                             <input
-                                type={id === "joinedDate" || id === "dateOfBirth" ? "date" : "text"}
+                                type={id.includes("Date") ? "date" : "text"}
                                 id={id}
                                 value={(formData as any)[id]}
                                 className="form-control"

@@ -1,58 +1,46 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Table, TableColumnsType } from "antd";
+import { RootState } from "../../store/Store.ts"; // Adjust the import based on your Redux store setup
+import { addLog, updateLog, deleteLog } from "../../slices/LogSlice.ts";
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
-
-interface Log {
-    id: number;
-    logCode: string;
-    date: string;
-    details: string;
-    image: string;
-    staff: string;
-    crop: string;
-    field: string;
-}
+import logModel from "../../Model/LogModel";
 
 const Logs: React.FC = () => {
-    const [logs, setLogs] = useState<Log[]>([]);
-    const [formData, setFormData] = useState<Omit<Log, "id">>({
-        logCode: "",
-        date: "",
-        details: "",
-        image: "",
-        staff: "",
-        crop: "",
-        field: "",
-    });
+    const logs = useSelector((state: RootState) => state.logs); // Fetch logs from Redux store
+    const dispatch = useDispatch();
+
+    const [formData, setFormData] = useState<logModel | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
     const [imagePopup, setImagePopup] = useState<string | null>(null);
-    const [currentLogId, setCurrentLogId] = useState<number | null>(null); // Track the log being edited
+    const [editingLogCode, setEditingLogCode] = useState<string | null>(null); // Track the log being edited
 
-    const columns: TableColumnsType<Log> = [
+    const columns: TableColumnsType<logModel> = [
         { title: "Log Code", dataIndex: "logCode", key: "logCode" },
-        { title: "Date", dataIndex: "date", key: "date" },
-        { title: "Details", dataIndex: "details", key: "details" },
+        { title: "Date", dataIndex: "logDate", key: "logDate" },
+        { title: "Details", dataIndex: "logDetails", key: "logDetails" },
         {
             title: "Image",
-            dataIndex: "image",
-            key: "image",
-            render: (image: string) => (
-                <img
-                    src={image}
-                    alt="Log Image"
-                    style={{ width: "50px", height: "50px", cursor: "pointer" }}
-                    onClick={() => setImagePopup(image)}
-                />
-            ),
+            dataIndex: "observedImage",
+            key: "observedImage",
+            render: (image: File | null) =>
+                image ? (
+                    <img
+                        src={URL.createObjectURL(image)}
+                        alt="Log Image"
+                        style={{ width: "50px", height: "50px", cursor: "pointer" }}
+                        onClick={() => setImagePopup(URL.createObjectURL(image))}
+                    />
+                ) : null,
         },
-        { title: "Staff", dataIndex: "staff", key: "staff" },
-        { title: "Crop", dataIndex: "crop", key: "crop" },
-        { title: "Field", dataIndex: "field", key: "field" },
+        { title: "Staff", dataIndex: "staffList", key: "staffList" },
+        { title: "Crop", dataIndex: "cropList", key: "cropList" },
+        { title: "Field", dataIndex: "fieldList", key: "fieldList" },
         {
             title: "Actions",
             key: "actions",
-            render: (_: any, record: Log) => (
+            render: (_: any, record: logModel) => (
                 <div>
                     <CustomButton
                         label="Edit"
@@ -62,8 +50,7 @@ const Logs: React.FC = () => {
                     <CustomButton
                         label="Delete"
                         className="btn btn-danger"
-                        onClick={() => handleDelete(record.id)}
-
+                        onClick={() => handleDelete(record.logCode)}
                     />
                 </div>
             ),
@@ -72,55 +59,48 @@ const Logs: React.FC = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
-        setFormData((prev) => ({ ...prev, [id]: value }));
+        setFormData((prev) => {
+            if (prev) {
+                return { ...prev, [id]: value };
+            }
+            return null;
+        });
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setFormData((prev) => ({ ...prev, image: reader.result as string }));
-            };
-            reader.readAsDataURL(e.target.files[0]);
+            const file = e.target.files[0];
+            setFormData((prev) => {
+                if (prev) {
+                    return { ...prev, observedImage: file };
+                }
+                return null;
+            });
         }
     };
 
     const handleSubmit = () => {
-        if (currentLogId !== null) {
-            // Update existing log
-            setLogs((prevLogs) =>
-                prevLogs.map((log) =>
-                    log.id === currentLogId ? { ...log, ...formData, id: currentLogId } : log
-                )
-            );
+        if (!formData) return;
+
+        if (editingLogCode) {
+            dispatch(updateLog({ log_id: editingLogCode, ...formData }));
         } else {
-            // Add new log
-            const newLog: Log = { id: logs.length + 1, ...formData };
-            setLogs([...logs, newLog]);
+            dispatch(addLog(formData));
         }
 
-        // Reset form and modal state
-        setFormData({
-            logCode: "",
-            date: "",
-            details: "",
-            image: "",
-            staff: "",
-            crop: "",
-            field: "",
-        });
-        setCurrentLogId(null);
+        setFormData(null);
+        setEditingLogCode(null);
         setModalOpen(false);
     };
 
-    const handleEdit = (log: Log) => {
-        setFormData(log); // Prefill form with log data
-        setCurrentLogId(log.id); // Set the log being edited
+    const handleEdit = (log: logModel) => {
+        setFormData(log);
+        setEditingLogCode(log.logCode);
         setModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        setLogs(logs.filter((log) => log.id !== id));
+    const handleDelete = (logCode: string) => {
+        dispatch(deleteLog({ log_id: logCode }));
     };
 
     return (
@@ -131,30 +111,24 @@ const Logs: React.FC = () => {
                     label="Add Log"
                     className="btn btn-success"
                     onClick={() => {
-                        setFormData({
-                            logCode: "",
-                            date: "",
-                            details: "",
-                            image: "",
-                            staff: "",
-                            crop: "",
-                            field: "",
-                        });
-                        setCurrentLogId(null); // Clear edit state
+                        setFormData(
+                            new logModel("", "", "", null, "", "", "")
+                        );
+                        setEditingLogCode(null);
                         setModalOpen(true);
                     }}
                 />
             </div>
-            <Table<Log> columns={columns} dataSource={logs} />
+            <Table<logModel> columns={columns} dataSource={logs} rowKey="logCode" />
             <MainModal
-                isType={currentLogId ? "Edit Log" : "Add Log"}
-                buttonType={currentLogId ? "Update Log" : "Save Log"}
+                isType={editingLogCode ? "Edit Log" : "Add Log"}
+                buttonType={editingLogCode ? "Update Log" : "Save Log"}
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
                 onSubmit={handleSubmit}
             >
                 <form>
-                    {[{ label: "Log Code", id: "logCode" }, { label: "Date", id: "date" }, { label: "Details", id: "details" }, { label: "Staff", id: "staff" }, { label: "Crop", id: "crop" }, { label: "Field", id: "field" }].map(({ label, id }) => (
+                    {[{ label: "Log Code", id: "logCode" }, { label: "Date", id: "logDate" }, { label: "Details", id: "logDetails" }, { label: "Staff", id: "staffList" }, { label: "Crop", id: "cropList" }, { label: "Field", id: "fieldList" }].map(({ label, id }) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
                                 {label}
@@ -162,7 +136,7 @@ const Logs: React.FC = () => {
                             <input
                                 type="text"
                                 id={id}
-                                value={(formData as any)[id]}
+                                value={(formData as any)?.[id] || ""}
                                 className="form-control"
                                 onChange={handleInputChange}
                                 required
@@ -170,12 +144,12 @@ const Logs: React.FC = () => {
                         </div>
                     ))}
                     <div className="mb-3">
-                        <label htmlFor="image" className="form-label">
+                        <label htmlFor="observedImage" className="form-label">
                             Upload Image
                         </label>
                         <input
                             type="file"
-                            id="image"
+                            id="observedImage"
                             className="form-control"
                             accept="image/*"
                             onChange={handleFileChange}

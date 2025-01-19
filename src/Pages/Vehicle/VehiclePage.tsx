@@ -1,46 +1,42 @@
 import React, { useState } from "react";
 import { Table, TableColumnsType } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../store/Store.ts"; // Update to the correct path for your Redux store
+import { addVehicle, updateVehicle, deleteVehicle } from "../../slices/VehicleSlice.ts"; // Update path to your slice
+import VehicleModel from "../../Model/VehicleModel";
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 
-interface Vehicle {
-    id: number;
-    licensePlate: string;
-    vehicleName: string;
-    category: string;
-    fuelType: string;
-    remark: string;
-    status: string;
-    staffId: string;
-}
-
 const VehicleManagement: React.FC = () => {
-    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-    const [formData, setFormData] = useState<Omit<Vehicle, "id">>({
-        licensePlate: "",
+    const vehicles = useSelector((state: RootState) => state.vehicles);
+    const dispatch = useDispatch();
+
+    const [formData, setFormData] = useState<Partial<VehicleModel>>({
+        vehicleCode: "",
+        licencePlateNumber: "",
         vehicleName: "",
         category: "",
         fuelType: "",
         remark: "",
         status: "",
-        staffId: "",
+        memberCode: "",
     });
     const [isModalOpen, setModalOpen] = useState(false);
-    const [currentVehicleId, setCurrentVehicleId] = useState<number | null>(null); // For tracking the vehicle being edited
+    const [currentVehicleCode, setCurrentVehicleCode] = useState<string | null>(null);
 
-    const columns: TableColumnsType<Vehicle> = [
-        { title: "Vehicle Code", dataIndex: "id", key: "id" },
-        { title: "License Plate", dataIndex: "licensePlate", key: "licensePlate" },
+    const columns: TableColumnsType<VehicleModel> = [
+        { title: "Vehicle Code", dataIndex: "vehicleCode", key: "vehicleCode" },
+        { title: "License Plate", dataIndex: "licencePlateNumber", key: "licencePlateNumber" },
         { title: "Name", dataIndex: "vehicleName", key: "vehicleName" },
         { title: "Category", dataIndex: "category", key: "category" },
         { title: "Fuel Type", dataIndex: "fuelType", key: "fuelType" },
         { title: "Remark", dataIndex: "remark", key: "remark" },
         { title: "Status", dataIndex: "status", key: "status" },
-        { title: "Staff", dataIndex: "staffId", key: "staffId" },
+        { title: "Staff ID", dataIndex: "memberCode", key: "memberCode" },
         {
             title: "Actions",
             key: "actions",
-            render: (_: any, record: Vehicle) => (
+            render: (_: any, record: VehicleModel) => (
                 <div>
                     <CustomButton
                         label="Edit"
@@ -50,7 +46,7 @@ const VehicleManagement: React.FC = () => {
                     <CustomButton
                         label="Delete"
                         className="btn btn-danger"
-                        onClick={() => handleDelete(record.id)}
+                        onClick={() => handleDelete(record.vehicleCode)}
                     />
                 </div>
             ),
@@ -63,41 +59,47 @@ const VehicleManagement: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        if (currentVehicleId !== null) {
+        if (currentVehicleCode) {
             // Update existing vehicle
-            setVehicles((prevVehicles) =>
-                prevVehicles.map((vehicle) =>
-                    vehicle.id === currentVehicleId ? { ...vehicle, ...formData, id: currentVehicleId } : vehicle
-                )
-            );
+            dispatch(updateVehicle({ vehicle_id: currentVehicleCode, ...formData }));
         } else {
             // Add new vehicle
-            const newVehicle: Vehicle = { id: vehicles.length + 1, ...formData };
-            setVehicles([...vehicles, newVehicle]);
+            const newVehicle = new VehicleModel(
+                `VEH-${Date.now()}`,
+                formData.licencePlateNumber!,
+                formData.vehicleName!,
+                formData.category!,
+                formData.fuelType!,
+                formData.remark!,
+                formData.status!,
+                formData.memberCode!
+            );
+            dispatch(addVehicle(newVehicle));
         }
 
         // Reset form and modal state
         setFormData({
-            licensePlate: "",
+            vehicleCode: "",
+            licencePlateNumber: "",
             vehicleName: "",
             category: "",
             fuelType: "",
             remark: "",
             status: "",
-            staffId: "",
+            memberCode: "",
         });
-        setCurrentVehicleId(null);
+        setCurrentVehicleCode(null);
         setModalOpen(false);
     };
 
-    const handleEdit = (vehicle: Vehicle) => {
+    const handleEdit = (vehicle: VehicleModel) => {
         setFormData(vehicle); // Prefill form with vehicle data
-        setCurrentVehicleId(vehicle.id); // Set the vehicle being edited
+        setCurrentVehicleCode(vehicle.vehicleCode); // Set the vehicle being edited
         setModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        setVehicles(vehicles.filter((vehicle) => vehicle.id !== id));
+    const handleDelete = (vehicleCode: string) => {
+        dispatch(deleteVehicle({ vehicle_id: vehicleCode }));
     };
 
     return (
@@ -109,38 +111,41 @@ const VehicleManagement: React.FC = () => {
                     className="btn btn-success"
                     onClick={() => {
                         setFormData({
-                            licensePlate: "",
+                            vehicleCode: "",
+                            licencePlateNumber: "",
                             vehicleName: "",
                             category: "",
                             fuelType: "",
                             remark: "",
                             status: "",
-                            staffId: "",
+                            memberCode: "",
                         });
-                        setCurrentVehicleId(null); // Clear edit state
+                        setCurrentVehicleCode(null);
                         setModalOpen(true);
                     }}
                 />
             </div>
-            <br />
-            <br />
-            <Table<Vehicle> columns={columns} dataSource={vehicles} rowKey="id" />
+            <Table<VehicleModel>
+                columns={columns}
+                dataSource={vehicles}
+                rowKey="vehicleCode"
+            />
             <MainModal
-                isType={currentVehicleId ? "Edit Vehicle" : "Add Vehicle"}
-                buttonType={currentVehicleId ? "Update Vehicle" : "Save Vehicle"}
+                isType={currentVehicleCode ? "Edit Vehicle" : "Add Vehicle"}
+                buttonType={currentVehicleCode ? "Update Vehicle" : "Save Vehicle"}
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
                 onSubmit={handleSubmit}
             >
                 <form>
                     {[
-                        { label: "License Plate", id: "licensePlate" },
+                        { label: "License Plate", id: "licencePlateNumber" },
                         { label: "Name", id: "vehicleName" },
                         { label: "Category", id: "category" },
                         { label: "Fuel Type", id: "fuelType" },
                         { label: "Remark", id: "remark" },
                         { label: "Status", id: "status" },
-                        { label: "Staff", id: "staffId" },
+                        { label: "Staff ID", id: "memberCode" },
                     ].map(({ label, id }) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
@@ -149,7 +154,7 @@ const VehicleManagement: React.FC = () => {
                             <input
                                 type="text"
                                 id={id}
-                                value={(formData as any)[id]}
+                                value={(formData as any)[id] || ""}
                                 className="form-control"
                                 onChange={handleInputChange}
                                 required
