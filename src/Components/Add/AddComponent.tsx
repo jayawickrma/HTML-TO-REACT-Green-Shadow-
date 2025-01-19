@@ -35,13 +35,13 @@ const MainModal: React.FC<ModalProps> = ({
                 theme={{
                     token: {
                         colorBgElevated: "",
-                        colorText: "#ffffff",
+                        colorText: "#333333",
                         colorPrimary: "green",
                     },
                 }}
             >
                 <Modal
-                    width={800}
+                    width={600}
                     title={isType}
                     open={isOpen}
                     onCancel={onClose}
