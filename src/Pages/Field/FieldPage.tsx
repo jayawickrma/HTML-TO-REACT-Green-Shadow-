@@ -91,8 +91,10 @@ const ManageFields: React.FC = () => {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: "fieldImage1" | "fieldImage2") => {
         if (e.target.files && e.target.files[0]) {
+
             setFormData((prev) => ({
                 ...prev,
+                // @ts-ignore
                 [field]: e.target.files[0],
             }));
         }

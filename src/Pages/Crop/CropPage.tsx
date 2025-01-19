@@ -106,6 +106,7 @@ const Crops: React.FC = () => {
             setFormData((prev) => {
                 return {
                     ...prev,
+                    // @ts-ignore
                     image: event.target.files[0],
                 };
             });
