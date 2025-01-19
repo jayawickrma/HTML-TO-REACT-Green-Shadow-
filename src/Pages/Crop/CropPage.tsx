@@ -25,6 +25,8 @@ const Crops: React.FC = () => {
     });
     const [imagePopup, setImagePopup] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState<number | null>(null);
 
     const columns: TableColumnsType<Crop> = [
         {
@@ -74,12 +76,20 @@ const Crops: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Crop) => (
-                <CustomButton
-                    label="Delete"
-                    type="button"
-                    className="btn-danger"
-                    onClick={() => handleDelete(record.id)}
-                />
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <CustomButton
+                        label="Edit"
+                        type="button"
+                        className="btn-warning"
+                        onClick={() => handleEdit(record)}
+                    />
+                    <CustomButton
+                        label="Delete"
+                        type="button"
+                        className="btn-danger"
+                        onClick={() => handleDelete(record.id)}
+                    />
+                </div>
             ),
         },
     ];
@@ -105,12 +115,43 @@ const Crops: React.FC = () => {
         }
     };
 
-    const handleSubmit = () => {
+    const handleAdd = () => {
         const newCrop: Crop = {
             id: crops.length + 1,
             ...formData,
         };
         setCrops([...crops, newCrop]);
+        resetForm();
+    };
+
+    const handleEdit = (record: Crop) => {
+        setIsEditing(true);
+        setEditId(record.id);
+        setFormData({
+            cropName: record.cropName,
+            category: record.category,
+            season: record.season,
+            scientificName: record.scientificName,
+            image: record.image,
+            field: record.field,
+        });
+        setIsModalOpen(true);
+    };
+
+    const handleUpdate = () => {
+        setCrops((prevCrops) =>
+            prevCrops.map((crop) =>
+                crop.id === editId ? { id: editId, ...formData } : crop
+            )
+        );
+        resetForm();
+    };
+
+    const handleDelete = (id: number) => {
+        setCrops(crops.filter((crop) => crop.id !== id));
+    };
+
+    const resetForm = () => {
         setFormData({
             cropName: "",
             category: "",
@@ -120,10 +161,8 @@ const Crops: React.FC = () => {
             field: "",
         });
         setIsModalOpen(false);
-    };
-
-    const handleDelete = (id: number) => {
-        setCrops(crops.filter((crop) => crop.id !== id));
+        setIsEditing(false);
+        setEditId(null);
     };
 
     return (
@@ -131,27 +170,26 @@ const Crops: React.FC = () => {
             <div className="section">
                 <h2 className="text-center my-4">Manage Crops</h2>
 
-                {/* Crop Save Button */}
+                {/* Add Crop Button */}
                 <div className="d-flex justify-content-center mb-4">
                     <CustomButton
                         label="Add Crop"
                         type="button"
                         className="btn-success"
                         onClick={() => setIsModalOpen(true)}
-                    /> <br/>
-                    <br/> <br/>
+                    />
                 </div>
 
                 {/* Crop Table */}
-                <Table<Crop> columns={columns} dataSource={crops} />
+                <Table<Crop> columns={columns} dataSource={crops} rowKey="id" />
 
-                {/* Modal for Adding Crop */}
+                {/* Modal for Adding/Editing Crop */}
                 <MainModal
-                    isType="Add Crop"
-                    buttonType="Save"
+                    isType={isEditing ? "Edit Crop" : "Add Crop"}
+                    buttonType={isEditing ? "Update" : "Save"}
                     isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onSubmit={handleSubmit}
+                    onClose={resetForm}
+                    onSubmit={isEditing ? handleUpdate : handleAdd}
                 >
                     <form id="cropForm">
                         <div className="mb-3">
@@ -216,7 +254,6 @@ const Crops: React.FC = () => {
                                 id="image"
                                 accept="image/*"
                                 onChange={handleImageChange}
-                                required
                             />
                         </div>
                         <div className="mb-3">
@@ -282,3 +319,4 @@ const Crops: React.FC = () => {
 };
 
 export default Crops;
+edit
