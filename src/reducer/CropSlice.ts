@@ -26,14 +26,14 @@ const CropSlice = createSlice({
             state.crops.push(action.payload);
         },
         updateCrop:(state,action)=>{
-
+            // @ts-ignore
             const index = state.crops.findIndex(c => c.code === action.payload.code);
             if (index !== -1) {
                 state.crops[index] = action.payload;
             }
         },
         deleteCrop:(state,action)=>{
-
+            //@ts-ignore
             state.crops = state.crops.filter(c => c.code !== action.payload.code);
         }
     }
