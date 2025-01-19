@@ -11,7 +11,7 @@ const Table = <T extends object>({ columns, dataSource }: TableProps<T>) => {
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 5;
 
-    // Calculate data for the current page
+
     const currentPageData = dataSource.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     const handlePageChange = (page: number) => {
@@ -24,15 +24,15 @@ const Table = <T extends object>({ columns, dataSource }: TableProps<T>) => {
             columns={columns}
             dataSource={currentPageData}
             pagination={{
-                pageSize, // Limit to 5 rows per page
+                pageSize,
                 current: currentPage,
-                total: dataSource.length, // Total rows in data
-                onChange: handlePageChange, // Page change handler
-                showSizeChanger: false, // Disable page size changer
-                style: { display: 'flex', justifyContent: 'center', alignItems: 'center' }, // Center the pagination
+                total: dataSource.length,
+                onChange: handlePageChange,
+                showSizeChanger: false,
+                style: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
             }}
-            key={currentPage} // Refresh table content when the page changes
-            scroll={{ x: 'max-content' }} // Enable horizontal scroll if table width exceeds
+            key={currentPage}
+            scroll={{ x: 'max-content' }}
         />
     );
 };
