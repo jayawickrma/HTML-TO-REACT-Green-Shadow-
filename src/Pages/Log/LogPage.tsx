@@ -27,6 +27,7 @@ const Logs: React.FC = () => {
     });
     const [isModalOpen, setModalOpen] = useState(false);
     const [imagePopup, setImagePopup] = useState<string | null>(null);
+    const [currentLogId, setCurrentLogId] = useState<number | null>(null); // Track the log being edited
 
     const columns: TableColumnsType<Log> = [
         { title: "Log Code", dataIndex: "logCode", key: "logCode" },
@@ -52,11 +53,19 @@ const Logs: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Log) => (
-                <CustomButton
-                    label="Delete"
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(record.id)}
-                />
+                <div>
+                    <CustomButton
+                        label="Edit"
+                        className="btn btn-primary"
+                        onClick={() => handleEdit(record)}
+                    />
+                    <CustomButton
+                        label="Delete"
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(record.id)}
+
+                    />
+                </div>
             ),
         },
     ];
@@ -77,8 +86,20 @@ const Logs: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        const newLog: Log = { id: logs.length + 1, ...formData };
-        setLogs([...logs, newLog]);
+        if (currentLogId !== null) {
+            // Update existing log
+            setLogs((prevLogs) =>
+                prevLogs.map((log) =>
+                    log.id === currentLogId ? { ...log, ...formData, id: currentLogId } : log
+                )
+            );
+        } else {
+            // Add new log
+            const newLog: Log = { id: logs.length + 1, ...formData };
+            setLogs([...logs, newLog]);
+        }
+
+        // Reset form and modal state
         setFormData({
             logCode: "",
             date: "",
@@ -88,7 +109,14 @@ const Logs: React.FC = () => {
             crop: "",
             field: "",
         });
+        setCurrentLogId(null);
         setModalOpen(false);
+    };
+
+    const handleEdit = (log: Log) => {
+        setFormData(log); // Prefill form with log data
+        setCurrentLogId(log.id); // Set the log being edited
+        setModalOpen(true);
     };
 
     const handleDelete = (id: number) => {
@@ -102,26 +130,31 @@ const Logs: React.FC = () => {
                 <CustomButton
                     label="Add Log"
                     className="btn btn-success"
-                    onClick={() => setModalOpen(true)}
+                    onClick={() => {
+                        setFormData({
+                            logCode: "",
+                            date: "",
+                            details: "",
+                            image: "",
+                            staff: "",
+                            crop: "",
+                            field: "",
+                        });
+                        setCurrentLogId(null); // Clear edit state
+                        setModalOpen(true);
+                    }}
                 />
-            </div> <br/> <br/>
+            </div>
             <Table<Log> columns={columns} dataSource={logs} />
             <MainModal
-                isType="Add Log"
-                buttonType="Save Log"
+                isType={currentLogId ? "Edit Log" : "Add Log"}
+                buttonType={currentLogId ? "Update Log" : "Save Log"}
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
                 onSubmit={handleSubmit}
             >
                 <form>
-                    {[
-                        { label: "Log Code", id: "logCode" },
-                        { label: "Date", id: "date" },
-                        { label: "Details", id: "details" },
-                        { label: "Staff", id: "staff" },
-                        { label: "Crop", id: "crop" },
-                        { label: "Field", id: "field" },
-                    ].map(({ label, id }) => (
+                    {[{ label: "Log Code", id: "logCode" }, { label: "Date", id: "date" }, { label: "Details", id: "details" }, { label: "Staff", id: "staff" }, { label: "Crop", id: "crop" }, { label: "Field", id: "field" }].map(({ label, id }) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
                                 {label}
