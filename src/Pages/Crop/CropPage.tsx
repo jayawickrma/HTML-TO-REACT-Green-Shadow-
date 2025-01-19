@@ -1,38 +1,35 @@
 import React, { useState } from "react";
 import { Table, TableColumnsType } from "antd";
-import MainModal from "../../Components/Add/AddComponent.tsx"; // Adjust the import path as needed
-import CustomButton from "../../Components/Button/CustomButonComponent.tsx"; // Adjust the import path as needed
-
-interface Crop {
-    id: number;
-    cropName: string;
-    category: string;
-    season: string;
-    scientificName: string;
-    image: string;
-    field: string;
-}
+import MainModal from "../../Components/Add/AddComponent.tsx";
+import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
+import { useDispatch, useSelector } from "react-redux";
+import { addCrop, updateCrop, deleteCrop } from "../../slices/CropSlice";
+import CropModel from "../../Model/CropModel.ts";
+// Import the correct RootState type from your store
+import { RootState } from "../../store/Store.ts"; // Adjust the path to your store file
 
 const Crops: React.FC = () => {
-    const [crops, setCrops] = useState<Crop[]>([]);
-    const [formData, setFormData] = useState<Omit<Crop, "id">>({
+    const crops = useSelector((state: RootState) => state.crops);
+    const dispatch = useDispatch();
+
+    const [formData, setFormData] = useState({
         cropName: "",
         category: "",
         season: "",
         scientificName: "",
-        image: "",
+        image: null as File | null,
         field: "",
     });
     const [imagePopup, setImagePopup] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [editId, setEditId] = useState<number | null>(null);
+    const [editId, setEditId] = useState<string | null>(null);
 
-    const columns: TableColumnsType<Crop> = [
+    const columns: TableColumnsType<CropModel> = [
         {
             title: "CROP Code",
-            dataIndex: "id",
-            key: "id",
+            dataIndex: "cropCode",
+            key: "cropCode",
         },
         {
             title: "Crop Name",
@@ -41,13 +38,13 @@ const Crops: React.FC = () => {
         },
         {
             title: "Category",
-            dataIndex: "category",
-            key: "category",
+            dataIndex: "cropCategory",
+            key: "cropCategory",
         },
         {
             title: "Season",
-            dataIndex: "season",
-            key: "season",
+            dataIndex: "cropSeason",
+            key: "cropSeason",
         },
         {
             title: "Scientific Name",
@@ -56,26 +53,28 @@ const Crops: React.FC = () => {
         },
         {
             title: "Image",
-            dataIndex: "image",
-            key: "image",
-            render: (image: string, record: Crop) => (
-                <img
-                    src={image}
-                    alt={record.cropName}
-                    style={{ width: "50px", height: "50px", cursor: "pointer" }}
-                    onClick={() => setImagePopup(image)}
-                />
+            dataIndex: "cropImage",
+            key: "cropImage",
+            render: (image: File | null, record: CropModel) => (
+                image ? (
+                    <img
+                        src={URL.createObjectURL(image)}
+                        alt={record.cropName}
+                        style={{ width: "50px", height: "50px", cursor: "pointer" }}
+                        onClick={() => setImagePopup(URL.createObjectURL(image))}
+                    />
+                ) : null
             ),
         },
         {
             title: "Field",
-            dataIndex: "field",
-            key: "field",
+            dataIndex: "fieldList",
+            key: "fieldList",
         },
         {
             title: "Actions",
             key: "actions",
-            render: (_: any, record: Crop) => (
+            render: (_: any, record: CropModel) => (
                 <div style={{ display: "flex", gap: "8px" }}>
                     <CustomButton
                         label="Edit"
@@ -87,7 +86,7 @@ const Crops: React.FC = () => {
                         label="Delete"
                         type="button"
                         className="btn-danger"
-                        onClick={() => handleDelete(record.id)}
+                        onClick={() => handleDelete(record.cropCode)}
                     />
                 </div>
             ),
@@ -104,51 +103,61 @@ const Crops: React.FC = () => {
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
-            const fileReader = new FileReader();
-            fileReader.onload = () => {
-                setFormData((prev) => ({
+            setFormData((prev) => {
+                return {
                     ...prev,
-                    image: fileReader.result as string,
-                }));
-            };
-            fileReader.readAsDataURL(event.target.files[0]);
+                    image: event.target.files[0],
+                };
+            });
         }
     };
 
     const handleAdd = () => {
-        const newCrop: Crop = {
-            id: crops.length + 1,
-            ...formData,
-        };
-        setCrops([...crops, newCrop]);
+        const newCrop = new CropModel(
+            `${crops.length + 1}`, // Assuming `cropCode` is a string (e.g., generated from a number)
+            formData.cropName,
+            formData.scientificName,
+            formData.category,
+            formData.season,
+            formData.image,
+            "",
+            formData.field
+        );
+        dispatch(addCrop(newCrop));
         resetForm();
     };
 
-    const handleEdit = (record: Crop) => {
+    const handleEdit = (record: CropModel) => {
         setIsEditing(true);
-        setEditId(record.id);
+        setEditId(record.cropCode);
         setFormData({
             cropName: record.cropName,
-            category: record.category,
-            season: record.season,
+            category: record.cropCategory,
+            season: record.cropSeason,
             scientificName: record.scientificName,
-            image: record.image,
-            field: record.field,
+            image: record.cropImage,
+            field: record.fieldList,
         });
         setIsModalOpen(true);
     };
 
     const handleUpdate = () => {
-        setCrops((prevCrops) =>
-            prevCrops.map((crop) =>
-                crop.id === editId ? { id: editId, ...formData } : crop
-            )
+        const updatedCrop = new CropModel(
+            editId!,
+            formData.cropName,
+            formData.scientificName,
+            formData.category,
+            formData.season,
+            formData.image,
+            "",
+            formData.field
         );
+        dispatch(updateCrop(updatedCrop));
         resetForm();
     };
 
-    const handleDelete = (id: number) => {
-        setCrops(crops.filter((crop) => crop.id !== id));
+    const handleDelete = (cropCode: string) => {
+        dispatch(deleteCrop({ crop_id: cropCode }));
     };
 
     const resetForm = () => {
@@ -157,7 +166,7 @@ const Crops: React.FC = () => {
             category: "",
             season: "",
             scientificName: "",
-            image: "",
+            image: null,
             field: "",
         });
         setIsModalOpen(false);
@@ -181,7 +190,7 @@ const Crops: React.FC = () => {
                 </div>
 
                 {/* Crop Table */}
-                <Table<Crop> columns={columns} dataSource={crops} rowKey="id" />
+                <Table<CropModel> columns={columns} dataSource={crops} rowKey="cropCode" />
 
                 {/* Modal for Adding/Editing Crop */}
                 <MainModal
@@ -291,20 +300,20 @@ const Crops: React.FC = () => {
                             zIndex: 999,
                         }}
                     >
-            <span
-                className="close"
-                style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "20px",
-                    fontSize: "30px",
-                    color: "white",
-                    cursor: "pointer",
-                }}
-                onClick={() => setImagePopup(null)}
-            >
-              ×
-            </span>
+                        <span
+                            className="close"
+                            style={{
+                                position: "absolute",
+                                top: "10px",
+                                right: "20px",
+                                fontSize: "30px",
+                                color: "white",
+                                cursor: "pointer",
+                            }}
+                            onClick={() => setImagePopup(null)}
+                        >
+                            ×
+                        </span>
                         <img
                             id="popupImage"
                             src={imagePopup}

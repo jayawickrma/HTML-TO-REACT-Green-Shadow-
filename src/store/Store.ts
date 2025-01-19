@@ -16,3 +16,6 @@ export const store = configureStore({
         fields : FieldSlice
     }
 })
+export type RootState = ReturnType<typeof store.getState>;
+
+export default store;
