@@ -112,7 +112,7 @@ const ManageEquipment: React.FC = () => {
                         setEditingEquipment(null);
                     }}
                 />
-            </div> <br/> <br/>
+            </div>
             <Table columns={columns} dataSource={equipmentList} rowKey="id" />
             <MainModal
                 isType={editingEquipment ? "Edit Equipment" : "Add Equipment"}
@@ -122,12 +122,10 @@ const ManageEquipment: React.FC = () => {
                 onSubmit={handleSubmit}
             >
                 <form>
-                    {[
-                        { label: "Equipment Name", id: "name", type: "text" },
+                    {[{ label: "Equipment Name", id: "name", type: "text" },
                         { label: "Equipment Type", id: "type", type: "text" },
                         { label: "Available Count", id: "availableCount", type: "number" },
-                        { label: "Field", id: "field", type: "text" },
-                    ].map(({ label, id, type }) => (
+                        { label: "Field", id: "field", type: "text" }].map(({ label, id, type }) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
                                 {label}

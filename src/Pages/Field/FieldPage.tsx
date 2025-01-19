@@ -26,6 +26,7 @@ const Fields: React.FC = () => {
         crops: "",
     });
     const [isModalOpen, setModalOpen] = useState(false);
+    const [editingField, setEditingField] = useState<Field | null>(null);
     const [imagePopup, setImagePopup] = useState<string | null>(null);
 
     const columns: TableColumnsType<Field> = [
@@ -65,11 +66,18 @@ const Fields: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Field) => (
-                <CustomButton
-                    label="Delete"
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(record.id)}
-                />
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <CustomButton
+                        label="Edit"
+                        className="btn btn-primary"
+                        onClick={() => handleEdit(record)}
+                    />
+                    <CustomButton
+                        label="Delete"
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(record.id)}
+                    />
+                </div>
             ),
         },
     ];
@@ -96,8 +104,17 @@ const Fields: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        const newField: Field = { id: fields.length + 1, ...formData };
-        setFields([...fields, newField]);
+        if (editingField) {
+            setFields(
+                fields.map((field) =>
+                    field.id === editingField.id ? { ...field, ...formData } : field
+                )
+            );
+        } else {
+            const newField: Field = { id: fields.length + 1, ...formData };
+            setFields([...fields, newField]);
+        }
+
         setFormData({
             fieldName: "",
             location: "",
@@ -108,10 +125,17 @@ const Fields: React.FC = () => {
             crops: "",
         });
         setModalOpen(false);
+        setEditingField(null);
     };
 
     const handleDelete = (id: number) => {
         setFields(fields.filter((field) => field.id !== id));
+    };
+
+    const handleEdit = (record: Field) => {
+        setEditingField(record);
+        setFormData(record);
+        setModalOpen(true);
     };
 
     return (
@@ -121,25 +145,37 @@ const Fields: React.FC = () => {
                 <CustomButton
                     label="Add Field"
                     className="btn btn-success"
-                    onClick={() => setModalOpen(true)}
+                    onClick={() => {
+                        setFormData({
+                            fieldName: "",
+                            location: "",
+                            size: 0,
+                            image1: "",
+                            image2: "",
+                            staff: "",
+                            crops: "",
+                        });
+                        setEditingField(null);
+                        setModalOpen(true);
+                    }}
                 />
-            </div>  <br/><br/>
-            <Table<Field> columns={columns} dataSource={fields} />
+            </div>
+            <br />
+            <br />
+            <Table<Field> columns={columns} dataSource={fields} rowKey="id" />
             <MainModal
-                isType="Add Field"
-                buttonType="Save Field"
+                isType={editingField ? "Edit Field" : "Add Field"}
+                buttonType={editingField ? "Save Changes" : "Save Field"}
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
                 onSubmit={handleSubmit}
             >
                 <form>
-                    {[
-                        { label: "Field Name", id: "fieldName" },
+                    {[{ label: "Field Name", id: "fieldName" },
                         { label: "Location", id: "location" },
                         { label: "Size (Acres)", id: "size" },
                         { label: "Staff", id: "staff" },
-                        { label: "Crops", id: "crops" },
-                    ].map(({ label, id }) => (
+                        { label: "Crops", id: "crops" }].map(({ label, id }) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
                                 {label}

@@ -319,4 +319,3 @@ const Crops: React.FC = () => {
 };
 
 export default Crops;
-edit
