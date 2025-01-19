@@ -1,187 +1,182 @@
 import React, { useState } from "react";
-import { Table, TableColumnsType } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { Table } from "antd";
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
+import { RootState } from "../../store/Store.ts"; // Adjust the path to your store file
+import { addField, updateField, deleteField } from "../../slices/FieldSlice";
+import FieldModel from "../../Model/FieldModel";
 
-interface Field {
-    id: number;
-    fieldName: string;
-    location: string;
-    size: number;
-    image1: string;
-    image2: string;
-    staff: string;
-    crops: string;
-}
+const ManageFields: React.FC = () => {
+    const fields = useSelector((state: RootState) => state.fields); // Access fields state
+    const dispatch = useDispatch();
 
-const Fields: React.FC = () => {
-    const [fields, setFields] = useState<Field[]>([]);
-    const [formData, setFormData] = useState<Omit<Field, "id">>({
+    const [formData, setFormData] = useState<Omit<FieldModel, "fieldCode">>({
         fieldName: "",
-        location: "",
-        size: 0,
-        image1: "",
-        image2: "",
-        staff: "",
-        crops: "",
+        fieldLocation: "",
+        fieldExtentSize: "",
+        fieldImage1: null,
+        fieldImage2: null,
+        equipmentList: "",
+        cropList: "",
+        logList: "",
     });
+
     const [isModalOpen, setModalOpen] = useState(false);
-    const [editingField, setEditingField] = useState<Field | null>(null);
+    const [editingField, setEditingField] = useState<FieldModel | null>(null);
     const [imagePopup, setImagePopup] = useState<string | null>(null);
 
-    const columns: TableColumnsType<Field> = [
-        { title: "Field Code", dataIndex: "id", key: "id" },
+    const columns = [
+        { title: "Field Code", dataIndex: "fieldCode", key: "fieldCode" },
         { title: "Field Name", dataIndex: "fieldName", key: "fieldName" },
-        { title: "Location", dataIndex: "location", key: "location" },
-        { title: "Size (Acres)", dataIndex: "size", key: "size" },
+        { title: "Location", dataIndex: "fieldLocation", key: "fieldLocation" },
+        { title: "Size (Acres)", dataIndex: "fieldExtentSize", key: "fieldExtentSize" },
         {
             title: "Image 1",
-            dataIndex: "image1",
-            key: "image1",
-            render: (image: string) => (
-                <img
-                    src={image}
-                    alt="Field Image 1"
-                    style={{ width: "50px", height: "50px", cursor: "pointer" }}
-                    onClick={() => setImagePopup(image)}
-                />
-            ),
+            dataIndex: "fieldImage1",
+            key: "fieldImage1",
+            render: (image: File | null) =>
+                image ? (
+                    <img
+                        src={URL.createObjectURL(image)}
+                        alt="Field Image 1"
+                        style={{ width: "50px", height: "50px", cursor: "pointer" }}
+                        onClick={() => setImagePopup(URL.createObjectURL(image))}
+                    />
+                ) : null,
         },
         {
             title: "Image 2",
-            dataIndex: "image2",
-            key: "image2",
-            render: (image: string) => (
-                <img
-                    src={image}
-                    alt="Field Image 2"
-                    style={{ width: "50px", height: "50px", cursor: "pointer" }}
-                    onClick={() => setImagePopup(image)}
-                />
-            ),
+            dataIndex: "fieldImage2",
+            key: "fieldImage2",
+            render: (image: File | null) =>
+                image ? (
+                    <img
+                        src={URL.createObjectURL(image)}
+                        alt="Field Image 2"
+                        style={{ width: "50px", height: "50px", cursor: "pointer" }}
+                        onClick={() => setImagePopup(URL.createObjectURL(image))}
+                    />
+                ) : null,
         },
-        { title: "Staff", dataIndex: "staff", key: "staff" },
-        { title: "Crops", dataIndex: "crops", key: "crops" },
+        { title: "Equipment List", dataIndex: "equipmentList", key: "equipmentList" },
+        { title: "Crop List", dataIndex: "cropList", key: "cropList" },
         {
             title: "Actions",
             key: "actions",
-            render: (_: any, record: Field) => (
+            render: (_: any, record: FieldModel) => (
                 <div style={{ display: "flex", gap: "8px" }}>
                     <CustomButton
                         label="Edit"
-                        className="btn btn-primary"
+                        className="btn btn-primary btn-sm"
                         onClick={() => handleEdit(record)}
                     />
                     <CustomButton
                         label="Delete"
-                        className="btn btn-danger"
-                        onClick={() => handleDelete(record.id)}
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(record.fieldCode)}
                     />
                 </div>
             ),
         },
     ];
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [id]: id === "size" ? Number(value) : value,
+            [id]: value,
         }));
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: "image1" | "image2") => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: "fieldImage1" | "fieldImage2") => {
         if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setFormData((prev) => ({
-                    ...prev,
-                    [field]: reader.result as string,
-                }));
-            };
-            reader.readAsDataURL(e.target.files[0]);
+            setFormData((prev) => ({
+                ...prev,
+                [field]: e.target.files[0],
+            }));
         }
     };
 
     const handleSubmit = () => {
         if (editingField) {
-            setFields(
-                fields.map((field) =>
-                    field.id === editingField.id ? { ...field, ...formData } : field
-                )
-            );
+            dispatch(updateField({ ...formData, field_id: editingField.fieldCode }));
         } else {
-            const newField: Field = { id: fields.length + 1, ...formData };
-            setFields([...fields, newField]);
+            const newField = new FieldModel(
+                `FLD${fields.length + 1}`,
+                formData.fieldName,
+                formData.fieldLocation,
+                formData.fieldExtentSize,
+                formData.fieldImage1,
+                formData.fieldImage2,
+                formData.equipmentList,
+                formData.cropList,
+                formData.logList
+            );
+            dispatch(addField(newField));
         }
+        resetForm();
+    };
 
+    const resetForm = () => {
         setFormData({
             fieldName: "",
-            location: "",
-            size: 0,
-            image1: "",
-            image2: "",
-            staff: "",
-            crops: "",
+            fieldLocation: "",
+            fieldExtentSize: "",
+            fieldImage1: null,
+            fieldImage2: null,
+            equipmentList: "",
+            cropList: "",
+            logList: "",
         });
         setModalOpen(false);
         setEditingField(null);
     };
 
-    const handleDelete = (id: number) => {
-        setFields(fields.filter((field) => field.id !== id));
-    };
-
-    const handleEdit = (record: Field) => {
+    const handleEdit = (record: FieldModel) => {
         setEditingField(record);
         setFormData(record);
         setModalOpen(true);
     };
 
+    const handleDelete = (fieldCode: string) => {
+        dispatch(deleteField({ field_id: fieldCode }));
+    };
+
     return (
-        <div id="fieldsSection" className="content-section">
+        <div id="manageFieldsSection" className="content-section">
             <h2 className="text-center my-4">Manage Fields</h2>
             <div className="d-flex justify-content-center mb-4">
                 <CustomButton
-                    label="Add Field"
+                    label="Add New Field"
                     className="btn btn-success"
                     onClick={() => {
-                        setFormData({
-                            fieldName: "",
-                            location: "",
-                            size: 0,
-                            image1: "",
-                            image2: "",
-                            staff: "",
-                            crops: "",
-                        });
-                        setEditingField(null);
+                        resetForm();
                         setModalOpen(true);
                     }}
                 />
             </div>
-            <br />
-            <br />
-            <Table<Field> columns={columns} dataSource={fields} rowKey="id" />
+            <Table columns={columns} dataSource={fields} rowKey="fieldCode" />
             <MainModal
                 isType={editingField ? "Edit Field" : "Add Field"}
-                buttonType={editingField ? "Save Changes" : "Save Field"}
+                buttonType={editingField ? "Save Changes" : "Add Field"}
                 isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)}
+                onClose={resetForm}
                 onSubmit={handleSubmit}
             >
                 <form>
                     {[{ label: "Field Name", id: "fieldName" },
-                        { label: "Location", id: "location" },
-                        { label: "Size (Acres)", id: "size" },
-                        { label: "Staff", id: "staff" },
-                        { label: "Crops", id: "crops" }].map(({ label, id }) => (
+                        { label: "Location", id: "fieldLocation" },
+                        { label: "Extent Size (Acres)", id: "fieldExtentSize" },
+                        { label: "Equipment List", id: "equipmentList" },
+                        { label: "Crop List", id: "cropList" },
+                        { label: "Log List", id: "logList" }].map(({ label, id }) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
                                 {label}
                             </label>
                             <input
-                                type={id === "size" ? "number" : "text"}
+                                type="text"
                                 id={id}
                                 value={(formData as any)[id]}
                                 className="form-control"
@@ -190,17 +185,17 @@ const Fields: React.FC = () => {
                             />
                         </div>
                     ))}
-                    {["image1", "image2"].map((id) => (
+                    {["fieldImage1", "fieldImage2"].map((id) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
-                                {id === "image1" ? "Image 1" : "Image 2"}
+                                {id === "fieldImage1" ? "Image 1" : "Image 2"}
                             </label>
                             <input
                                 type="file"
                                 id={id}
                                 className="form-control"
                                 accept="image/*"
-                                onChange={(e) => handleFileChange(e, id as "image1" | "image2")}
+                                onChange={(e) => handleFileChange(e, id as "fieldImage1" | "fieldImage2")}
                             />
                         </div>
                     ))}
@@ -225,11 +220,6 @@ const Fields: React.FC = () => {
                         label="Close"
                         className="btn btn-light"
                         onClick={() => setImagePopup(null)}
-                        style={{
-                            position: "absolute",
-                            top: "10px",
-                            right: "10px",
-                        }}
                     />
                 </div>
             )}
@@ -237,4 +227,4 @@ const Fields: React.FC = () => {
     );
 };
 
-export default Fields;
+export default ManageFields;
