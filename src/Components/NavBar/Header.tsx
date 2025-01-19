@@ -15,7 +15,7 @@ const Header: React.FC = () => {
             }}
         >
             <h2 style={{ margin: 0 }}>Welcome to the Green Shadow</h2>
-            <div style={{ display: 'flex', gap: '15px' }}>
+            <div style={{display: 'flex', gap: '15px'}}>
                 <button
                     style={{
                         background: 'white',
@@ -43,6 +43,20 @@ const Header: React.FC = () => {
                     onClick={() => alert('Profile Settings')}
                 >
                     Profile
+                </button>
+                <button
+                    style={{
+                        background: 'red',
+                        color: 'white',
+                        border:'none',
+                        borderRadius:'4px',
+                        padding: '5px 10px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                    }}
+                    onClick={() => alert('Profile Settings')}
+                >
+                    Log Out
                 </button>
             </div>
         </header>

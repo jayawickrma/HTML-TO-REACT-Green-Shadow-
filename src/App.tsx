@@ -9,6 +9,7 @@ import {DashBoard} from "./Pages/DashBoard.tsx";
 import Crops from "./Pages/Crop/CropPage.tsx";
 import Fields from "./Pages/Field/FieldPage.tsx";
 import VehiclePage from "./Pages/Vehicle/VehiclePage.tsx";
+import {LogOut} from "lucide-react";
 
 
 
@@ -31,6 +32,8 @@ const App: React.FC = () => {
                 return <StaffPage />;
             case 'vehicle':
                 return <VehiclePage />;
+            case 'settings':
+                return <LogOut/>
             default:
                 return <DashBoard />;
         }
