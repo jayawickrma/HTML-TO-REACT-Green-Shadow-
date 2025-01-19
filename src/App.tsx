@@ -10,7 +10,6 @@ import Crops from "./Pages/Crop/CropPage.tsx";
 import Fields from "./Pages/Field/FieldPage.tsx";
 import VehiclePage from "./Pages/Vehicle/VehiclePage.tsx";
 import {LogOut} from "lucide-react";
-import SignIn from "./Pages/Login/SignIn.tsx";
 
 
 
@@ -18,9 +17,8 @@ const App: React.FC = () => {
     const [activePage, setActivePage] = useState<string>('dashboard');
 
     const renderContent = () => {
+
         switch (activePage) {
-            case '':
-                return<SignIn/>
             case 'dashboard':
                 return <DashBoard />;
             case 'crops':
