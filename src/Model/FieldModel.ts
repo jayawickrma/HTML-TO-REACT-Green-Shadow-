@@ -1,4 +1,4 @@
-export class fieldModel{
+class fieldModel{
     fieldCode:string;
     fieldName:string;
     fieldLocation:string;
@@ -22,3 +22,4 @@ export class fieldModel{
         this.logList = logList;
     }
 }
+export default fieldModel

@@ -1,4 +1,4 @@
-export class Staff{
+class Staff{
     memberCode: string;
     firstName:string;
     lastName:string;
@@ -37,3 +37,4 @@ export class Staff{
         this.fieldList = fieldList;
     }
 }
+export default Staff

@@ -1,4 +1,4 @@
-import StaffModel from "../model/StaffModel.ts";
+import StaffModel from "../Model/StaffModel.ts";
 import {createSlice} from "@reduxjs/toolkit";
 
 const initialStaffs : StaffModel[] = []
@@ -11,13 +11,13 @@ const staffSlice = createSlice({
             state.push(action.payload);
         },
         updateStaff: (state, action) => {
-            const index = state.findIndex(staff => staff.staff_id === action.payload.staff_id);
+            const index = state.findIndex(staff => staff.memberCode === action.payload.staff_id);
             if (index !== -1) {
                 state[index] = { ...state[index], ...action.payload };
             }
         },
         deleteStaff: (state, action) => {
-            return state.filter(staff => staff.staff_id !== action.payload.staff_id);
+            return state.filter(staff => staff.memberCode !== action.payload.staff_id);
         }
     }
 })

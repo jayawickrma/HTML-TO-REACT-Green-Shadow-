@@ -1,4 +1,4 @@
-import LogModel from "../model/LogModel.ts";
+import LogModel from "../Model/LogModel.ts";
 import {createSlice} from "@reduxjs/toolkit";
 
 const initialLogs:LogModel[] = []
@@ -10,13 +10,13 @@ const logSlice = createSlice({
             state.push(action.payload);
         },
         updateLog: (state, action) => {
-            const index = state.findIndex(log => log.log_id === action.payload.log_id);
+            const index = state.findIndex(log => log.logCode === action.payload.log_id);
             if (index !== -1) {
                 state[index] = { ...state[index], ...action.payload };
             }
         },
         deleteLog: (state, action) => {
-            return state.filter(log => log.log_id !== action.payload.log_id);
+            return state.filter(log => log.logCode !== action.payload.log_id);
 
         }
 

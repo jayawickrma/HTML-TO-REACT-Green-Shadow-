@@ -1,4 +1,4 @@
-export class logModel{
+class logModel{
     logCode:string;
     logDate:string;
     logDetails:string;
@@ -17,3 +17,4 @@ export class logModel{
         this.fieldList = fieldList;
     }
 }
+export default logModel

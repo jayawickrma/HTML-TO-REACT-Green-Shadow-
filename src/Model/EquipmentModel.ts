@@ -1,4 +1,4 @@
-export class EquipmentModel{
+class EquipmentModel{
     equipmentCode: string;
     equipmentName: string;
     equipmentType: string;
@@ -15,3 +15,4 @@ export class EquipmentModel{
         this.fieldList = fields;
     }
 }
+export default EquipmentModel

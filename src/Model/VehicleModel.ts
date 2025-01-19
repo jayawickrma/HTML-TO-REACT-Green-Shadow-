@@ -1,4 +1,4 @@
-export class VehicleModel{
+class VehicleModel{
     vehicleCode: string;
     licencePlateNumber: string;
     vehicleName: string;
@@ -19,3 +19,4 @@ export class VehicleModel{
         this.memberCode = memberCode;
     }
 }
+export default VehicleModel

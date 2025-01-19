@@ -1,35 +1,27 @@
 import React, { useState } from "react";
 import { Table, TableColumnsType } from "antd";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../store"; // Adjust import based on your project structure
-import { addCrop, updateCrop, deleteCrop } from "../../slices/CropSlice"; // Adjust import based on your slice
-import MainModal from "../../Components/Add/AddComponent.tsx";
-import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
-import CropModel from "../../Model/CropModel.ts"; // Import your CropModel
+import MainModal from "../../Components/Add/AddComponent.tsx"; // Adjust the import path as needed
+import CustomButton from "../../Components/Button/CustomButonComponent.tsx"; // Adjust the import path as needed
 
 interface Crop {
-    cropCode: number;
+    id: number;
     cropName: string;
-    cropCategory: string;
-    cropSeason: string;
+    category: string;
+    season: string;
     scientificName: string;
-    cropImage: string | null; // Image name or null
-    logList: any[];
-    fieldList: any[];
+    image: string;
+    field: string;
 }
 
 const Crops: React.FC = () => {
-    const crops = useSelector((state: RootState) => state.crops);
-    const dispatch = useDispatch();
-
-    const [formData, setFormData] = useState<Omit<Crop, "cropCode">>({
+    const [crops, setCrops] = useState<Crop[]>([]);
+    const [formData, setFormData] = useState<Omit<Crop, "id">>({
         cropName: "",
-        cropCategory: "",
-        cropSeason: "",
+        category: "",
+        season: "",
         scientificName: "",
-        cropImage: null,
-        logList: [],
-        fieldList: [],
+        image: "",
+        field: "",
     });
     const [imagePopup, setImagePopup] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,9 +30,9 @@ const Crops: React.FC = () => {
 
     const columns: TableColumnsType<Crop> = [
         {
-            title: "Crop Code",
-            dataIndex: "cropCode",
-            key: "cropCode",
+            title: "CROP Code",
+            dataIndex: "id",
+            key: "id",
         },
         {
             title: "Crop Name",
@@ -49,13 +41,13 @@ const Crops: React.FC = () => {
         },
         {
             title: "Category",
-            dataIndex: "cropCategory",
-            key: "cropCategory",
+            dataIndex: "category",
+            key: "category",
         },
         {
             title: "Season",
-            dataIndex: "cropSeason",
-            key: "cropSeason",
+            dataIndex: "season",
+            key: "season",
         },
         {
             title: "Scientific Name",
@@ -64,8 +56,8 @@ const Crops: React.FC = () => {
         },
         {
             title: "Image",
-            dataIndex: "cropImage",
-            key: "cropImage",
+            dataIndex: "image",
+            key: "image",
             render: (image: string, record: Crop) => (
                 <img
                     src={image}
@@ -74,6 +66,11 @@ const Crops: React.FC = () => {
                     onClick={() => setImagePopup(image)}
                 />
             ),
+        },
+        {
+            title: "Field",
+            dataIndex: "field",
+            key: "field",
         },
         {
             title: "Actions",
@@ -90,7 +87,7 @@ const Crops: React.FC = () => {
                         label="Delete"
                         type="button"
                         className="btn-danger"
-                        onClick={() => handleDelete(record.cropCode)}
+                        onClick={() => handleDelete(record.id)}
                     />
                 </div>
             ),
@@ -111,7 +108,7 @@ const Crops: React.FC = () => {
             fileReader.onload = () => {
                 setFormData((prev) => ({
                     ...prev,
-                    cropImage: fileReader.result as string,
+                    image: fileReader.result as string,
                 }));
             };
             fileReader.readAsDataURL(event.target.files[0]);
@@ -119,65 +116,49 @@ const Crops: React.FC = () => {
     };
 
     const handleAdd = () => {
-        const newCrop = new CropModel(
-            crops.length + 1, // Or use another method to generate unique cropCode
-            formData.cropName,
-            formData.scientificName,
-            formData.cropCategory,
-            formData.cropSeason,
-            formData.cropImage ? { name: formData.cropImage } : null, // Assuming file is being uploaded
-            [], // logList (you can add logic for this)
-            []  // fieldList (you can add logic for this)
-        );
-        dispatch(addCrop(newCrop.toPlainObject())); // Dispatch the plain object version
+        const newCrop: Crop = {
+            id: crops.length + 1,
+            ...formData,
+        };
+        setCrops([...crops, newCrop]);
         resetForm();
     };
 
     const handleEdit = (record: Crop) => {
         setIsEditing(true);
-        setEditId(record.cropCode);
+        setEditId(record.id);
         setFormData({
             cropName: record.cropName,
-            cropCategory: record.cropCategory,
-            cropSeason: record.cropSeason,
+            category: record.category,
+            season: record.season,
             scientificName: record.scientificName,
-            cropImage: record.cropImage,
-            logList: record.logList,
-            fieldList: record.fieldList,
+            image: record.image,
+            field: record.field,
         });
         setIsModalOpen(true);
     };
 
     const handleUpdate = () => {
-        if (editId) {
-            const updatedCrop = new CropModel(
-                editId,
-                formData.cropName,
-                formData.scientificName,
-                formData.cropCategory,
-                formData.cropSeason,
-                formData.cropImage ? { name: formData.cropImage } : null, // Assuming file is being uploaded
-                formData.logList,
-                formData.fieldList
-            );
-            dispatch(updateCrop(updatedCrop.toPlainObject()));
-        }
+        setCrops((prevCrops) =>
+            prevCrops.map((crop) =>
+                crop.id === editId ? { id: editId, ...formData } : crop
+            )
+        );
         resetForm();
     };
 
-    const handleDelete = (cropCode: number) => {
-        dispatch(deleteCrop({ cropCode }));
+    const handleDelete = (id: number) => {
+        setCrops(crops.filter((crop) => crop.id !== id));
     };
 
     const resetForm = () => {
         setFormData({
             cropName: "",
-            cropCategory: "",
-            cropSeason: "",
+            category: "",
+            season: "",
             scientificName: "",
-            cropImage: null,
-            logList: [],
-            fieldList: [],
+            image: "",
+            field: "",
         });
         setIsModalOpen(false);
         setIsEditing(false);
@@ -200,7 +181,7 @@ const Crops: React.FC = () => {
                 </div>
 
                 {/* Crop Table */}
-                <Table<Crop> columns={columns} dataSource={crops} rowKey="cropCode" />
+                <Table<Crop> columns={columns} dataSource={crops} rowKey="id" />
 
                 {/* Modal for Adding/Editing Crop */}
                 <MainModal
@@ -224,7 +205,70 @@ const Crops: React.FC = () => {
                                 required
                             />
                         </div>
-                        {/* Add other form fields similarly... */}
+                        <div className="mb-3">
+                            <label htmlFor="category" className="form-label">
+                                Category
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="category"
+                                value={formData.category}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="season" className="form-label">
+                                Season
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="season"
+                                value={formData.season}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="scientificName" className="form-label">
+                                Scientific Name
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="scientificName"
+                                value={formData.scientificName}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="image" className="form-label">
+                                Image
+                            </label>
+                            <input
+                                type="file"
+                                className="form-control"
+                                id="image"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="field" className="form-label">
+                                Field
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="field"
+                                value={formData.field}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
                     </form>
                 </MainModal>
 
@@ -247,20 +291,20 @@ const Crops: React.FC = () => {
                             zIndex: 999,
                         }}
                     >
-                        <span
-                            className="close"
-                            style={{
-                                position: "absolute",
-                                top: "10px",
-                                right: "20px",
-                                fontSize: "30px",
-                                color: "white",
-                                cursor: "pointer",
-                            }}
-                            onClick={() => setImagePopup(null)}
-                        >
-                            ×
-                        </span>
+            <span
+                className="close"
+                style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "20px",
+                    fontSize: "30px",
+                    color: "white",
+                    cursor: "pointer",
+                }}
+                onClick={() => setImagePopup(null)}
+            >
+              ×
+            </span>
                         <img
                             id="popupImage"
                             src={imagePopup}

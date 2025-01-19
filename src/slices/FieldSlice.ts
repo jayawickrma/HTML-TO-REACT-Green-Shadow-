@@ -1,4 +1,4 @@
-import FieldModel from "../model/FieldModel.ts";
+import FieldModel from "../Model/FieldModel.ts";
 import {createSlice} from "@reduxjs/toolkit";
 
 const initialFields:FieldModel[] = []
@@ -10,10 +10,10 @@ const fieldSlice = createSlice({
             state.push(action.payload);
         },
         deleteField: (state, action) => {
-            return state.filter(field => field.field_id !== action.payload.field_id);
+            return state.filter(field => field.fieldCode !== action.payload.field_id);
         },
         updateField: (state, action) => {
-            const index = state.findIndex(field => field.field_id === action.payload.field_id);
+            const index = state.findIndex(field => field.fieldCode === action.payload.field_id);
             if (index !== -1) {
                 state[index] = { ...state[index], ...action.payload };
             }
