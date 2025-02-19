@@ -5,6 +5,7 @@ import StaffSlice from "../slices/StaffSlice.ts";
 import CropSlice from "../slices/CropSlice.ts";
 import LogSlice from "../slices/LogSlice.ts";
 import FieldSlice from "../slices/FieldSlice.ts";
+import TokenSlice from "../slices/TokenSlice.ts";
 
 export const store = configureStore({
     reducer:{
@@ -13,9 +14,11 @@ export const store = configureStore({
         staffs : StaffSlice,
         crops : CropSlice,
         logs : LogSlice,
-        fields : FieldSlice
+        fields : FieldSlice,
+        token: TokenSlice
     }
 })
-export type RootState = ReturnType<typeof store.getState>;
 
-export default store;
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
