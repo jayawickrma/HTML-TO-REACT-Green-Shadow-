@@ -3,5 +3,12 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "baseUrl": ".", // Base directory for relative paths
+    "paths": {
+      "@/*": ["src/*"], // Adjust 'src/*' to match your directory structure
+      "@components/*": ["src/Components/*"] // Example alias for components
+    }
+  }
 }

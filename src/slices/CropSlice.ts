@@ -8,7 +8,7 @@ const initialCrops: CropModel[] = [];
 // Fetch Crops
 export const getCrops = createAsyncThunk('crops/getCrops', async (_, { rejectWithValue }) => {
     try {
-        const response: AxiosResponse<CropModel[]> = await Api_call.getApiCall('/crop/getAllCrops');
+        const response: AxiosResponse<CropModel[]> = await Api_call.getApiCall('http://localhost:8080/api/v1/crop/getAllCrops');
         return response.data;
     } catch (err) {
         return rejectWithValue(err);
@@ -58,7 +58,7 @@ export const saveCrop = createAsyncThunk('crops/saveCrop', async (crop: CropMode
         if (crop.cropImage) {
             formData.append("cropImage", crop.cropImage);
         }
-        const response: AxiosResponse<CropModel> = await Api_call.postApiCallWithFormData('/crop/saveCrop', formData);
+        const response: AxiosResponse<CropModel> = await Api_call.postApiCallWithFormData('http://localhost:8080/api/v1/crop/getAllCrops', formData);
         return response.data;
     } catch (err) {
         return rejectWithValue(err);
