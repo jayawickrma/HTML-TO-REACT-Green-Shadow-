@@ -1,90 +1,75 @@
-import axios from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
-class ApiCall{
-    baseUrl: string = "http://localhost:3000/api/v1"
+class ApiCall {
+    private api: AxiosInstance;
 
-
-     api = axios.create({
-        baseURL : this.baseUrl
-    })
-
-    async postApiCallWithFromData(url: string, data: any){
-        try {
-            const token = localStorage.getItem("token")
-            return await this.api.post(url, data,{
-                headers : {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-        }catch (err){
-            return err;
-        }
+    constructor() {
+        this.api = axios.create({
+            baseURL: "http://localhost:3000/api/v1",
+        });
     }
-    async patchApiCallWithFormData(url:string,data:FormData){
-        try {
-            const token = localStorage.getItem("token")
-            return await this.api.patch(url, data,{
-                headers : {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-        }catch (err){
-            return err;
-        }
+
+    private getAuthHeaders(): Record<string, string> {
+        const token = localStorage.getItem("token");
+        return {
+            Authorization: `Bearer ${token}`
+        };
     }
-    async postApiCall(url:string,data:any){
+
+    async postApiCallWithFormData<T>(url: string, data: FormData): Promise<AxiosResponse<T>> {
         try {
-            const token = localStorage.getItem("token")
-            return await this.api.post(url, data,{
-                headers : {
-                    Authorization :`Bearer ${token}`
-                }
-            });
-        }catch (err){
-            console.error("Failed to save", err);
-            return err;
+            return await this.api.post<T>(url, data, { headers: this.getAuthHeaders() });
+        } catch (err) {
+            console.error("POST with FormData failed:", err);
+            throw err;
         }
     }
 
-    async patchApiCall(url:string,data:any){
+    async patchApiCallWithFormData<T>(url: string, data: FormData): Promise<AxiosResponse<T>> {
         try {
-            const token = localStorage.getItem("token")
-            return await this.api.patch(url, data,{
-                headers : {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-        }catch (err){
-            return err;
+            return await this.api.patch<T>(url, data, { headers: this.getAuthHeaders() });
+        } catch (err) {
+            console.error("PATCH with FormData failed:", err);
+            throw err;
         }
     }
-    async deleteApiCall(url:string,id:string){
+
+    async postApiCall<T>(url: string, data: T): Promise<AxiosResponse<T>> {
         try {
-            const token = localStorage.getItem("token")
-            return await this.api.delete(url,{
-                params:{
-                    id : id
-                },
-                headers : {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-        }catch (err){
-            return err;
+            return await this.api.post<T>(url, data, { headers: this.getAuthHeaders() });
+        } catch (err) {
+            console.error("POST request failed:", err);
+            throw err;
         }
     }
-    async getApiCall(url:string){
+
+    async patchApiCall<T>(url: string, data: T): Promise<AxiosResponse<T>> {
         try {
-            const token = localStorage.getItem("token")
-            return await this.api.get(url,{
-                headers : {
-                    Authorization : `Bearer ${token}`
-                }
-            });
-        }catch (err){
-            return err;
+            return await this.api.patch<T>(url, data, { headers: this.getAuthHeaders() });
+        } catch (err) {
+            console.error("PATCH request failed:", err);
+            throw err;
+        }
+    }
+
+    async deleteApiCall<T>(url: string): Promise<AxiosResponse<T>> {
+        try {
+            return await this.api.delete<T>(url, { headers: this.getAuthHeaders() });
+        } catch (err) {
+            console.error("DELETE request failed:", err);
+            throw err;
+        }
+    }
+
+    async getApiCall<T>(url: string): Promise<AxiosResponse<T>> {
+        try {
+            return await this.api.get<T>(url, { headers: this.getAuthHeaders() });
+        } catch (err) {
+            console.error("GET request failed:", err);
+            throw err;
         }
     }
 }
+
 const Api_call = new ApiCall();
 export default Api_call;
