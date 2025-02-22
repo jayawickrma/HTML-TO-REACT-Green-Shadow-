@@ -22,7 +22,7 @@ const Crops: React.FC = () => {
         category: "",
         season: "",
         scientificName: "",
-        image: null as File | null,
+        cropImage: null as File | null,
         field: "",
     });
     const [imagePopup, setImagePopup] = useState<string | null>(null);

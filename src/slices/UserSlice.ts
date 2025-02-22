@@ -77,15 +77,19 @@ const userSlice = createSlice({
                 if (action.payload) {
                     state.user = action.payload;
                     state.isAuthenticated = true;
+                    state.error = "";
                     localStorage.setItem("jwt_token", action.payload.accessToken);
                     localStorage.setItem("refresh_token", action.payload.refreshToken);
                 }
             })
-            .addCase(register.pending, () => {
-                console.log("Pending register user");
+            .addCase(register.pending, (state) => {
+                state.loading = true;
+                state.error = "";
             })
-            .addCase(register.rejected, () => {
-                console.error("Rejected register user");
+            .addCase(register.rejected, (state, action) => {
+                state.loading = false;
+                state.error = "Registration failed. Please try again.";
+                console.error(action.error.message);
             })
 
             // Handling the successful login case
@@ -96,15 +100,22 @@ const userSlice = createSlice({
                     state.refresh_token = action.payload.refreshToken;
                     state.username = action.payload.username;
                     state.isAuthenticated = true;
+                    state.error = "";
 
                     // Store JWT tokens in localStorage
                     localStorage.setItem("jwt_token", action.payload.accessToken);
                     localStorage.setItem("refresh_token", action.payload.refreshToken);
                 }
             })
-            .addCase(login.rejected, (state) => {
+            .addCase(login.pending, (state) => {
+                state.loading = true;
+                state.error = "";
+            })
+            .addCase(login.rejected, (state, action) => {
+                state.loading = false;
                 state.isAuthenticated = false;
-                console.error("Login failed");
+                state.error = "Login failed. Please check your credentials.";
+                console.error(action.error.message);
             });
     },
 });
