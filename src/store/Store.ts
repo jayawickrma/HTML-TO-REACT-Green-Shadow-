@@ -12,13 +12,11 @@ export const store = configureStore({
         vehicles : VehicleSlice,
         equipments : EquipmentSlice,
         staffs : StaffSlice,
-        crops : CropSlice,
+        crop : CropSlice,
         logs : LogSlice,
         fields : FieldSlice,
         token: TokenSlice
     }
 })
 
-
-export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

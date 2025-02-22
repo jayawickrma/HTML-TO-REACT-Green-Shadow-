@@ -3,9 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { Table } from "antd";
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
-import { RootState } from "../../store/Store.ts"; // Adjust the path to your store file
 import { addEquipment, updateEquipment, deleteEquipment } from "../../slices/EquipmentSlice";
 import EquipmentModel from "../../Model/EquipmentModel";
+import {RootState} from "@reduxjs/toolkit/query";
 
 const ManageEquipment: React.FC = () => {
     const equipmentList = useSelector((state: RootState) => state.equipments); // Access equipment state

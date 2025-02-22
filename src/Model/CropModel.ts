@@ -1,4 +1,4 @@
-class CropModel{
+export class CropModel{
 
     cropCode:string;
     cropName:string;
@@ -21,4 +21,3 @@ class CropModel{
         this.fieldList = fieldList;
     }
 }
-export default CropModel
