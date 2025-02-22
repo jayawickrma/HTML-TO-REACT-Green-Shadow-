@@ -16,7 +16,7 @@ export const store = configureStore({
         staffs : StaffSlice,
         crop : CropSlice,
         logs : LogSlice,
-        fields : FieldSlice,
+        field : FieldSlice,
         token: TokenSlice
     }
 })

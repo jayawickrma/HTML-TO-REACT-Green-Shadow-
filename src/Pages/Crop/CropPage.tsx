@@ -75,6 +75,31 @@ const Crops: React.FC = () => {
             title: "Field",
             dataIndex: "fieldList",
             key: "fieldList",
+            render: (fields: Array<{ fieldCode: number }> | null) => {
+                console.log("Field List:", fields); // Debugging line
+                if (fields && fields.length > 0) {
+                    return fields.map((field, index) => (
+                        <div key={index}>Field Code: {field.fieldCode}</div>
+                    ));
+                } else {
+                    return "No fields found";
+                }
+            },
+        },
+        {
+            title: "Log",
+            dataIndex: "logList",
+            key: "logList",
+            render: (logs: Array<{ logCode: number }> | null) => {
+                console.log("Log List:", logs); // Debugging line
+                if (logs && logs.length > 0) {
+                    return logs.map((log, index) => (
+                        <div key={index}>Log Code: {log.logCode}</div>
+                    ));
+                } else {
+                    return "No logs found";
+                }
+            },
         },
         {
             title: "Actions",
@@ -97,6 +122,7 @@ const Crops: React.FC = () => {
             ),
         },
     ];
+
 
     useEffect(() => {
         dispatch(getAllCrops());

@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Table } from "antd";
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
-import { RootState } from "../../store/Store.ts"; // Adjust the path to your store file
-import { addField, updateField, deleteField } from "../../slices/FieldSlice";
+import { saveField, updateField, deleteField, FieldRootState, getAllFields } from "../../slices/FieldSlice";
 import FieldModel from "../../Model/FieldModel";
 
 const ManageFields: React.FC = () => {
-    const fields = useSelector((state: RootState) => state.fields); // Access fields state
+    const fields = useSelector((state: FieldRootState) => state.field.fields);  // Accessing fields from the Redux store
     const dispatch = useDispatch();
 
     const [formData, setFormData] = useState<Omit<FieldModel, "fieldCode">>({
@@ -81,6 +80,10 @@ const ManageFields: React.FC = () => {
         },
     ];
 
+    useEffect(() => {
+        dispatch(getAllFields());
+    }, [dispatch]);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
         setFormData((prev) => ({
@@ -91,31 +94,39 @@ const ManageFields: React.FC = () => {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: "fieldImage1" | "fieldImage2") => {
         if (e.target.files && e.target.files[0]) {
-
             setFormData((prev) => ({
                 ...prev,
-                // @ts-ignore
-                [field]: e.target.files[0],
+                [field]: e.target.files[0],  // Store the file object
             }));
         }
     };
 
     const handleSubmit = () => {
+        const newField = {
+            ...formData,
+            fieldCode: editingField ? editingField.fieldCode : `FLD${fields.length + 1}`,
+        };
+
+        const formDataToSubmit = new FormData();
+        formDataToSubmit.append("fieldCode", newField.fieldCode);
+        formDataToSubmit.append("fieldName", newField.fieldName);
+        formDataToSubmit.append("fieldLocation", newField.fieldLocation);
+        formDataToSubmit.append("fieldExtentSize", newField.fieldExtentSize);
+        formDataToSubmit.append("equipmentList", newField.equipmentList);
+        formDataToSubmit.append("cropList", newField.cropList);
+        formDataToSubmit.append("logList", newField.logList);
+
+        if (newField.fieldImage1) {
+            formDataToSubmit.append("fieldImage1", newField.fieldImage1);
+        }
+        if (newField.fieldImage2) {
+            formDataToSubmit.append("fieldImage2", newField.fieldImage2);
+        }
+
         if (editingField) {
-            dispatch(updateField({ ...formData, field_id: editingField.fieldCode }));
+            dispatch(updateField(formDataToSubmit));  // Update field
         } else {
-            const newField = new FieldModel(
-                `FLD${fields.length + 1}`,
-                formData.fieldName,
-                formData.fieldLocation,
-                formData.fieldExtentSize,
-                formData.fieldImage1,
-                formData.fieldImage2,
-                formData.equipmentList,
-                formData.cropList,
-                formData.logList
-            );
-            dispatch(addField(newField));
+            dispatch(saveField(formDataToSubmit));  // Save new field
         }
         resetForm();
     };
@@ -142,7 +153,7 @@ const ManageFields: React.FC = () => {
     };
 
     const handleDelete = (fieldCode: string) => {
-        dispatch(deleteField({ field_id: fieldCode }));
+        dispatch(deleteField(fieldCode));  // Delete field by fieldCode
     };
 
     return (
@@ -158,7 +169,7 @@ const ManageFields: React.FC = () => {
                     }}
                 />
             </div>
-            <Table columns={columns} dataSource={fields} rowKey="fieldCode" />
+            <Table columns={columns} dataSource={fields || []} rowKey="fieldCode" />
             <MainModal
                 isType={editingField ? "Edit Field" : "Add Field"}
                 buttonType={editingField ? "Save Changes" : "Add Field"}
@@ -205,23 +216,41 @@ const ManageFields: React.FC = () => {
             </MainModal>
             {imagePopup && (
                 <div
+                    id="imagePopup"
                     style={{
+                        display: "flex",
                         position: "fixed",
                         top: 0,
                         left: 0,
-                        right: 0,
                         bottom: 0,
+                        right: 0,
+                        width: "100%",
+                        height: "100%",
                         background: "rgba(0, 0, 0, 0.8)",
-                        display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
+                        zIndex: 999,
                     }}
                 >
-                    <img src={imagePopup} alt="Popup" style={{ maxHeight: "80%", maxWidth: "80%" }} />
-                    <CustomButton
-                        label="Close"
-                        className="btn btn-light"
+                    <span
+                        className="close"
+                        style={{
+                            position: "absolute",
+                            top: "10px",
+                            right: "20px",
+                            fontSize: "30px",
+                            color: "white",
+                            cursor: "pointer",
+                        }}
                         onClick={() => setImagePopup(null)}
+                    >
+                        ×
+                    </span>
+                    <img
+                        id="popupImage"
+                        src={imagePopup}
+                        alt="Popup Image"
+                        style={{ maxWidth: "50%", maxHeight: "50%" }}
                     />
                 </div>
             )}
