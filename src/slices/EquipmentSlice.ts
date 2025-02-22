@@ -8,7 +8,7 @@ const initialState = {
 
 export type EquipmentRootState = {
     equipment: {
-        equipment: Array<{
+        equipments: Array<{
             equipmentCode: string;
             equipmentName: string;
             equipmentType: string;

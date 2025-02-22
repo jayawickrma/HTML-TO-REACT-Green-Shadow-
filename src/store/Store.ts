@@ -10,7 +10,7 @@ import TokenSlice from "../slices/TokenSlice.ts";
 export const store = configureStore({
     reducer:{
         vehicles : VehicleSlice,
-        equipments : EquipmentSlice,
+        equipment : EquipmentSlice,
         staffs : StaffSlice,
         crop : CropSlice,
         logs : LogSlice,
