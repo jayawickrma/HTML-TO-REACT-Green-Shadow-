@@ -43,13 +43,13 @@ const Crops: React.FC = () => {
         },
         {
             title: "Category",
-            dataIndex: "cropCategory",
-            key: "cropCategory",
+            dataIndex: "category",
+            key: "category",
         },
         {
             title: "Season",
-            dataIndex: "cropSeason",
-            key: "cropSeason",
+            dataIndex: "season",
+            key: "season",
         },
         {
             title: "Scientific Name",
