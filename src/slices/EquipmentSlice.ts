@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../Services/api.ts"; // Your API service to make requests
-import EquipmentModel from "../Model/EquipmentModel.ts"; // Your model class for equipment
+import {EquipmentModel} from "../Model/EquipmentModel.ts"; // Your model class for equipment
 
 const initialState = {
     equipment: [] as EquipmentModel[], // State holding the equipment data
