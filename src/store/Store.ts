@@ -1,24 +1,28 @@
-import {configureStore} from "@reduxjs/toolkit";
-import VehicleSlice from "../slices/VehicleSlice.ts";
-import EquipmentSlice from "../slices/EquipmentSlice.ts";
-import StaffSlice from "../slices/StaffSlice.ts";
-import CropSlice from "../slices/CropSlice.ts";
-import LogSlice from "../slices/LogSlice.ts";
-import FieldSlice from "../slices/FieldSlice.ts";
-import TokenSlice from "../slices/TokenSlice.ts";
-import UserSlice from "../slices/UserSlice.ts";
+import { configureStore } from "@reduxjs/toolkit";
+import VehicleSlice from "../slices/VehicleSlice";
+import EquipmentSlice from "../slices/EquipmentSlice";
+import StaffSlice from "../slices/StaffSlice";
+import CropSlice from "../slices/CropSlice";
+import LogSlice from "../slices/LogSlice";
+import FieldSlice from "../slices/FieldSlice";
+import TokenSlice from "../slices/TokenSlice";
+import UserSlice from "../slices/UserSlice";
 
 export const store = configureStore({
-    reducer:{
-        user:UserSlice,
-        vehicle : VehicleSlice,
-        equipment : EquipmentSlice,
-        staffs : StaffSlice,
-        crop : CropSlice,
-        logs : LogSlice,
-        field : FieldSlice,
-        token: TokenSlice
-    }
-})
+    reducer: {
+        user: UserSlice,
+        vehicle: VehicleSlice,
+        equipment: EquipmentSlice,
+        staffs: StaffSlice,
+        crop: CropSlice,
+        logs: LogSlice,
+        field: FieldSlice,
+        token: TokenSlice,
+    },
+});
 
+// ✅ Type for RootState
+export type RootState = ReturnType<typeof store.getState>;
+
+// ✅ Type for App Dispatch
 export type AppDispatch = typeof store.dispatch;

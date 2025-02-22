@@ -74,7 +74,6 @@ export const getAllCrops= createAsyncThunk(
     async () => {
         try {
             const response = await api.get("crop/getAllCrops");
-            console.log("all crop details =======",response.data)
             return response.data;
         } catch (e) {
             console.log("Failed to get all crop!",e);
