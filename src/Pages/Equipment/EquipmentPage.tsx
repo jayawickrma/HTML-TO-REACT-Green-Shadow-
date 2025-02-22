@@ -22,7 +22,6 @@ const Equipment: React.FC = () => {
         equipmentType: "",
         equipmentStatus: "Available",
         availableCount: "",
-        image: null as File | null,
         fieldList: "",
     });
     const [imagePopup, setImagePopup] = useState<string | null>(null);
@@ -109,7 +108,6 @@ const Equipment: React.FC = () => {
             equipmentType: record.equipmentType,
             equipmentStatus: record.equipmentStatus,
             availableCount: record.availableCount,
-            image: record.image,
             fieldList: record.fieldList,
         });
         setIsModalOpen(true);
@@ -279,12 +277,6 @@ const Equipment: React.FC = () => {
                         >
                             ×
                         </span>
-                        <img
-                            id="popupImage"
-                            src={imagePopup}
-                            alt="Popup Image"
-                            style={{ maxWidth: "50%", maxHeight: "50%" }}
-                        />
                     </div>
                 )}
             </div>

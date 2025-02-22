@@ -6,9 +6,11 @@ import CropSlice from "../slices/CropSlice.ts";
 import LogSlice from "../slices/LogSlice.ts";
 import FieldSlice from "../slices/FieldSlice.ts";
 import TokenSlice from "../slices/TokenSlice.ts";
+import UserSlice from "../slices/UserSlice.ts";
 
 export const store = configureStore({
     reducer:{
+        user:UserSlice,
         vehicles : VehicleSlice,
         equipment : EquipmentSlice,
         staffs : StaffSlice,
