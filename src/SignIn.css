@@ -1,189 +1,200 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* General Styles */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f4f9f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+/* Base layout enhancements */
+.min-h-screen {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
 }
 
-/* Authentication Container */
-.auth-container {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
-    width: 100%;
-    max-width: 400px;
+/* Image container styling */
+.bg-green-100 {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 16px 16px 0;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
 }
 
-/* Form Styles */
-.auth-form {
-    display: flex;
-    flex-direction: column;
+.bg-green-100 img {
+    transform: scale(1.02);
+    transition: transform 0.6s ease-in-out;
+    filter: brightness(0.95);
 }
 
-.auth-form h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: #2e7d32;
+.bg-green-100::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+            135deg,
+            rgba(52, 211, 153, 0.2),
+            rgba(16, 185, 129, 0.3)
+    );
 }
 
-.input-group {
-    margin-bottom: 1rem;
+/* Form container enhancements */
+.shadow-lg {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.input-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-    color: #555;
+.rounded-lg {
+    border-radius: 16px;
 }
 
-.input-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
+/* Form fields styling */
+.ant-form-item {
+    margin-bottom: 24px;
 }
 
-.input-group input:focus {
-    border-color: #2e7d32;
-    outline: none;
-    box-shadow: 0 0 4px rgba(46, 125, 50, 0.5);
+.ant-form-item-label > label {
+    color: #374151;
+    font-weight: 600;
+    font-size: 0.95rem;
 }
 
-/* Button Styles */
-#btn {
-    background: #2e7d32;
-    color: #fff;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
+.ant-input,
+.ant-input-password {
+    height: 48px;
+    background-color: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    transition: all 0.2s ease;
 }
 
-#btn:hover {
-    background: #256f28;
-}
-
-/* Links */
-.auth-form p {
-    text-align: center;
-    margin-top: 1rem;
-    color: #555;
-}
-
-.auth-form a {
-    color: #2e7d32;
-    text-decoration: none;
-}
-
-.auth-form a:hover {
-    text-decoration: underline;
-}
-/* General Styles */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-/* Container */
-.auth-container {
+.ant-input:hover,
+.ant-input-password:hover {
+    border-color: #34d399;
     background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px 30px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
 }
 
-/* Form Header */
-.auth-form h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #333333;
+.ant-input:focus,
+.ant-input-password-focused {
+    border-color: #34d399;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
 }
 
-/* Input Groups */
-.input-group {
-    margin-bottom: 15px;
-    text-align: left;
-}
-
-.input-group label {
-    font-size: 14px;
-    color: #555555;
-    margin-bottom: 5px;
-    display: block;
-}
-
-.input-group input,
-.input-group select {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-
-.input-group input:focus,
-.input-group select:focus {
-    border-color: #007BFF;
-}
-
-/* Button */
-.btn {
-    background-color: green;
-    color: #ffffff;
-    padding: 10px 15px;
-    font-size: 14px;
-    font-weight: bold;
+/* Button styling */
+.ant-btn-primary {
+    height: 48px;
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
     border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+}
+
+.ant-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(16, 185, 129, 0.2);
+}
+
+.ant-btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Checkbox styling */
+.ant-checkbox-wrapper {
+    color: #4b5563;
+}
+
+.ant-checkbox-inner {
     border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
+    border: 2px solid #d1d5db;
 }
 
-.btn:hover {
-    background-color: green;
+.ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #10b981;
+    border-color: #10b981;
 }
 
-/* Link */
-.auth-form p {
-    font-size: 14px;
-    margin-top: 15px;
-    color: #555555;
+/* Link styling */
+.text-green-500 {
+    color: #10b981;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
-.auth-form a {
-    color: green;
-    text-decoration: none;
-    font-weight: bold;
+.text-green-500:hover {
+    color: #059669;
 }
 
-.auth-form a:hover {
-    text-decoration: underline;
+/* Animation */
+@keyframes formAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+.space-y-4 {
+    animation: formAppear 0.5s ease-out;
+}
+
+/* Title styling */
+.text-3xl {
+    color: #111827;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Error states */
+.ant-form-item-explain-error {
+    margin-top: 4px;
+    color: #ef4444;
+    font-size: 0.875rem;
+}
+
+.ant-form-item-has-error .ant-input,
+.ant-form-item-has-error .ant-input-password {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .max-w-2xl {
+        max-width: 100%;
+        margin: 0;
+        padding: 2rem;
+    }
+
+    .rounded-lg {
+        border-radius: 0;
+    }
+
+    .shadow-lg {
+        box-shadow: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .bg-white {
+        background-color: #1f2937;
+    }
+
+    .text-gray-800 {
+        color: #f3f4f6;
+    }
+
+    .text-gray-600 {
+        color: #d1d5db;
+    }
+
+    .ant-input,
+    .ant-input-password {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #f3f4f6;
+    }
+
+    .ant-form-item-label > label {
+        color: #e5e7eb;
+    }
+}

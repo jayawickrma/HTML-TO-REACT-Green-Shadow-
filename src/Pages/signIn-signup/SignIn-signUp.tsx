@@ -1,20 +1,16 @@
-import React, {useEffect, useState} from "react";
-import { Input, Button, Checkbox, Form, FormProps } from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, Checkbox, Form, Card, message } from "antd"; // Added message for displaying error/success
 import { useNavigate } from "react-router-dom";
-import agricultureImg from "../../assets/img/pexels-pixabay-325944.jpg";
-import AnchorTag from "../../components/anchor-tag/AnchorTag.tsx";
-import Image from "../../components/img/Image.tsx";
-import { Heading1 } from "../../components/heading/Heading.tsx";
-import {useDispatch, useSelector} from "react-redux";
-import {register, login, UserRootState} from "../../reducer/UserSlice.ts";
-import {AppDispatch} from "../../store/store.ts";
-import {User} from "../../model/User.ts";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "../../store/Store.ts";
+import { login, register, UserRootState } from "../../slices/UserSlice.ts";
+import { User } from "../../Model/User.ts";
+import "../../SignIn.css";
 
 type FieldType = {
-    username?: string;
-    password?: string;
     email?: string;
-    remember?: string;
+    password?: string;
+    remember?: boolean;
 };
 
 const SignInSignUp: React.FC = () => {
@@ -22,153 +18,160 @@ const SignInSignUp: React.FC = () => {
     const navigate = useNavigate();
     const [isSignUp, setIsSignUp] = useState(false);
     const isAuthenticated = useSelector((state: UserRootState) => state.user.isAuthenticated);
-    const [registerUsername, setRegisterUsername] = useState("");
-    const [registerEmail, setRegisterEmail] = useState("");
-    const [registerPassword, setRegisterPassword] = useState("");
 
-    const [loginUsername, setLoginUsername] = useState("");
-    const [loginPassword, setLoginPassword] = useState("");
+    // Form state management
+    const [form] = Form.useForm();
+    const [formData, setFormData] = useState({
+        email: "",
+        password: ""
+    });
 
     useEffect(() => {
-        if (isSignUp) {
-            if (isAuthenticated) {
-                navigate("/");
-            }
-        }
         if (isAuthenticated) {
             navigate("/dashboard");
         }
-    },[isAuthenticated])
+    }, [isAuthenticated, navigate]);
 
-    const handleUser = () => {
-        if (isSignUp) {
-            const newUser = new User(registerUsername,registerEmail,registerPassword);
-            return dispatch(register(newUser));
+    // Handle form submission
+    const onFinish = async (values: FieldType) => {
+        const user = new User(values.email!, values.password!);
+
+        try {
+            if (isSignUp) {
+                // Dispatch the register action
+                const result = await dispatch(register(user)).unwrap();
+                if (result) {
+                    message.success("Registration successful! Redirecting to login.");
+                    setIsSignUp(false);  // Switch to login after successful registration
+                }
+            } else {
+                // Dispatch the login action
+                const result = await dispatch(login(user)).unwrap();
+                if (result) {
+                    message.success("Login successful! Redirecting to dashboard.");
+                }
+            }
+        } catch (error) {
+            // Handle error in login or registration
+            message.error("An error occurred during authentication. Please try again.");
+            console.error(error); // Log the error for debugging purposes
         }
-        const user: User = { username: loginUsername, email: "", password: loginPassword };
-        dispatch(login(user));
     };
 
-
-    const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-        console.log("Success:", values);
-        navigate("/dashboard");
-    };
-
-    const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (errorInfo) => {
-        console.log("Failed:", errorInfo);
+    // Handle input changes
+    const handleInputChange = (field: keyof typeof formData) => (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: e.target.value
+        }));
     };
 
     return (
-        <div className="flex min-h-screen w-full">
-            {/* Left Side */}
-            <div className="hidden lg:flex flex-[4] bg-green-100 justify-center items-center">
-                <Image path={agricultureImg} altName={"Agriculture"} classes={"w-full h-full object-cover"} />
-            </div>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 p-4">
+            <Card className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
+                <div className="space-y-6">
+                    {/* Form Header */}
+                    <div className="text-center space-y-2">
+                        <h1 className="text-3xl font-bold text-gray-900">
+                            {isSignUp ? "Create Account" : "Welcome Back"}
+                        </h1>
+                        <p className="text-gray-500">
+                            {isSignUp
+                                ? "Start your journey with us today"
+                                : "Please enter your details to sign in"}
+                        </p>
+                    </div>
 
-            {/* Right Side - Form */}
-            <div className="flex flex-[2] justify-center items-center p-8 w-full max-w-2xl">
-                <div className="w-full">
-                    <Heading1 name={isSignUp ? "Create Your Account" : "Sign In"} classes={"text-center mb-8 font-bold text-2xl"} />
+                    {/* Auth Form */}
                     <Form
-                        name="basic"
-                        labelCol={{ span: 10 }}
-                        wrapperCol={{ span: 20 }}
-                        style={{ width: "100%" }}
-                        initialValues={{ remember: true }}
+                        form={form}
+                        name="authForm"
                         onFinish={onFinish}
-                        onFinishFailed={onFinishFailed}
-                        autoComplete="off"
+                        layout="vertical"
+                        className="space-y-4"
                     >
-                        {/* Username Field */}
-                        <Form.Item<FieldType>
-                            label="Username"
-                            name="username"
-                            labelCol={{ span: 24 }}
-                            wrapperCol={{ span: 24 }}
-                            rules={[{ required: true, message: "Please input your username!" }]}
-                            style={{ marginBottom: "3px" }}
+                        <Form.Item
+                            name="email"
+                            label="Email"
+                            rules={[
+                                { required: true, message: "Please input your email!" },
+                                { type: "email", message: "Please enter a valid email!" }
+                            ]}
                         >
-                            <Input onChange={
-                                isSignUp
-                                ? (e) => setRegisterUsername(e.target.value)
-                                : (e) => setLoginUsername(e.target.value)}/>
+                            <Input
+                                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white"
+                                placeholder="Enter your email"
+                                value={formData.email}
+                                onChange={handleInputChange("email")}
+                            />
                         </Form.Item>
-
-                        {/* Email Field (Only for Sign Up) */}
-                        {isSignUp && (
-                            <Form.Item<FieldType>
-                                label="Email"
-                                name="email"
-                                labelCol={{ span: 24 }}
-                                wrapperCol={{ span: 24 }}
-                                rules={[{ required: true, message: "Please input your username!" }]}
-                                style={{ marginBottom: "3px" }}
-                            >
-                                <Input onChange={(e) => setRegisterEmail(e.target.value)}/>
-                            </Form.Item>
-
-                        )}
-
-                        {/* Password Field */}
-                        <Form.Item<FieldType>
-                            label="Password"
-                            name="password"
-                            labelCol={{ span: 24 }}
-                            wrapperCol={{ span: 24 }}
-                            rules={[{ required: true, message: "Please input your password!" }]}
-                            style={{ marginBottom: "3px" }}
-                        >
-                            <Input.Password onChange={
-                                isSignUp
-                                ? (e) => setRegisterPassword(e.target.value)
-                                : (e) => setLoginPassword(e.target.value)}/>
-                        </Form.Item>
-
-                        {/* Forgot Password (Only for Sign In) */}
-                        {!isSignUp && (
-                            <AnchorTag href="/forgot-password" name={"Forgot password?"} classes={"text-blue-500 mb-2 text-right hover:underline block"} />
-                        )}
-
-                        {/* Remember Me Checkbox (Only for Sign In) */}
-                        {!isSignUp && (
-                            <Form.Item<FieldType>
-                                name="remember" valuePropName="checked"
-                                className={"text-center"}
-                                label={null}
-                                wrapperCol={{ span: 24, offset: 0 }}>
-                                <Checkbox>Remember me</Checkbox>
-                            </Form.Item>
-                        )}
 
                         <Form.Item
-                            label={null}
-                            wrapperCol={{ span: 24, offset: 0 }}
-                            className="flex justify-center"
-                            style={{ marginTop: "24px" }}
+                            name="password"
+                            label="Password"
+                            rules={[{ required: true, message: "Please input your password!" }]}
                         >
-                            <Button type="primary" className="bg-green-500 w-full max-w-sm px-20" htmlType="button" onClick={handleUser}>
-                                {isSignUp ? "Sign Up" : "Sign In"}
-                            </Button>
+                            <Input.Password
+                                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white"
+                                placeholder="Enter your password"
+                                value={formData.password}
+                                onChange={handleInputChange("password")}
+                            />
                         </Form.Item>
 
-                        {/* Toggle Between Sign In & Sign Up */}
-                        <div className="text-center mt-4 pr-3 pl-3">
-                            {isSignUp ? (
-                                <p>
-                                    Already have an account?{" "}
-                                    <AnchorTag name={"Sign In"} href={"#"} classes={"text-blue-500 hover:underline"} onClick={() => setIsSignUp(false)} />
-                                </p>
-                            ) : (
-                                <p>
-                                    Don't have an account?{" "}
-                                    <AnchorTag name={"Sign Up"} href={"#"} classes={"text-blue-500 hover:underline"} onClick={() => setIsSignUp(true)} />
-                                </p>
-                            )}
-                        </div>
+                        {/* Rest of the component remains the same */}
+                        {!isSignUp && (
+                            <div className="flex items-center justify-between">
+                                <Form.Item name="remember" valuePropName="checked" noStyle>
+                                    <Checkbox className="text-gray-600">Remember me</Checkbox>
+                                </Form.Item>
+                                <a
+                                    href="#"
+                                    className="text-sm font-medium text-green-600 hover:text-green-500"
+                                >
+                                    Forgot password?
+                                </a>
+                            </div>
+                        )}
+
+                        <Form.Item>
+                            <Button
+                                htmlType="submit"
+                                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5"
+                            >
+                                {isSignUp ? "Create Account" : "Sign In"}
+                            </Button>
+                        </Form.Item>
                     </Form>
+
+                    {/* Switch between sign up and sign in */}
+                    <div className="text-center">
+                        {isSignUp ? (
+                            <p>
+                                Already have an account?{" "}
+                                <span
+                                    className="text-green-600 cursor-pointer"
+                                    onClick={() => setIsSignUp(false)}
+                                >
+                                    Sign In
+                                </span>
+                            </p>
+                        ) : (
+                            <p>
+                                Don't have an account?{" "}
+                                <span
+                                    className="text-green-600 cursor-pointer"
+                                    onClick={() => setIsSignUp(true)}
+                                >
+                                    Sign Up
+                                </span>
+                            </p>
+                        )}
+                    </div>
                 </div>
-            </div>
+            </Card>
         </div>
     );
 };
