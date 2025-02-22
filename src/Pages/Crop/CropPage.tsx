@@ -151,7 +151,7 @@ const Crops: React.FC = () => {
             category: record.cropCategory,
             season: record.cropSeason,
             scientificName: record.scientificName,
-            image: record.cropImage,
+            cropImage: record.cropImage,
             field: record.fieldList,
         });
         setIsModalOpen(true);

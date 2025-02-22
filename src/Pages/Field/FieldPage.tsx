@@ -7,7 +7,7 @@ import { saveField, updateField, deleteField, FieldRootState, getAllFields } fro
 import FieldModel from "../../Model/FieldModel";
 
 const ManageFields: React.FC = () => {
-    const fields = useSelector((state: FieldRootState) => state.field.fields);  // Accessing fields from the Redux store
+    const fields = useSelector((state: FieldRootState) => state.field.fields); // Corrected selector to access the fields state
     const dispatch = useDispatch();
 
     const [formData, setFormData] = useState<Omit<FieldModel, "fieldCode">>({
@@ -27,9 +27,9 @@ const ManageFields: React.FC = () => {
 
     const columns = [
         { title: "Field Code", dataIndex: "fieldCode", key: "fieldCode" },
-        { title: "Field Name", dataIndex: "fieldName", key: "fieldName" },
-        { title: "Location", dataIndex: "fieldLocation", key: "fieldLocation" },
-        { title: "Size (Acres)", dataIndex: "fieldExtentSize", key: "fieldExtentSize" },
+        { title: "Field Name", dataIndex: "name", key: "fieldName" },
+        { title: "Location", dataIndex: "location", key: "fieldLocation" },
+        { title: "Size (Acres)", dataIndex: "extentSize", key: "fieldExtentSize" },
         {
             title: "Image 1",
             dataIndex: "fieldImage1",
@@ -96,7 +96,7 @@ const ManageFields: React.FC = () => {
         if (e.target.files && e.target.files[0]) {
             setFormData((prev) => ({
                 ...prev,
-                [field]: e.target.files[0],  // Store the file object
+                [field]: e.target.files[0], // Store the file object
             }));
         }
     };
@@ -124,9 +124,9 @@ const ManageFields: React.FC = () => {
         }
 
         if (editingField) {
-            dispatch(updateField(formDataToSubmit));  // Update field
+            dispatch(updateField(formDataToSubmit));
         } else {
-            dispatch(saveField(formDataToSubmit));  // Save new field
+            dispatch(saveField(formDataToSubmit));
         }
         resetForm();
     };
@@ -153,7 +153,7 @@ const ManageFields: React.FC = () => {
     };
 
     const handleDelete = (fieldCode: string) => {
-        dispatch(deleteField(fieldCode));  // Delete field by fieldCode
+        dispatch(deleteField(fieldCode));
     };
 
     return (
@@ -169,7 +169,7 @@ const ManageFields: React.FC = () => {
                     }}
                 />
             </div>
-            <Table columns={columns} dataSource={fields || []} rowKey="fieldCode" />
+            <Table columns={columns} dataSource={fields} rowKey="fieldCode" />
             <MainModal
                 isType={editingField ? "Edit Field" : "Add Field"}
                 buttonType={editingField ? "Save Changes" : "Add Field"}

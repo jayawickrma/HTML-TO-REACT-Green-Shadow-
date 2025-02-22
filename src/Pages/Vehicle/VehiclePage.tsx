@@ -1,15 +1,13 @@
-import React, { useState } from "react";
-import { Table, TableColumnsType } from "antd";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../store/Store.ts"; // Update to the correct path for your Redux store
-import { addVehicle, updateVehicle, deleteVehicle } from "../../slices/VehicleSlice.ts"; // Update path to your slice
+import React, { useState, useEffect } from "react";
+import { Table, Modal, Form, Input, Button } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { saveVehicle, updateVehicle, deleteVehicle, getAllVehicles } from "../../slices/VehicleSlice";
 import VehicleModel from "../../Model/VehicleModel";
-import MainModal from "../../Components/Add/AddComponent.tsx";
-import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
+import { RootState } from "../../store";  // Adjust according to your project structure
 
 const VehicleManagement: React.FC = () => {
-    const vehicles = useSelector((state: RootState) => state.vehicles);
     const dispatch = useDispatch();
+    const vehicles = useSelector((state: RootState) => state.vehicle.vehicles.vehicleList);
 
     const [formData, setFormData] = useState<Partial<VehicleModel>>({
         vehicleCode: "",
@@ -21,10 +19,14 @@ const VehicleManagement: React.FC = () => {
         status: "",
         memberCode: "",
     });
-    const [isModalOpen, setModalOpen] = useState(false);
     const [currentVehicleCode, setCurrentVehicleCode] = useState<string | null>(null);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-    const columns: TableColumnsType<VehicleModel> = [
+    useEffect(() => {
+        dispatch(getAllVehicles()); // Fetch all vehicles when the component mounts
+    }, [dispatch]);
+
+    const columns = [
         { title: "Vehicle Code", dataIndex: "vehicleCode", key: "vehicleCode" },
         { title: "License Plate", dataIndex: "licencePlateNumber", key: "licencePlateNumber" },
         { title: "Name", dataIndex: "vehicleName", key: "vehicleName" },
@@ -36,48 +38,46 @@ const VehicleManagement: React.FC = () => {
         {
             title: "Actions",
             key: "actions",
-            render: (_: any, record: VehicleModel) => (
+            render: (_, record: VehicleModel) => (
                 <div>
-                    <CustomButton
-                        label="Edit"
-                        className="btn btn-primary"
-                        onClick={() => handleEdit(record)}
-                    />
-                    <CustomButton
-                        label="Delete"
-                        className="btn btn-danger"
-                        onClick={() => handleDelete(record.vehicleCode)}
-                    />
+                    <Button onClick={() => handleEdit(record)}>Edit</Button>
+                    <Button onClick={() => handleDelete(record.vehicleCode)}>Delete</Button>
                 </div>
             ),
         },
     ];
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { id, value } = e.target;
-        setFormData((prev) => ({ ...prev, [id]: value }));
+    const handleEdit = (vehicle: VehicleModel) => {
+        setFormData(vehicle);
+        setCurrentVehicleCode(vehicle.vehicleCode);
+        setIsModalVisible(true);
+    };
+
+    const handleDelete = (vehicleCode: string) => {
+        dispatch(deleteVehicle(vehicleCode));
     };
 
     const handleSubmit = () => {
+        const newVehicle = new VehicleModel(
+            formData.vehicleCode || `VEH-${Date.now()}`,
+            formData.licencePlateNumber || "",
+            formData.vehicleName || "",
+            formData.category || "",
+            formData.fuelType || "",
+            formData.remark || "",
+            formData.status || "",
+            formData.memberCode || ""
+        );
+
         if (currentVehicleCode) {
             // Update existing vehicle
-            dispatch(updateVehicle({ vehicle_id: currentVehicleCode, ...formData }));
+            dispatch(updateVehicle(newVehicle));
         } else {
             // Add new vehicle
-            const newVehicle = new VehicleModel(
-                `VEH-${Date.now()}`,
-                formData.licencePlateNumber!,
-                formData.vehicleName!,
-                formData.category!,
-                formData.fuelType!,
-                formData.remark!,
-                formData.status!,
-                formData.memberCode!
-            );
-            dispatch(addVehicle(newVehicle));
+            dispatch(saveVehicle(newVehicle));
         }
 
-        // Reset form and modal state
+        // Reset form after submission
         setFormData({
             vehicleCode: "",
             licencePlateNumber: "",
@@ -89,80 +89,92 @@ const VehicleManagement: React.FC = () => {
             memberCode: "",
         });
         setCurrentVehicleCode(null);
-        setModalOpen(false);
+        setIsModalVisible(false);
     };
 
-    const handleEdit = (vehicle: VehicleModel) => {
-        setFormData(vehicle); // Prefill form with vehicle data
-        setCurrentVehicleCode(vehicle.vehicleCode); // Set the vehicle being edited
-        setModalOpen(true);
-    };
-
-    const handleDelete = (vehicleCode: string) => {
-        dispatch(deleteVehicle({ vehicle_id: vehicleCode }));
+    const handleCancel = () => {
+        setIsModalVisible(false);
+        setFormData({
+            vehicleCode: "",
+            licencePlateNumber: "",
+            vehicleName: "",
+            category: "",
+            fuelType: "",
+            remark: "",
+            status: "",
+            memberCode: "",
+        });
+        setCurrentVehicleCode(null);
     };
 
     return (
-        <div id="vehiclesSection" className="content-section">
-            <h2 className="text-center my-4">Vehicle Management</h2>
-            <div className="d-flex justify-content-center mb-4">
-                <CustomButton
-                    label="Add Vehicle"
-                    className="btn btn-success"
-                    onClick={() => {
-                        setFormData({
-                            vehicleCode: "",
-                            licencePlateNumber: "",
-                            vehicleName: "",
-                            category: "",
-                            fuelType: "",
-                            remark: "",
-                            status: "",
-                            memberCode: "",
-                        });
-                        setCurrentVehicleCode(null);
-                        setModalOpen(true);
-                    }}
-                />
-            </div>
-            <Table<VehicleModel>
-                columns={columns}
-                dataSource={vehicles}
-                rowKey="vehicleCode"
-            />
-            <MainModal
-                isType={currentVehicleCode ? "Edit Vehicle" : "Add Vehicle"}
-                buttonType={currentVehicleCode ? "Update Vehicle" : "Save Vehicle"}
-                isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)}
-                onSubmit={handleSubmit}
+        <div>
+            <h2>Vehicle Management</h2>
+            <Button type="primary" onClick={() => setIsModalVisible(true)}>
+                Add Vehicle
+            </Button>
+            <Table columns={columns} dataSource={vehicles} rowKey="vehicleCode" />
+
+            {/* Modal for adding/editing vehicles */}
+            <Modal
+                title={currentVehicleCode ? "Edit Vehicle" : "Add Vehicle"}
+                open={isModalVisible}  // Using 'open' instead of 'visible' for the latest Ant Design version
+                onOk={handleSubmit}
+                onCancel={handleCancel}
+                okText="Submit"
+                cancelText="Cancel"
             >
-                <form>
-                    {[
-                        { label: "License Plate", id: "licencePlateNumber" },
-                        { label: "Name", id: "vehicleName" },
-                        { label: "Category", id: "category" },
-                        { label: "Fuel Type", id: "fuelType" },
-                        { label: "Remark", id: "remark" },
-                        { label: "Status", id: "status" },
-                        { label: "Staff ID", id: "memberCode" },
-                    ].map(({ label, id }) => (
-                        <div className="mb-3" key={id}>
-                            <label htmlFor={id} className="form-label">
-                                {label}
-                            </label>
-                            <input
-                                type="text"
-                                id={id}
-                                value={(formData as any)[id] || ""}
-                                className="form-control"
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                    ))}
-                </form>
-            </MainModal>
+                <Form layout="vertical" onFinish={handleSubmit}>
+                    <Form.Item label="Vehicle Code" name="vehicleCode">
+                        <Input
+                            value={formData.vehicleCode}
+                            onChange={(e) => setFormData({ ...formData, vehicleCode: e.target.value })}
+                        />
+                    </Form.Item>
+                    <Form.Item label="License Plate Number" name="licencePlateNumber">
+                        <Input
+                            value={formData.licencePlateNumber}
+                            onChange={(e) => setFormData({ ...formData, licencePlateNumber: e.target.value })}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Vehicle Name" name="vehicleName">
+                        <Input
+                            value={formData.vehicleName}
+                            onChange={(e) => setFormData({ ...formData, vehicleName: e.target.value })}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Category" name="category">
+                        <Input
+                            value={formData.category}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Fuel Type" name="fuelType">
+                        <Input
+                            value={formData.fuelType}
+                            onChange={(e) => setFormData({ ...formData, fuelType: e.target.value })}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Remark" name="remark">
+                        <Input
+                            value={formData.remark}
+                            onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Status" name="status">
+                        <Input
+                            value={formData.status}
+                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Staff ID" name="memberCode">
+                        <Input
+                            value={formData.memberCode}
+                            onChange={(e) => setFormData({ ...formData, memberCode: e.target.value })}
+                        />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };

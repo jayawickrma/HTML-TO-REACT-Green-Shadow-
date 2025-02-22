@@ -11,7 +11,7 @@ import UserSlice from "../slices/UserSlice.ts";
 export const store = configureStore({
     reducer:{
         user:UserSlice,
-        vehicles : VehicleSlice,
+        vehicle : VehicleSlice,
         equipment : EquipmentSlice,
         staffs : StaffSlice,
         crop : CropSlice,
