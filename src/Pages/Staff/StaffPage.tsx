@@ -1,57 +1,26 @@
-import React, { useState } from "react";
-import { Table, TableColumnsType } from "antd";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../store/Store.ts"; // Update path to your store
-import { addStaff, updateStaff, deleteStaff } from "../../slices/StaffSlice.ts"; // Update path to staffSlice
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Table } from "antd";
+import { RootState } from "../../store/Store.ts";
+import { getAllStaffs, saveStaff, updateStaff, deleteStaff } from "../../slices/StaffSlice.ts";
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 
-interface StaffFormData {
-    memberCode?: string;
-    firstName: string;
-    lastName: string;
-    joinedDate: string;
-    dateOfBirth: string;
-    gender: string;
-    designation: string;
-    addressLine1: string;
-    addressLine2: string;
-    addressLine3: string;
-    addressLine4: string;
-    addressLine5: string;
-    contactNumber: string;
-    email: string;
-    role: string;
-    vehicleList: string;
-    fieldList: string;
-}
-
 const StaffManagement: React.FC = () => {
-    const staffList = useSelector((state: RootState) => state.staffs);
     const dispatch = useDispatch();
-
-    const [formData, setFormData] = useState<StaffFormData>({
-        firstName: "",
-        lastName: "",
-        joinedDate: "",
-        dateOfBirth: "",
-        gender: "",
-        designation: "",
-        addressLine1: "",
-        addressLine2: "",
-        addressLine3: "",
-        addressLine4: "",
-        addressLine5: "",
-        contactNumber: "",
-        email: "",
-        role: "",
-        vehicleList: "",
-        fieldList: "",
-    });
+    const staffList = useSelector((state: RootState) => state.staffs.staffs);
     const [isModalOpen, setModalOpen] = useState(false);
-    const [currentStaffId, setCurrentStaffId] = useState<string | null>(null); // Track the staff being edited
+    const [formData, setFormData] = useState<any>({});
+    const [isEditing, setIsEditing] = useState(false);
 
-    const columns: TableColumnsType<StaffFormData> = [
+    useEffect(() => {
+        if (staffList.length === 0) {
+            dispatch(getAllStaffs());
+        }
+    }, [dispatch, staffList.length]);
+
+
+    const columns = [
         { title: "Member Code", dataIndex: "memberCode", key: "memberCode" },
         { title: "First Name", dataIndex: "firstName", key: "firstName" },
         { title: "Last Name", dataIndex: "lastName", key: "lastName" },
@@ -59,28 +28,29 @@ const StaffManagement: React.FC = () => {
         { title: "Date of Birth", dataIndex: "dateOfBirth", key: "dateOfBirth" },
         { title: "Gender", dataIndex: "gender", key: "gender" },
         { title: "Designation", dataIndex: "designation", key: "designation" },
+        { title: "Address Line 1", dataIndex: "addressLine1", key: "addressLine1" },
+        { title: "Address Line 2", dataIndex: "addressLine2", key: "addressLine2" },
+        { title: "Address Line 3", dataIndex: "addressLine3", key: "addressLine3" },
+        { title: "Address Line 4", dataIndex: "addressLine4", key: "addressLine4" },
+        { title: "Address Line 5", dataIndex: "addressLine5", key: "addressLine5" },
         { title: "Contact No", dataIndex: "contactNumber", key: "contactNumber" },
         { title: "Email", dataIndex: "email", key: "email" },
         { title: "Role", dataIndex: "role", key: "role" },
+        { title: "Vehicle List", dataIndex: "vehicleList", key: "vehicleList" },
+        { title: "Field List", dataIndex: "fieldList", key: "fieldList" },
         {
             title: "Actions",
             key: "actions",
+            fixed: "right",
             render: (_, record) => (
                 <div>
-                    <CustomButton
-                        label="Edit"
-                        className="btn btn-primary"
-                        onClick={() => handleEdit(record)}
-                    />
-                    <CustomButton
-                        label="Delete"
-                        className="btn btn-danger"
-                        onClick={() => handleDelete(record.memberCode!)}
-                    />
+                    <CustomButton label="Edit" className="btn btn-primary" onClick={() => handleEdit(record)} />
+                    <CustomButton label="Delete" className="btn btn-danger" onClick={() => handleDelete(record.memberCode)} />
                 </div>
             ),
         },
     ];
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
@@ -88,122 +58,35 @@ const StaffManagement: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        if (currentStaffId) {
-            // Update existing staff
-            dispatch(updateStaff({ staff_id: currentStaffId, ...formData }));
+        if (isEditing) {
+            dispatch(updateStaff(formData));
         } else {
-            // Add new staff
-            const newStaff = { ...formData, memberCode: `STAFF-${Date.now()}` }; // Generate unique memberCode
-            dispatch(addStaff(newStaff));
+            dispatch(saveStaff(formData));
         }
-
-        // Reset form and modal state
-        setFormData({
-            firstName: "",
-            lastName: "",
-            joinedDate: "",
-            dateOfBirth: "",
-            gender: "",
-            designation: "",
-            addressLine1: "",
-            addressLine2: "",
-            addressLine3: "",
-            addressLine4: "",
-            addressLine5: "",
-            contactNumber: "",
-            email: "",
-            role: "",
-            vehicleList: "",
-            fieldList: "",
-        });
-        setCurrentStaffId(null);
         setModalOpen(false);
     };
 
-    const handleEdit = (staff: StaffFormData) => {
-        setFormData(staff); // Prefill form with staff data
-        setCurrentStaffId(staff.memberCode || null); // Set the staff being edited
+    const handleEdit = (staff: any) => {
+        setFormData(staff);
+        setIsEditing(true);
         setModalOpen(true);
     };
 
     const handleDelete = (memberCode: string) => {
-        dispatch(deleteStaff({ staff_id: memberCode }));
+        dispatch(deleteStaff(memberCode));
     };
 
     return (
         <div id="staffSection" className="content-section">
             <h2 className="text-center my-4">Staff Management</h2>
-            <div className="d-flex justify-content-center mb-4">
-                <CustomButton
-                    label="Add Staff"
-                    className="btn btn-success"
-                    onClick={() => {
-                        setFormData({
-                            firstName: "",
-                            lastName: "",
-                            joinedDate: "",
-                            dateOfBirth: "",
-                            gender: "",
-                            designation: "",
-                            addressLine1: "",
-                            addressLine2: "",
-                            addressLine3: "",
-                            addressLine4: "",
-                            addressLine5: "",
-                            contactNumber: "",
-                            email: "",
-                            role: "",
-                            vehicleList: "",
-                            fieldList: "",
-                        });
-                        setCurrentStaffId(null); // Clear edit state
-                        setModalOpen(true);
-                    }}
-                />
-            </div>
-            <Table<StaffFormData>
-                columns={columns}
-                dataSource={staffList}
-                rowKey="memberCode"
-            />
-            <MainModal
-                isType={currentStaffId ? "Edit Staff" : "Add Staff"}
-                buttonType={currentStaffId ? "Update Staff" : "Save Staff"}
-                isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)}
-                onSubmit={handleSubmit}
-            >
+            <CustomButton label="Add Staff" className="btn btn-success" onClick={() => { setFormData({}); setIsEditing(false); setModalOpen(true); }} />
+            <Table columns={columns} dataSource={staffList} rowKey="memberCode" />
+            <MainModal isType={isEditing ? "Edit Staff" : "Add Staff"} isOpen={isModalOpen} onClose={() => setModalOpen(false)} onSubmit={handleSubmit}>
                 <form>
-                    {[
-                        { label: "First Name", id: "firstName" },
-                        { label: "Last Name", id: "lastName" },
-                        { label: "Joined Date", id: "joinedDate" },
-                        { label: "Date of Birth", id: "dateOfBirth" },
-                        { label: "Gender", id: "gender" },
-                        { label: "Designation", id: "designation" },
-                        { label: "Address Line 1", id: "addressLine1" },
-                        { label: "Address Line 2", id: "addressLine2" },
-                        { label: "Address Line 3", id: "addressLine3" },
-                        { label: "Address Line 4", id: "addressLine4" },
-                        { label: "Address Line 5", id: "addressLine5" },
-                        { label: "Contact Number", id: "contactNumber" },
-                        { label: "Email", id: "email" },
-                        { label: "Role", id: "role" },
-                        { label: "Vehicle List", id: "vehicleList" },
-                        { label: "Field List", id: "fieldList" },
-                    ].map(({ label, id }) => (
-                        <div className="mb-3" key={id}>
-                            <label htmlFor={id} className="form-label">
-                                {label}
-                            </label>
-                            <input
-                                type={id.includes("Date") ? "date" : "text"}
-                                id={id}
-                                value={(formData as any)[id]}
-                                className="form-control"
-                                onChange={handleInputChange}
-                                required
-                            />
+                    {["firstName", "lastName", "designation", "contactNumber", "email"].map((field) => (
+                        <div className="mb-3" key={field}>
+                            <label htmlFor={field} className="form-label">{field.replace(/([A-Z])/g, ' $1')}</label>
+                            <input type="text" id={field} value={formData[field] || ""} className="form-control" onChange={handleInputChange} required />
                         </div>
                     ))}
                 </form>
