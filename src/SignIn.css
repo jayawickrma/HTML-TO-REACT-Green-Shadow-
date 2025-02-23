@@ -3,40 +3,34 @@
 /* Full-Screen Background */
 .min-h-screen {
     min-height: 100vh;
-    display: flex;
-    background: linear-gradient(to bottom, lightgreen, whitesmoke);
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #6d28d9, #4c1d95); /* Gradient background */
 }
 
-/* Left Side: Image and Welcome Text */
+/* Full-Screen Split-Screen Layout */
+.split-container {
+    display: flex;
+    width: 159%;
+    height: 100vh; /* Full height */
+    background: white;
+    overflow: hidden;
+}
+
+/* Left Side: Image */
 .left-side {
     flex: 1;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
     background-color: lightgreen; /* Match the gradient */
+    padding: 2rem;
 }
 
 .left-side img {
     width: 100%;
-    max-width: 400px; /* Adjust as needed */
+    max-width: 500px; /* Adjust as needed */
     height: auto;
-    margin-bottom: 2rem;
-}
-
-.left-side h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: black;
-    text-align: center;
-}
-
-.left-side p {
-    font-size: 1.25rem;
-    color: black;
-    text-align: center;
-    margin-top: 1rem;
 }
 
 /* Right Side: Form */
