@@ -1,3 +1,4 @@
+// src/store/Store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import VehicleSlice from "../slices/VehicleSlice";
 import EquipmentSlice from "../slices/EquipmentSlice";
@@ -8,13 +9,13 @@ import FieldSlice from "../slices/FieldSlice";
 import TokenSlice from "../slices/TokenSlice";
 import UserSlice from "../slices/UserSlice";
 
-// ✅ Create Redux Store
+// Create Redux Store
 export const store = configureStore({
     reducer: {
         user: UserSlice,
         vehicle: VehicleSlice,
         equipment: EquipmentSlice,
-        staff: StaffSlice,
+        staffs: StaffSlice,
         crop: CropSlice,
         logs: LogSlice,
         field: FieldSlice,
@@ -22,12 +23,9 @@ export const store = configureStore({
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
-            serializableCheck: false, // Disable serializability warnings if using FormData, Date, etc.
+            serializableCheck: false, // Disable serializability warnings
         }),
 });
 
-// ✅ Type for RootState
 export type RootState = ReturnType<typeof store.getState>;
-
-// ✅ Type for App Dispatch
 export type AppDispatch = typeof store.dispatch;

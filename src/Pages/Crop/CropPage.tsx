@@ -77,7 +77,6 @@ const Crops: React.FC = () => {
             key: "fieldList",
             render: (fields: { fieldCode: number }[]) =>
                 fields?.length > 0 ? fields.map(field => field.fieldCode).join(", ") : "N/A",
-
         },
         {
             title: "Log",
@@ -85,7 +84,6 @@ const Crops: React.FC = () => {
             key: "logList",
             render: (logs: { logCode: number }[]) =>
                 logs?.length > 0 ? logs.map(field => field.logCode).join(", ") : "N/A",
-
         },
         {
             title: "Actions",
@@ -108,7 +106,6 @@ const Crops: React.FC = () => {
             ),
         },
     ];
-
 
     useEffect(() => {
         dispatch(getAllCrops());
@@ -145,7 +142,7 @@ const Crops: React.FC = () => {
 
     const handleUpdate = () => {
         const updatedCrop = new FormData();
-        updatedCrop.append("code", "");
+        updatedCrop.append("code", editId || "");
         updatedCrop.append("name", cropName);
         updatedCrop.append("scientificName", scientificName);
         updatedCrop.append("category", category);
@@ -279,39 +276,19 @@ const Crops: React.FC = () => {
                         id="imagePopup"
                         style={{
                             display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                             position: "fixed",
                             top: 0,
                             left: 0,
-                            bottom: 0,
-                            right: 0,
                             width: "100%",
                             height: "100%",
-                            background: "rgba(0, 0, 0, 0.8)",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            zIndex: 999,
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            zIndex: 1000,
                         }}
+                        onClick={() => setImagePopup(null)}
                     >
-                        <span
-                            className="close"
-                            style={{
-                                position: "absolute",
-                                top: "10px",
-                                right: "20px",
-                                fontSize: "30px",
-                                color: "white",
-                                cursor: "pointer",
-                            }}
-                            onClick={() => setImagePopup(null)}
-                        >
-                            ×
-                        </span>
-                        <img
-                            id="popupImage"
-                            src={imagePopup}
-                            alt="Popup Image"
-                            style={{ maxWidth: "50%", maxHeight: "50%" }}
-                        />
+                        <img src={imagePopup} alt="Crop" style={{ maxWidth: "90%", maxHeight: "90%" }} />
                     </div>
                 )}
             </div>

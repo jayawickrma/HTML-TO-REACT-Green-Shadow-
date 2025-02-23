@@ -62,6 +62,7 @@ export const deleteCrop = createAsyncThunk(
     async ( code: string ) => {
         try {
             return await api.delete(`crop/deleteCrop/${code}`);
+            console.log(code)
         } catch (e) {
             console.log("Failed to delete crop!",e);
             throw e;

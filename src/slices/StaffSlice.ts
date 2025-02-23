@@ -1,12 +1,14 @@
+// src/slices/StaffSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../Services/api.ts";
 import Staff from "../Model/StaffModel.ts";
 
+// Initial State
 const initialState: { staffs: Staff[] } = {
     staffs: [],
 };
 
-
+// Save Staff Action
 export const saveStaff = createAsyncThunk(
     "staff/saveStaff",
     async (staff: Staff, { dispatch }) => {
@@ -21,6 +23,7 @@ export const saveStaff = createAsyncThunk(
     }
 );
 
+// Update Staff Action
 export const updateStaff = createAsyncThunk(
     "staff/updateStaff",
     async (staff: Staff, { dispatch }) => {
@@ -35,6 +38,7 @@ export const updateStaff = createAsyncThunk(
     }
 );
 
+// Delete Staff Action
 export const deleteStaff = createAsyncThunk(
     "staff/deleteStaff",
     async (memberCode: string) => {
@@ -47,12 +51,12 @@ export const deleteStaff = createAsyncThunk(
     }
 );
 
+// Fetch All Staff Action
 export const getAllStaffs = createAsyncThunk(
     "staff/getAllStaffs",
     async () => {
         try {
             const response = await api.get("staff/getAllStaff");
-            console.log(response.data)
             return response.data;
         } catch (e) {
             console.log("Failed to get all staff!", e);
@@ -61,6 +65,7 @@ export const getAllStaffs = createAsyncThunk(
     }
 );
 
+// Slice for managing staff
 const staffSlice = createSlice({
     name: "staffs",
     initialState,

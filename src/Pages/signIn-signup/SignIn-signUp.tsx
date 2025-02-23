@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, Checkbox, Form, Card, message } from "antd"; // Added message for displaying error/success
+import { Input, Button, Checkbox, Form, Card, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../store/Store.ts";
 import { login, register, UserRootState } from "../../slices/UserSlice.ts";
 import { User } from "../../Model/User.ts";
-import "../../SignIn.css";
 
 type FieldType = {
     email?: string;
@@ -19,7 +18,6 @@ const SignInSignUp: React.FC = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const isAuthenticated = useSelector((state: UserRootState) => state.user.isAuthenticated);
 
-    // Form state management
     const [form] = Form.useForm();
     const [formData, setFormData] = useState({
         email: "",
@@ -32,33 +30,28 @@ const SignInSignUp: React.FC = () => {
         }
     }, [isAuthenticated, navigate]);
 
-    // Handle form submission
     const onFinish = async (values: FieldType) => {
         const user = new User(values.email!, values.password!);
 
         try {
             if (isSignUp) {
-                // Dispatch the register action
                 const result = await dispatch(register(user)).unwrap();
                 if (result) {
                     message.success("Registration successful! Redirecting to login.");
-                    setIsSignUp(false);  // Switch to login after successful registration
+                    setIsSignUp(false);
                 }
             } else {
-                // Dispatch the login action
                 const result = await dispatch(login(user)).unwrap();
                 if (result) {
                     message.success("Login successful! Redirecting to dashboard.");
                 }
             }
         } catch (error) {
-            // Handle error in login or registration
             message.error("An error occurred during authentication. Please try again.");
-            console.error(error); // Log the error for debugging purposes
+            console.error(error);
         }
     };
 
-    // Handle input changes
     const handleInputChange = (field: keyof typeof formData) => (
         e: React.ChangeEvent<HTMLInputElement>
     ) => {
@@ -69,12 +62,11 @@ const SignInSignUp: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 p-4">
-            <Card className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <Card className="w-full max-w-md shadow-lg">
                 <div className="space-y-6">
-                    {/* Form Header */}
                     <div className="text-center space-y-2">
-                        <h1 className="text-3xl font-bold text-gray-900">
+                        <h1 className="text-3xl font-bold">
                             {isSignUp ? "Create Account" : "Welcome Back"}
                         </h1>
                         <p className="text-gray-500">
@@ -84,7 +76,6 @@ const SignInSignUp: React.FC = () => {
                         </p>
                     </div>
 
-                    {/* Auth Form */}
                     <Form
                         form={form}
                         name="authForm"
@@ -101,7 +92,6 @@ const SignInSignUp: React.FC = () => {
                             ]}
                         >
                             <Input
-                                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white"
                                 placeholder="Enter your email"
                                 value={formData.email}
                                 onChange={handleInputChange("email")}
@@ -114,23 +104,18 @@ const SignInSignUp: React.FC = () => {
                             rules={[{ required: true, message: "Please input your password!" }]}
                         >
                             <Input.Password
-                                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white"
                                 placeholder="Enter your password"
                                 value={formData.password}
                                 onChange={handleInputChange("password")}
                             />
                         </Form.Item>
 
-                        {/* Rest of the component remains the same */}
                         {!isSignUp && (
                             <div className="flex items-center justify-between">
                                 <Form.Item name="remember" valuePropName="checked" noStyle>
-                                    <Checkbox className="text-gray-600">Remember me</Checkbox>
+                                    <Checkbox>Remember me</Checkbox>
                                 </Form.Item>
-                                <a
-                                    href="#"
-                                    className="text-sm font-medium text-green-600 hover:text-green-500"
-                                >
+                                <a href="#" className="text-sm font-medium">
                                     Forgot password?
                                 </a>
                             </div>
@@ -139,20 +124,20 @@ const SignInSignUp: React.FC = () => {
                         <Form.Item>
                             <Button
                                 htmlType="submit"
-                                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5"
+                                type="primary"
+                                className="w-full"
                             >
                                 {isSignUp ? "Create Account" : "Sign In"}
                             </Button>
                         </Form.Item>
                     </Form>
 
-                    {/* Switch between sign up and sign in */}
                     <div className="text-center">
                         {isSignUp ? (
                             <p>
                                 Already have an account?{" "}
                                 <span
-                                    className="text-green-600 cursor-pointer"
+                                    className="cursor-pointer text-blue-500"
                                     onClick={() => setIsSignUp(false)}
                                 >
                                     Sign In
@@ -162,7 +147,7 @@ const SignInSignUp: React.FC = () => {
                             <p>
                                 Don't have an account?{" "}
                                 <span
-                                    className="text-green-600 cursor-pointer"
+                                    className="cursor-pointer text-blue-500"
                                     onClick={() => setIsSignUp(true)}
                                 >
                                     Sign Up
