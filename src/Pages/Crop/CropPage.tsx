@@ -16,7 +16,8 @@ const Crops: React.FC = () => {
     const [category, setCategory] = useState("");
     const [season, setSeason] = useState("");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [selectedFields, setFields] = useState<string[]>([]);
+    const [logList, setLogList] = useState<string>("");
+    const [fieldList, setFieldList] = useState<string>("");
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -105,7 +106,7 @@ const Crops: React.FC = () => {
     ];
 
     const handleAdd = async () => {
-        if (!cropName || !scientificName || !category || !season) {
+        if (!cropName || !scientificName || !category || !season || !logList || !fieldList) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
@@ -115,15 +116,20 @@ const Crops: React.FC = () => {
         }
 
         const newCropData = new FormData();
-        newCropData.append("code", "");
-        newCropData.append("name", cropName);
+        newCropData.append("cropName", cropName);
         newCropData.append("scientificName", scientificName);
         newCropData.append("category", category);
         newCropData.append("season", season);
+        newCropData.append("logList", logList.split(",").map(Number).join(",")); // Convert to array of numbers
+        newCropData.append("fieldList", fieldList.split(",").map(Number).join(",")); // Convert to array of numbers
         if (selectedFile) {
-            newCropData.append("image", selectedFile);
+            newCropData.append("cropImage", selectedFile);
         }
-        newCropData.append("assignFields", JSON.stringify(selectedFields));
+
+        // Debugging: Log FormData
+        for (let [key, value] of newCropData.entries()) {
+            console.log(key, value);
+        }
 
         dispatch(saveCrop(newCropData))
             .unwrap()
@@ -152,8 +158,9 @@ const Crops: React.FC = () => {
         setScientificName(record.scientificName);
         setCategory(record.category);
         setSeason(record.season);
+        setLogList(record.logList.join(",")); // Convert array to comma-separated string
+        setFieldList(record.fieldList.join(",")); // Convert array to comma-separated string
         setSelectedFile(null); // Reset file input for editing
-        setFields(record.fieldList ? record.fieldList.split(",") : []);
         setIsModalOpen(true);
     };
 
@@ -164,10 +171,11 @@ const Crops: React.FC = () => {
         updatedCropData.append("scientificName", scientificName);
         updatedCropData.append("category", category);
         updatedCropData.append("season", season);
+        updatedCropData.append("logList", logList.split(",").map(Number).join(",")); // Convert to array of numbers
+        updatedCropData.append("fieldList", fieldList.split(",").map(Number).join(",")); // Convert to array of numbers
         if (selectedFile) {
             updatedCropData.append("image", selectedFile);
         }
-        updatedCropData.append("assignFields", JSON.stringify(selectedFields));
 
         dispatch(updateCrop(updatedCropData))
             .unwrap()
@@ -227,8 +235,9 @@ const Crops: React.FC = () => {
         setScientificName("");
         setCategory("");
         setSeason("");
+        setLogList("");
+        setFieldList("");
         setSelectedFile(null);
-        setFields([]);
         setImagePreview(null);
         setIsModalOpen(false);
         setIsEditing(false);
@@ -269,7 +278,7 @@ const Crops: React.FC = () => {
                     onClose={resetForm}
                     onSubmit={isEditing ? handleUpdate : handleAdd}
                 >
-                    <form id="cropForm">
+                    <form id="cropForm" className="crop-form">
                         <div className="mb-3">
                             <label htmlFor="cropName" className="form-label">
                                 Crop Name
@@ -280,6 +289,19 @@ const Crops: React.FC = () => {
                                 id="cropName"
                                 value={cropName}
                                 onChange={(e) => setCropName(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="scientificName" className="form-label">
+                                Scientific Name
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="scientificName"
+                                value={scientificName}
+                                onChange={(e) => setScientificName(e.target.value)}
                                 required
                             />
                         </div>
@@ -310,15 +332,28 @@ const Crops: React.FC = () => {
                             />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="scientificName" className="form-label">
-                                Scientific Name
+                            <label htmlFor="logList" className="form-label">
+                                Log List (comma-separated numbers)
                             </label>
                             <input
                                 type="text"
                                 className="form-control"
-                                id="scientificName"
-                                value={scientificName}
-                                onChange={(e) => setScientificName(e.target.value)}
+                                id="logList"
+                                value={logList}
+                                onChange={(e) => setLogList(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="fieldList" className="form-label">
+                                Field List (comma-separated numbers)
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="fieldList"
+                                value={fieldList}
+                                onChange={(e) => setFieldList(e.target.value)}
                                 required
                             />
                         </div>
