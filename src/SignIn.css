@@ -1,0 +1,128 @@
+/* SignIn.css */
+
+/* Full-Screen Background */
+.min-h-screen {
+    min-height: 100vh;
+    display: flex;
+    background: linear-gradient(to bottom, lightgreen, whitesmoke);
+}
+
+/* Left Side: Image and Welcome Text */
+.left-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: lightgreen; /* Match the gradient */
+}
+
+.left-side img {
+    width: 100%;
+    max-width: 400px; /* Adjust as needed */
+    height: auto;
+    margin-bottom: 2rem;
+}
+
+.left-side h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: black;
+    text-align: center;
+}
+
+.left-side p {
+    font-size: 1.25rem;
+    color: black;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/* Right Side: Form */
+.right-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+    width: 100%;
+    max-width: 28rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 2rem;
+}
+
+/* Form Header */
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.form-header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: black;
+}
+
+.form-header p {
+    font-size: 1rem;
+    color: #4a5568;
+    margin-top: 0.5rem;
+}
+
+/* Input Fields */
+.input-field {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    outline: none;
+}
+
+.input-field:focus {
+    box-shadow: 0 0 0 2px rgba(144, 238, 144, 0.5);
+}
+
+/* Button Styling */
+.submit-button {
+    width: 100%;
+    background: linear-gradient(to right, lightgreen, darkgreen);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(144, 238, 144, 0.3);
+    transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 8px rgba(144, 238, 144, 0.4);
+}
+
+/* Toggle Sign In/Sign Up */
+.toggle-text {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #4a5568;
+}
+
+.toggle-text span {
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.toggle-text span:hover {
+    color: #2d3748;
+}
