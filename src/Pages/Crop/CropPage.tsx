@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveCrop, updateCrop, deleteCrop, CropRootState, getAllCrops } from "../../slices/CropSlice";
 import { CropModel } from "../../Model/CropModel.ts";
 import { AppDispatch } from "../../store/Store.ts";
+import Swal from "sweetalert2";
 
 const Crops: React.FC = () => {
     const crops = useSelector((state: CropRootState) => state.crop.crops) || [];
@@ -16,19 +17,15 @@ const Crops: React.FC = () => {
     const [season, setSeason] = useState("");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [selectedFields, setFields] = useState<string[]>([]);
-
-    const [formData, setFormData] = useState({
-        cropName: "",
-        category: "",
-        season: "",
-        scientificName: "",
-        cropImage: null as File | null,
-        field: "",
-    });
-    const [imagePopup, setImagePopup] = useState<string | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
+    const [imagePopup, setImagePopup] = useState<string | null>(null); // For image popup
+
+    useEffect(() => {
+        dispatch(getAllCrops());
+    }, [dispatch]);
 
     const columns: TableColumnsType<CropModel> = [
         {
@@ -63,10 +60,10 @@ const Crops: React.FC = () => {
             render: (image: string | null, record: CropModel) => (
                 image ? (
                     <img
-                        src={`data:image/png;base64,${image}`} // Base64 image format
+                        src={`data:image/png;base64,${image}`}
                         alt={record.cropName}
                         style={{ width: "50px", height: "50px", cursor: "pointer" }}
-                        onClick={() => setImagePopup(`data:image/png;base64,${image}`)}
+                        onClick={() => setImagePopup(`data:image/png;base64,${image}`)} // Set image for popup
                     />
                 ) : null
             ),
@@ -83,7 +80,7 @@ const Crops: React.FC = () => {
             dataIndex: "LogCropDetails",
             key: "logList",
             render: (logs: { logCode: number }[]) =>
-                logs?.length > 0 ? logs.map(field => field.logCode).join(", ") : "N/A",
+                logs?.length > 0 ? logs.map(log => log.logCode).join(", ") : "N/A",
         },
         {
             title: "Actions",
@@ -107,56 +104,122 @@ const Crops: React.FC = () => {
         },
     ];
 
-    useEffect(() => {
-        dispatch(getAllCrops());
-    }, [dispatch]);
-
-    const handleAdd = () => {
-        const newCrops = new FormData();
-        newCrops.append("code", "");
-        newCrops.append("name", cropName);
-        newCrops.append("scientificName", scientificName);
-        newCrops.append("category", category);
-        newCrops.append("season", season);
-        if (selectedFile) {
-            newCrops.append("image", selectedFile);
+    const handleAdd = async () => {
+        if (!cropName || !scientificName || !category || !season) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Please fill all required fields.",
+            });
+            return;
         }
-        newCrops.append("assignFields", JSON.stringify(selectedFields));
-        dispatch(saveCrop(newCrops));
-        resetForm();
+
+        const newCropData = new FormData();
+        newCropData.append("code", "");
+        newCropData.append("name", cropName);
+        newCropData.append("scientificName", scientificName);
+        newCropData.append("category", category);
+        newCropData.append("season", season);
+        if (selectedFile) {
+            newCropData.append("image", selectedFile);
+        }
+        newCropData.append("assignFields", JSON.stringify(selectedFields));
+
+        dispatch(saveCrop(newCropData))
+            .unwrap()
+            .then(() => {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Crop saved successfully!",
+                });
+                resetForm();
+            })
+            .catch((error) => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to save crop. Please try again.",
+                });
+                console.error("Failed to save crop:", error);
+            });
     };
 
     const handleEdit = (record: CropModel) => {
         setIsEditing(true);
         setEditId(record.cropCode);
-        setFormData({
-            cropName: record.cropName,
-            category: record.cropCategory,
-            season: record.cropSeason,
-            scientificName: record.scientificName,
-            cropImage: record.cropImage,
-            field: record.fieldList,
-        });
+        setCropName(record.cropName);
+        setScientificName(record.scientificName);
+        setCategory(record.category);
+        setSeason(record.season);
+        setSelectedFile(null); // Reset file input for editing
+        setFields(record.fieldList ? record.fieldList.split(",") : []);
         setIsModalOpen(true);
     };
 
     const handleUpdate = () => {
-        const updatedCrop = new FormData();
-        updatedCrop.append("code", editId || "");
-        updatedCrop.append("name", cropName);
-        updatedCrop.append("scientificName", scientificName);
-        updatedCrop.append("category", category);
-        updatedCrop.append("season", season);
+        const updatedCropData = new FormData();
+        updatedCropData.append("code", editId || "");
+        updatedCropData.append("name", cropName);
+        updatedCropData.append("scientificName", scientificName);
+        updatedCropData.append("category", category);
+        updatedCropData.append("season", season);
         if (selectedFile) {
-            updatedCrop.append("image", selectedFile);
+            updatedCropData.append("image", selectedFile);
         }
-        updatedCrop.append("assignFields", JSON.stringify(selectedFields));
-        dispatch(updateCrop(updatedCrop));
-        resetForm();
+        updatedCropData.append("assignFields", JSON.stringify(selectedFields));
+
+        dispatch(updateCrop(updatedCropData))
+            .unwrap()
+            .then(() => {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Crop updated successfully!",
+                });
+                resetForm();
+            })
+            .catch((error) => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to update crop. Please try again.",
+                });
+                console.error("Failed to update crop:", error);
+            });
     };
 
     const handleDelete = (cropCode: string) => {
-        dispatch(deleteCrop(cropCode));
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log("Deleting crop with code:", cropCode); // Debugging
+                dispatch(deleteCrop(cropCode))
+                    .unwrap()
+                    .then(() => {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Deleted!",
+                            text: "Crop has been deleted.",
+                        });
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Failed to delete crop. Please check the console for details.",
+                        });
+                        console.error("Failed to delete crop:", error);
+                    });
+            }
+        });
     };
 
     const resetForm = () => {
@@ -166,13 +229,17 @@ const Crops: React.FC = () => {
         setSeason("");
         setSelectedFile(null);
         setFields([]);
+        setImagePreview(null);
         setIsModalOpen(false);
         setIsEditing(false);
+        setEditId(null);
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
-            setSelectedFile(event.target.files[0]);
+            const file = event.target.files[0];
+            setSelectedFile(file);
+            setImagePreview(URL.createObjectURL(file));
         }
     };
 
@@ -211,7 +278,7 @@ const Crops: React.FC = () => {
                                 type="text"
                                 className="form-control"
                                 id="cropName"
-                                value={formData.cropName}
+                                value={cropName}
                                 onChange={(e) => setCropName(e.target.value)}
                                 required
                             />
@@ -224,7 +291,7 @@ const Crops: React.FC = () => {
                                 type="text"
                                 className="form-control"
                                 id="category"
-                                value={formData.category}
+                                value={category}
                                 onChange={(e) => setCategory(e.target.value)}
                                 required
                             />
@@ -237,7 +304,7 @@ const Crops: React.FC = () => {
                                 type="text"
                                 className="form-control"
                                 id="season"
-                                value={formData.season}
+                                value={season}
                                 onChange={(e) => setSeason(e.target.value)}
                                 required
                             />
@@ -250,7 +317,7 @@ const Crops: React.FC = () => {
                                 type="text"
                                 className="form-control"
                                 id="scientificName"
-                                value={formData.scientificName}
+                                value={scientificName}
                                 onChange={(e) => setScientificName(e.target.value)}
                                 required
                             />
@@ -273,22 +340,25 @@ const Crops: React.FC = () => {
                 {/* Image Popup */}
                 {imagePopup && (
                     <div
-                        id="imagePopup"
                         style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
                             position: "fixed",
                             top: 0,
                             left: 0,
                             width: "100%",
                             height: "100%",
-                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                             zIndex: 1000,
                         }}
                         onClick={() => setImagePopup(null)}
                     >
-                        <img src={imagePopup} alt="Crop" style={{ maxWidth: "90%", maxHeight: "90%" }} />
+                        <img
+                            src={imagePopup}
+                            alt="Crop"
+                            style={{ maxWidth: "90%", maxHeight: "90%", borderRadius: "8px" }}
+                        />
                     </div>
                 )}
             </div>

@@ -59,12 +59,14 @@ export const updateCrop = createAsyncThunk(
 
 export const deleteCrop = createAsyncThunk(
     'crop/deleteCrop',
-    async ( code: string ) => {
+    async (cropCode: string) => {
         try {
-            return await api.delete(`crop/deleteCrop/${code}`);
-            console.log(code)
+            const response = await api.delete(`crop/deleteCrop`, {
+                params: { id: cropCode }, // Send cropCode as a query parameter
+            });
+            return response.data;
         } catch (e) {
-            console.log("Failed to delete crop!",e);
+            console.error("Failed to delete crop:", e);
             throw e;
         }
     }
