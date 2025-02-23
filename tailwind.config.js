@@ -18,5 +18,7 @@ export default {
     scrollbar: ['rounded'], // Optional: Customizes scrollbar styles
   },
 
+
+
 }
 
