@@ -7,6 +7,7 @@ import { saveCrop, updateCrop, deleteCrop, CropRootState, getAllCrops } from "..
 import { CropModel } from "../../Model/CropModel.ts";
 import { AppDispatch } from "../../store/Store.ts";
 import Swal from "sweetalert2";
+import "../../css/cropPage.css"
 
 const Crops: React.FC = () => {
     const crops = useSelector((state: CropRootState) => state.crop.crops) || [];
