@@ -8,6 +8,7 @@ import FieldSlice from "../slices/FieldSlice";
 import TokenSlice from "../slices/TokenSlice";
 import UserSlice from "../slices/UserSlice";
 
+// ✅ Create Redux Store
 export const store = configureStore({
     reducer: {
         user: UserSlice,
@@ -19,6 +20,10 @@ export const store = configureStore({
         field: FieldSlice,
         token: TokenSlice,
     },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false, // Disable serializability warnings if using FormData, Date, etc.
+        }),
 });
 
 // ✅ Type for RootState

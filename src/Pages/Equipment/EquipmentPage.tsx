@@ -3,19 +3,20 @@ import { Table, TableColumnsType } from "antd";
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 import { useDispatch, useSelector } from "react-redux";
-import { saveEquipment, updateEquipment, deleteEquipment, EquipmentRootState, getAllEquipment } from "../../slices/EquipmentSlice";
+import {
+    saveEquipment,
+    updateEquipment,
+    deleteEquipment,
+    getAllEquipment,
+} from "../../slices/EquipmentSlice";
 import { EquipmentModel } from "../../Model/EquipmentModel.ts";
-import { AppDispatch } from "../../store/Store.ts";
+import { AppDispatch, RootState } from "../../store/Store.ts";
 
 const Equipment: React.FC = () => {
-    const equipmentList = useSelector((state: EquipmentRootState) => state.equipment.equipments) || [];
     const dispatch = useDispatch<AppDispatch>();
-    const [equipmentName, setEquipmentName] = useState("");
-    const [equipmentType, setEquipmentType] = useState("");
-    const [equipmentStatus, setEquipmentStatus] = useState("Available");
-    const [availableCount, setAvailableCount] = useState("");
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [selectedFields, setFields] = useState<string[]>([]);
+    const equipmentList = useSelector(
+        (state: RootState) => state.equipment.equipment
+    );
 
     const [formData, setFormData] = useState({
         equipmentName: "",
@@ -24,42 +25,30 @@ const Equipment: React.FC = () => {
         availableCount: "",
         fieldList: "",
     });
-    const [imagePopup, setImagePopup] = useState<string | null>(null);
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
 
+    useEffect(() => {
+        dispatch(getAllEquipment());
+    }, [dispatch]);
+
     const columns: TableColumnsType<EquipmentModel> = [
-        {
-            title: "Equipment Code",
-            dataIndex: "equipmentCode",
-            key: "equipmentCode",
-        },
-        {
-            title: "Equipment Name",
-            dataIndex: "equipmentName",
-            key: "equipmentName",
-        },
-        {
-            title: "Equipment Type",
-            dataIndex: "equipmentType",
-            key: "equipmentType",
-        },
-        {
-            title: "Status",
-            dataIndex: "equipmentStatus",
-            key: "equipmentStatus",
-        },
-        {
-            title: "Available Count",
-            dataIndex: "availableCount",
-            key: "availableCount",
-        },
+        { title: "Equipment Code", dataIndex: "equipmentCode", key: "equipmentCode" },
+        { title: "Equipment Name", dataIndex: "name", key: "equipmentName" },
+        { title: "Equipment Type", dataIndex: "type", key: "equipmentType" },
+        { title: "Status", dataIndex: "status", key: "equipmentStatus" },
+        { title: "Available Count", dataIndex: "availableCount", key: "availableCount" },
         {
             title: "Field List",
-            dataIndex: "fieldList",
+            dataIndex: "EquipmentFieldDetails",
             key: "fieldList",
+            render: (fields: { fieldCode: number }[]) =>
+                fields?.length > 0 ? fields.map(field => field.fieldCode).join(", ") : "N/A",
         },
+
         {
             title: "Actions",
             key: "actions",
@@ -67,13 +56,11 @@ const Equipment: React.FC = () => {
                 <div style={{ display: "flex", gap: "8px" }}>
                     <CustomButton
                         label="Edit"
-                        type="button"
                         className="btn-warning"
                         onClick={() => handleEdit(record)}
                     />
                     <CustomButton
                         label="Delete"
-                        type="button"
                         className="btn-danger"
                         onClick={() => handleDelete(record.equipmentCode)}
                     />
@@ -82,22 +69,18 @@ const Equipment: React.FC = () => {
         },
     ];
 
-    useEffect(() => {
-        dispatch(getAllEquipment());
-    }, [dispatch]);
-
     const handleAdd = () => {
         const newEquipment = new FormData();
-        newEquipment.append("name", equipmentName);
-        newEquipment.append("equipmentType", equipmentType);
-        newEquipment.append("status", equipmentStatus);
-        newEquipment.append("availableCount", availableCount);
-        if (selectedFile) {
-            newEquipment.append("image", selectedFile);
-        }
-        newEquipment.append("assignFields", JSON.stringify(selectedFields));
-        dispatch(saveEquipment(newEquipment));
-        resetForm();
+        newEquipment.append("equipmentName", formData.equipmentName);
+        newEquipment.append("equipmentType", formData.equipmentType);
+        newEquipment.append("equipmentStatus", formData.equipmentStatus);
+        newEquipment.append("availableCount", formData.availableCount);
+        if (selectedFile) newEquipment.append("image", selectedFile);
+
+        dispatch(saveEquipment(newEquipment)).then(() => {
+            dispatch(getAllEquipment());
+            resetForm();
+        });
     };
 
     const handleEdit = (record: EquipmentModel) => {
@@ -114,30 +97,37 @@ const Equipment: React.FC = () => {
     };
 
     const handleUpdate = () => {
+        if (!editId) return;
+
         const updatedEquipment = new FormData();
-        updatedEquipment.append("name", equipmentName);
-        updatedEquipment.append("equipmentType", equipmentType);
-        updatedEquipment.append("status", equipmentStatus);
-        updatedEquipment.append("availableCount", availableCount);
-        if (selectedFile) {
-            updatedEquipment.append("image", selectedFile);
-        }
-        updatedEquipment.append("assignFields", JSON.stringify(selectedFields));
-        dispatch(updateEquipment(updatedEquipment));
-        resetForm();
+        updatedEquipment.append("code", editId);
+        updatedEquipment.append("equipmentName", formData.equipmentName);
+        updatedEquipment.append("equipmentType", formData.equipmentType);
+        updatedEquipment.append("equipmentStatus", formData.equipmentStatus);
+        updatedEquipment.append("availableCount", formData.availableCount);
+        if (selectedFile) updatedEquipment.append("image", selectedFile);
+
+        dispatch(updateEquipment(updatedEquipment)).then(() => {
+            dispatch(getAllEquipment());
+            resetForm();
+        });
     };
 
     const handleDelete = (equipmentCode: string) => {
-        dispatch(deleteEquipment(equipmentCode));
+        dispatch(deleteEquipment(equipmentCode)).then(() => {
+            dispatch(getAllEquipment());
+        });
     };
 
     const resetForm = () => {
-        setEquipmentName("");
-        setEquipmentType("");
-        setEquipmentStatus("Available");
-        setAvailableCount("");
+        setFormData({
+            equipmentName: "",
+            equipmentType: "",
+            equipmentStatus: "Available",
+            availableCount: "",
+            fieldList: "",
+        });
         setSelectedFile(null);
-        setFields([]);
         setIsModalOpen(false);
         setIsEditing(false);
     };
@@ -149,24 +139,20 @@ const Equipment: React.FC = () => {
     };
 
     return (
-        <div id="equipmentSection" className="content-section">
+        <div className="content-section">
             <div className="section">
                 <h2 className="text-center my-4">Manage Equipment</h2>
 
-                {/* Add Equipment Button */}
                 <div className="d-flex justify-content-center mb-4">
                     <CustomButton
                         label="Add Equipment"
-                        type="button"
                         className="btn-success"
                         onClick={() => setIsModalOpen(true)}
                     />
                 </div>
 
-                {/* Equipment Table */}
                 <Table<EquipmentModel> columns={columns} dataSource={equipmentList} rowKey="equipmentCode" />
 
-                {/* Modal for Adding/Editing Equipment */}
                 <MainModal
                     isType={isEditing ? "Edit Equipment" : "Add Equipment"}
                     buttonType={isEditing ? "Update" : "Save"}
@@ -174,55 +160,51 @@ const Equipment: React.FC = () => {
                     onClose={resetForm}
                     onSubmit={isEditing ? handleUpdate : handleAdd}
                 >
-                    <form id="equipmentForm">
+                    <form>
                         <div className="mb-3">
-                            <label htmlFor="equipmentName" className="form-label">
-                                Equipment Name
-                            </label>
+                            <label className="form-label">Equipment Name</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                id="equipmentName"
                                 value={formData.equipmentName}
-                                onChange={(e) => setEquipmentName(e.target.value)}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, equipmentName: e.target.value })
+                                }
                                 required
                             />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="equipmentType" className="form-label">
-                                Equipment Type
-                            </label>
+                            <label className="form-label">Equipment Type</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                id="equipmentType"
                                 value={formData.equipmentType}
-                                onChange={(e) => setEquipmentType(e.target.value)}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, equipmentType: e.target.value })
+                                }
                                 required
                             />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="availableCount" className="form-label">
-                                Available Count
-                            </label>
+                            <label className="form-label">Available Count</label>
                             <input
                                 type="number"
                                 className="form-control"
-                                id="availableCount"
                                 value={formData.availableCount}
-                                onChange={(e) => setAvailableCount(e.target.value)}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, availableCount: e.target.value })
+                                }
                                 required
                             />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="equipmentStatus" className="form-label">
-                                Equipment Status
-                            </label>
+                            <label className="form-label">Equipment Status</label>
                             <select
-                                id="equipmentStatus"
-                                value={formData.equipmentStatus}
                                 className="form-control"
-                                onChange={(e) => setEquipmentStatus(e.target.value)}
+                                value={formData.equipmentStatus}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, equipmentStatus: e.target.value })
+                                }
                                 required
                             >
                                 <option value="Available">Available</option>
@@ -230,55 +212,16 @@ const Equipment: React.FC = () => {
                             </select>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="image" className="form-label">
-                                Image
-                            </label>
+                            <label className="form-label">Image</label>
                             <input
                                 type="file"
                                 className="form-control"
-                                id="image"
                                 accept="image/*"
                                 onChange={handleFileChange}
                             />
                         </div>
                     </form>
                 </MainModal>
-
-                {/* Image Popup */}
-                {imagePopup && (
-                    <div
-                        id="imagePopup"
-                        style={{
-                            display: "flex",
-                            position: "fixed",
-                            top: 0,
-                            left: 0,
-                            bottom: 0,
-                            right: 0,
-                            width: "100%",
-                            height: "100%",
-                            background: "rgba(0, 0, 0, 0.8)",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            zIndex: 999,
-                        }}
-                    >
-                        <span
-                            className="close"
-                            style={{
-                                position: "absolute",
-                                top: "10px",
-                                right: "20px",
-                                fontSize: "30px",
-                                color: "white",
-                                cursor: "pointer",
-                            }}
-                            onClick={() => setImagePopup(null)}
-                        >
-                            ×
-                        </span>
-                    </div>
-                )}
             </div>
         </div>
     );

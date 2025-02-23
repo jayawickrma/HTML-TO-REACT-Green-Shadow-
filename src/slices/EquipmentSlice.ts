@@ -73,7 +73,6 @@ export const getAllEquipment = createAsyncThunk(
     async () => {
         try {
             const response = await api.get("equipment/getAllEquipment");
-
             console.log("all equipment details =======",response.data)
             return response.data;
         } catch (e) {
