@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { Table } from "antd";
 import MainModal from "../../Components/Add/AddComponent.tsx";
 import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
+import { useDispatch, useSelector } from "react-redux";
 import { saveField, updateField, deleteField, FieldRootState, getAllFields } from "../../slices/FieldSlice";
 import FieldModel from "../../Model/FieldModel";
 
+// ManageFields Component
 const ManageFields: React.FC = () => {
-    const fields = useSelector((state: FieldRootState) => state.field.fields); // Corrected selector to access the fields state
+    const fields = useSelector((state: FieldRootState) => state.field.fields); // Access fields state
     const dispatch = useDispatch();
 
     const [formData, setFormData] = useState<Omit<FieldModel, "fieldCode">>({
         fieldName: "",
         fieldLocation: "",
         fieldExtentSize: "",
-        fieldImage1: null,
-        fieldImage2: null,
+        fieldImage: "", // Now we store base64 string
         equipmentList: "",
         cropList: "",
         logList: "",
@@ -25,41 +25,36 @@ const ManageFields: React.FC = () => {
     const [editingField, setEditingField] = useState<FieldModel | null>(null);
     const [imagePopup, setImagePopup] = useState<string | null>(null);
 
+    // Table columns definition
     const columns = [
         { title: "Field Code", dataIndex: "fieldCode", key: "fieldCode" },
         { title: "Field Name", dataIndex: "name", key: "fieldName" },
         { title: "Location", dataIndex: "location", key: "fieldLocation" },
         { title: "Size (Acres)", dataIndex: "extentSize", key: "fieldExtentSize" },
         {
-            title: "Image 1",
-            dataIndex: "fieldImage1",
-            key: "fieldImage1",
-            render: (image: File | null) =>
+            title: "Field Image",
+            dataIndex: "fieldImage",
+            key: "fieldImage",
+            render: (image: string | null) =>
                 image ? (
                     <img
-                        src={URL.createObjectURL(image)}
-                        alt="Field Image 1"
+                        src={image}  // Base64 string used here directly
+                        alt="Field Image"
                         style={{ width: "50px", height: "50px", cursor: "pointer" }}
-                        onClick={() => setImagePopup(URL.createObjectURL(image))}
+                        onClick={() => setImagePopup(image)}  // Trigger the popup to show the image in larger size
                     />
-                ) : null,
+                ) : (
+                    <span>No image</span>
+                ),
         },
-        {
-            title: "Image 2",
-            dataIndex: "fieldImage2",
-            key: "fieldImage2",
-            render: (image: File | null) =>
-                image ? (
-                    <img
-                        src={URL.createObjectURL(image)}
-                        alt="Field Image 2"
-                        style={{ width: "50px", height: "50px", cursor: "pointer" }}
-                        onClick={() => setImagePopup(URL.createObjectURL(image))}
-                    />
-                ) : null,
+        { title: "Equipment List", dataIndex: "EquipmentFieldDetails", key: "equipmentList",
+            render: (equipment: { equipmentCode: number }[]) =>
+                equipment?.length > 0 ? equipment.map(equipment => equipment.equipmentCode).join(", ") : "N/A",
         },
-        { title: "Equipment List", dataIndex: "equipmentList", key: "equipmentList" },
-        { title: "Crop List", dataIndex: "cropList", key: "cropList" },
+        { title: "Crop List", dataIndex: "CropFieldDetails", key: "cropList",
+            render: (crops: { cropCode: number }[]) =>
+                crops?.length > 0 ? crops.map(crop => crop.cropCode).join(", ") : "N/A",
+        },
         {
             title: "Actions",
             key: "actions",
@@ -81,9 +76,10 @@ const ManageFields: React.FC = () => {
     ];
 
     useEffect(() => {
-        dispatch(getAllFields());
+        dispatch(getAllFields()); // Fetch all fields from Redux store
     }, [dispatch]);
 
+    // Handle form input change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
         setFormData((prev) => ({
@@ -92,52 +88,43 @@ const ManageFields: React.FC = () => {
         }));
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: "fieldImage1" | "fieldImage2") => {
+    // Handle file change for image input and convert to base64 string
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setFormData((prev) => ({
-                ...prev,
-                [field]: e.target.files[0], // Store the file object
-            }));
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setFormData((prev) => ({
+                    ...prev,
+                    fieldImage: base64String, // Store base64 string for image
+                }));
+            };
+            reader.readAsDataURL(e.target.files[0]); // Convert file to base64
         }
     };
 
+    // Handle form submission (either add or update field)
     const handleSubmit = () => {
         const newField = {
             ...formData,
             fieldCode: editingField ? editingField.fieldCode : `FLD${fields.length + 1}`,
         };
 
-        const formDataToSubmit = new FormData();
-        formDataToSubmit.append("fieldCode", newField.fieldCode);
-        formDataToSubmit.append("fieldName", newField.fieldName);
-        formDataToSubmit.append("fieldLocation", newField.fieldLocation);
-        formDataToSubmit.append("fieldExtentSize", newField.fieldExtentSize);
-        formDataToSubmit.append("equipmentList", newField.equipmentList);
-        formDataToSubmit.append("cropList", newField.cropList);
-        formDataToSubmit.append("logList", newField.logList);
-
-        if (newField.fieldImage1) {
-            formDataToSubmit.append("fieldImage1", newField.fieldImage1);
-        }
-        if (newField.fieldImage2) {
-            formDataToSubmit.append("fieldImage2", newField.fieldImage2);
-        }
-
         if (editingField) {
-            dispatch(updateField(formDataToSubmit));
+            dispatch(updateField(newField));  // Update the field
         } else {
-            dispatch(saveField(formDataToSubmit));
+            dispatch(saveField(newField));  // Add the new field
         }
-        resetForm();
+        resetForm(); // Reset the form after submission
     };
 
+    // Reset form to its initial state
     const resetForm = () => {
         setFormData({
             fieldName: "",
             fieldLocation: "",
             fieldExtentSize: "",
-            fieldImage1: null,
-            fieldImage2: null,
+            fieldImage: "", // Reset to empty string
             equipmentList: "",
             cropList: "",
             logList: "",
@@ -146,14 +133,16 @@ const ManageFields: React.FC = () => {
         setEditingField(null);
     };
 
+    // Handle Edit action
     const handleEdit = (record: FieldModel) => {
         setEditingField(record);
         setFormData(record);
         setModalOpen(true);
     };
 
+    // Handle Delete action
     const handleDelete = (fieldCode: string) => {
-        dispatch(deleteField(fieldCode));
+        dispatch(deleteField(fieldCode)); // Delete the field by its fieldCode
     };
 
     return (
@@ -198,20 +187,18 @@ const ManageFields: React.FC = () => {
                             />
                         </div>
                     ))}
-                    {["fieldImage1", "fieldImage2"].map((id) => (
-                        <div className="mb-3" key={id}>
-                            <label htmlFor={id} className="form-label">
-                                {id === "fieldImage1" ? "Image 1" : "Image 2"}
-                            </label>
-                            <input
-                                type="file"
-                                id={id}
-                                className="form-control"
-                                accept="image/*"
-                                onChange={(e) => handleFileChange(e, id as "fieldImage1" | "fieldImage2")}
-                            />
-                        </div>
-                    ))}
+                    <div className="mb-3">
+                        <label htmlFor="fieldImage" className="form-label">
+                            Field Image (Upload Image)
+                        </label>
+                        <input
+                            type="file"
+                            id="fieldImage"
+                            className="form-control"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
+                    </div>
                 </form>
             </MainModal>
             {imagePopup && (

@@ -13,6 +13,7 @@ const initialState: VehicleState = {
 // Fetch all vehicles
 export const getAllVehicles = createAsyncThunk("vehicle/getAll", async () => {
     const response = await api.get("/vehicle/getAllVehicles");
+    console.log(response.data)
     return response.data;
 });
 

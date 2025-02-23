@@ -6,11 +6,6 @@ const initialState: { staffs: Staff[] } = {
     staffs: [],
 };
 
-export type StaffRootState = {
-    staff: {
-        staffs: Array<Staff>;
-    };
-};
 
 export const saveStaff = createAsyncThunk(
     "staff/saveStaff",

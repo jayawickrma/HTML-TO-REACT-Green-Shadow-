@@ -14,7 +14,7 @@ export const store = configureStore({
         user: UserSlice,
         vehicle: VehicleSlice,
         equipment: EquipmentSlice,
-        staffs: StaffSlice,
+        staff: StaffSlice,
         crop: CropSlice,
         logs: LogSlice,
         field: FieldSlice,

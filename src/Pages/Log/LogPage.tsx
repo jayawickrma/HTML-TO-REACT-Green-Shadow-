@@ -2,32 +2,55 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store/Store";
 import { fetchLogs, createLog, updateLog, deleteLog } from "../../slices/LogSlice";
-import { Table, TableColumnsType, Spin, message } from "antd";
+import { Table, TableColumnsType, message } from "antd";
 import logModel from "../../Model/LogModel";
 import MainModal from "../../Components/Add/AddComponent";
-import CustomButton from "../../Components/Button/CustomButonComponent";
+import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 
 const LogPage: React.FC = () => {
     const dispatch = useDispatch();
-    const { logs, loading, error } = useSelector((state: RootState) => state.logs);
+    const { logs } = useSelector((state: RootState) => state.logs);
 
     const [formData, setFormData] = useState<logModel | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
     const [editingLogCode, setEditingLogCode] = useState<string | null>(null);
 
-    // ✅ Load logs on page load
     useEffect(() => {
         dispatch(fetchLogs());
     }, [dispatch]);
 
-    // 🔹 Table Columns
     const columns: TableColumnsType<logModel> = [
         { title: "Log Code", dataIndex: "logCode", key: "logCode" },
         { title: "Date", dataIndex: "date", key: "logDate" },
         { title: "Details", dataIndex: "logDetails", key: "logDetails" },
-        { title: "Staff", dataIndex: "staffList", key: "staffList" },
-        { title: "Crop", dataIndex: "cropList", key: "cropList" },
-        { title: "Field", dataIndex: "fieldList", key: "fieldList" },
+        {
+            title: "Observed Image",
+            dataIndex: "observedImage",
+            key: "observedImage",
+            render: (image: string | null) =>
+                image ? (
+                    <img
+                        src={image}
+                        alt="Observed Image"
+                        style={{ width: "100px", height: "100px", objectFit: "cover", cursor: "pointer" }}
+                        onClick={() => window.open(image, "_blank")}
+                    />
+                ) : (
+                    "No Image"
+                ),
+        },
+        { title: "Staff", dataIndex: "LogStaffDetails", key: "staffList",
+            render: (staffs: { staffId: number }[]) =>
+                staffs?.length > 0 ? staffs.map(staff => staff.staffId).join(", ") : "N/A",
+        },
+        { title: "Crop", dataIndex: "LogCropDetails", key: "cropList",
+            render: (crops: { cropCode: number }[]) =>
+                crops?.length > 0 ? crops.map(crop => crop.cropCode).join(", ") : "N/A",
+        },
+        { title: "Field", dataIndex: "LogFieldsDetails", key: "fieldList",
+            render: (fields: { fieldCode: number }[]) =>
+                fields?.length > 0 ? fields.map(field => field.fieldCode).join(", ") : "N/A",
+        },
         {
             title: "Actions",
             key: "actions",
@@ -40,13 +63,11 @@ const LogPage: React.FC = () => {
         },
     ];
 
-    // 🔹 Handle Input Change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
         setFormData((prev) => (prev ? { ...prev, [id]: value } : null));
     };
 
-    // 🔹 Handle Submit (Add or Edit Log)
     const handleSubmit = () => {
         if (!formData) return;
 
@@ -65,14 +86,12 @@ const LogPage: React.FC = () => {
         setModalOpen(false);
     };
 
-    // 🔹 Handle Edit
     const handleEdit = (log: logModel) => {
         setFormData(log);
         setEditingLogCode(log.logCode);
         setModalOpen(true);
     };
 
-    // 🔹 Handle Delete
     const handleDelete = (logCode: string) => {
         dispatch(deleteLog(logCode))
             .then(() => message.success("Log deleted successfully"))
@@ -95,10 +114,8 @@ const LogPage: React.FC = () => {
                 />
             </div>
 
-            {loading ? <Spin size="large" className="d-block mx-auto" /> : <Table<logModel> columns={columns} dataSource={logs} rowKey="logCode" />}
-            {error && <p className="text-danger text-center">{error}</p>}
+            <Table<logModel> columns={columns} dataSource={logs} rowKey="logCode" />
 
-            {/* 🔹 Modal for Adding & Editing Logs */}
             <MainModal
                 isType={editingLogCode ? "Edit Log" : "Add Log"}
                 buttonType={editingLogCode ? "Update Log" : "Save Log"}
@@ -110,7 +127,14 @@ const LogPage: React.FC = () => {
                     {["logCode", "logDate", "logDetails", "staffList", "cropList", "fieldList"].map((id) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">{id.replace(/([A-Z])/g, " $1")}</label>
-                            <input type="text" id={id} className="form-control" value={(formData as any)?.[id] || ""} onChange={handleInputChange} required />
+                            <input
+                                type="text"
+                                id={id}
+                                className="form-control"
+                                value={(formData as any)?.[id] || ""}
+                                onChange={handleInputChange}
+                                required
+                            />
                         </div>
                     ))}
                 </form>

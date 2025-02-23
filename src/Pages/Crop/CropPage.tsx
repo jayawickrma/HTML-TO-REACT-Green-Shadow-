@@ -73,7 +73,7 @@ const Crops: React.FC = () => {
         },
         {
             title: "Field",
-            dataIndex: "fieldList",
+            dataIndex: "CropFieldDetails",
             key: "fieldList",
             render: (fields: { fieldCode: number }[]) =>
                 fields?.length > 0 ? fields.map(field => field.fieldCode).join(", ") : "N/A",
@@ -81,7 +81,7 @@ const Crops: React.FC = () => {
         },
         {
             title: "Log",
-            dataIndex: "logList",
+            dataIndex: "LogCropDetails",
             key: "logList",
             render: (logs: { logCode: number }[]) =>
                 logs?.length > 0 ? logs.map(field => field.logCode).join(", ") : "N/A",
