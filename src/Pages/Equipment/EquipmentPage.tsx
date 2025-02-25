@@ -11,22 +11,22 @@ import {
 } from "../../slices/EquipmentSlice";
 import { EquipmentModel } from "../../Model/EquipmentModel.ts";
 import { AppDispatch, RootState } from "../../store/Store.ts";
+import Swal from "sweetalert2";
+import "../../css/equipmentPage.css"; // Import the CSS file
 
 const Equipment: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const equipmentList = useSelector(
-        (state: RootState) => state.equipment.equipment
-    );
+    const equipmentList = useSelector((state: RootState) => state.equipment.equipment);
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<EquipmentModel>({
+        equipmentCode: "", // Will be auto-generated or handled by the backend
         equipmentName: "",
         equipmentType: "",
         equipmentStatus: "Available",
         availableCount: "",
-        fieldList: "",
+        fieldList: [],
     });
 
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
@@ -37,18 +37,16 @@ const Equipment: React.FC = () => {
 
     const columns: TableColumnsType<EquipmentModel> = [
         { title: "Equipment Code", dataIndex: "equipmentCode", key: "equipmentCode" },
-        { title: "Equipment Name", dataIndex: "name", key: "equipmentName" },
-        { title: "Equipment Type", dataIndex: "type", key: "equipmentType" },
-        { title: "Status", dataIndex: "status", key: "equipmentStatus" },
+        { title: "Equipment Name", dataIndex: "equipmentName", key: "equipmentName" },
+        { title: "Equipment Type", dataIndex: "equipmentType", key: "equipmentType" },
+        { title: "Status", dataIndex: "equipmentStatus", key: "equipmentStatus" },
         { title: "Available Count", dataIndex: "availableCount", key: "availableCount" },
         {
             title: "Field List",
-            dataIndex: "EquipmentFieldDetails",
+            dataIndex: "fieldList",
             key: "fieldList",
-            render: (fields: { fieldCode: number }[]) =>
-                fields?.length > 0 ? fields.map(field => field.fieldCode).join(", ") : "N/A",
+            render: (fields: string[]) => (fields?.length > 0 ? fields.join(", ") : "N/A"),
         },
-
         {
             title: "Actions",
             key: "actions",
@@ -70,72 +68,77 @@ const Equipment: React.FC = () => {
     ];
 
     const handleAdd = () => {
-        const newEquipment = new FormData();
-        newEquipment.append("equipmentName", formData.equipmentName);
-        newEquipment.append("equipmentType", formData.equipmentType);
-        newEquipment.append("equipmentStatus", formData.equipmentStatus);
-        newEquipment.append("availableCount", formData.availableCount);
-        if (selectedFile) newEquipment.append("image", selectedFile);
-
-        dispatch(saveEquipment(newEquipment)).then(() => {
-            dispatch(getAllEquipment());
-            resetForm();
-        });
+        dispatch(saveEquipment(formData))
+            .then(() => {
+                Swal.fire("Success!", "Equipment added successfully.", "success");
+                dispatch(getAllEquipment());
+                resetForm();
+            })
+            .catch(() => {
+                Swal.fire("Error!", "Failed to add equipment.", "error");
+            });
     };
 
     const handleEdit = (record: EquipmentModel) => {
         setIsEditing(true);
         setEditId(record.equipmentCode);
-        setFormData({
-            equipmentName: record.equipmentName,
-            equipmentType: record.equipmentType,
-            equipmentStatus: record.equipmentStatus,
-            availableCount: record.availableCount,
-            fieldList: record.fieldList,
-        });
+        setFormData(record);
         setIsModalOpen(true);
     };
 
     const handleUpdate = () => {
         if (!editId) return;
 
-        const updatedEquipment = new FormData();
-        updatedEquipment.append("code", editId);
-        updatedEquipment.append("equipmentName", formData.equipmentName);
-        updatedEquipment.append("equipmentType", formData.equipmentType);
-        updatedEquipment.append("equipmentStatus", formData.equipmentStatus);
-        updatedEquipment.append("availableCount", formData.availableCount);
-        if (selectedFile) updatedEquipment.append("image", selectedFile);
-
-        dispatch(updateEquipment(updatedEquipment)).then(() => {
-            dispatch(getAllEquipment());
-            resetForm();
-        });
+        dispatch(updateEquipment(formData))
+            .then(() => {
+                Swal.fire("Success!", "Equipment updated successfully.", "success");
+                dispatch(getAllEquipment());
+                resetForm();
+            })
+            .catch(() => {
+                Swal.fire("Error!", "Failed to update equipment.", "error");
+            });
     };
 
     const handleDelete = (equipmentCode: string) => {
-        dispatch(deleteEquipment(equipmentCode)).then(() => {
-            dispatch(getAllEquipment());
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(deleteEquipment(equipmentCode))
+                    .then(() => {
+                        Swal.fire("Deleted!", "Equipment has been deleted.", "success");
+                        dispatch(getAllEquipment());
+                    })
+                    .catch(() => {
+                        Swal.fire("Error!", "Failed to delete equipment.", "error");
+                    });
+            }
         });
     };
 
     const resetForm = () => {
         setFormData({
+            equipmentCode: "",
             equipmentName: "",
             equipmentType: "",
             equipmentStatus: "Available",
             availableCount: "",
-            fieldList: "",
+            fieldList: [],
         });
-        setSelectedFile(null);
         setIsModalOpen(false);
         setIsEditing(false);
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files.length > 0) {
-            setSelectedFile(event.target.files[0]);
-        }
+    const handleFieldListChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const fields = e.target.value.split(",").map((field) => field.trim());
+        setFormData({ ...formData, fieldList: fields });
     };
 
     return (
@@ -160,16 +163,14 @@ const Equipment: React.FC = () => {
                     onClose={resetForm}
                     onSubmit={isEditing ? handleUpdate : handleAdd}
                 >
-                    <form>
+                    <form className="equipment-form">
                         <div className="mb-3">
                             <label className="form-label">Equipment Name</label>
                             <input
                                 type="text"
                                 className="form-control"
                                 value={formData.equipmentName}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, equipmentName: e.target.value })
-                                }
+                                onChange={(e) => setFormData({ ...formData, equipmentName: e.target.value })}
                                 required
                             />
                         </div>
@@ -179,21 +180,17 @@ const Equipment: React.FC = () => {
                                 type="text"
                                 className="form-control"
                                 value={formData.equipmentType}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, equipmentType: e.target.value })
-                                }
+                                onChange={(e) => setFormData({ ...formData, equipmentType: e.target.value })}
                                 required
                             />
                         </div>
                         <div className="mb-3">
                             <label className="form-label">Available Count</label>
                             <input
-                                type="number"
+                                type="text"
                                 className="form-control"
                                 value={formData.availableCount}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, availableCount: e.target.value })
-                                }
+                                onChange={(e) => setFormData({ ...formData, availableCount: e.target.value })}
                                 required
                             />
                         </div>
@@ -202,9 +199,7 @@ const Equipment: React.FC = () => {
                             <select
                                 className="form-control"
                                 value={formData.equipmentStatus}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, equipmentStatus: e.target.value })
-                                }
+                                onChange={(e) => setFormData({ ...formData, equipmentStatus: e.target.value })}
                                 required
                             >
                                 <option value="Available">Available</option>
@@ -212,12 +207,13 @@ const Equipment: React.FC = () => {
                             </select>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Image</label>
+                            <label className="form-label">Field List (Comma-separated)</label>
                             <input
-                                type="file"
+                                type="text"
                                 className="form-control"
-                                accept="image/*"
-                                onChange={handleFileChange}
+                                value={formData.fieldList.join(", ")}
+                                onChange={handleFieldListChange}
+                                required
                             />
                         </div>
                     </form>

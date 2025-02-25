@@ -4,9 +4,9 @@ export class EquipmentModel{
     equipmentType: string;
     equipmentStatus: string;
     availableCount:string;
-    fieldList:string;
+    fieldList:string[];
 
-    constructor(code: string, name: string, type: string, status: string, count: string, fields: string){
+    constructor(code: string, name: string, type: string, status: string, count: string, fields: string[]){
         this.equipmentCode = code;
         this.equipmentName = name;
         this.equipmentType = type;
