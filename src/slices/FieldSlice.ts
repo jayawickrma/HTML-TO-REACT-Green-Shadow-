@@ -11,12 +11,14 @@ const initialState: { fields: FieldModel[] } = {
 export type FieldRootState = {
     field: {
         fields: Array<{
-            fieldCode: string;
-            fieldName: string;
-            area: string;
-            cropList: string;
-            logList: string;
-            fieldImage: File | null; // fieldImage handling
+            fieldCode:string;
+            fieldName:string;
+            fieldLocation:string;
+            fieldExtentSize:string;
+            fieldImage:File|null;
+            equipmentList:string;
+            cropList:string;
+            logList:string;
         }>;
     };
 };
@@ -28,7 +30,7 @@ export const saveField = createAsyncThunk(
     "field/saveField",
     async (field: FormData, { dispatch }) => {
         try {
-            const response = await api.post("field/saveField", field, {
+            const response = await api.post("field/addField", field, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -72,7 +74,10 @@ export const deleteField = createAsyncThunk(
     "field/deleteField",
     async (fieldCode: string) => {
         try {
-            return await api.delete(`field/deleteField/${fieldCode}`);
+            const response= await api.delete(`field/deleteField`,{
+                params:{id:fieldCode}
+            });
+            return  response.data
         } catch (e) {
             console.error("Failed to delete field!", e);
             throw e; // Propagate error to the caller

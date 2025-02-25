@@ -1,8 +1,8 @@
 class fieldModel{
     fieldCode:string;
-    fieldName:string;
-    fieldLocation:string;
-    fieldExtentSize:string;
+    name:string;
+    location:string;
+    extentSize:string;
     fieldImage:File|null;
     equipmentList:string;
     cropList:string;
@@ -11,9 +11,9 @@ class fieldModel{
 
     constructor(fieldCode: string, fieldName: string, fieldLocation: string, fieldExtentSize: string, fieldImage: File | null, equipmentList: string, cropList: string, logList: string) {
         this.fieldCode = fieldCode;
-        this.fieldName = fieldName;
-        this.fieldLocation = fieldLocation;
-        this.fieldExtentSize = fieldExtentSize;
+        this.name = fieldName;
+        this.location = fieldLocation;
+        this.extentSize = fieldExtentSize;
         this.fieldImage = fieldImage;
         this.equipmentList = equipmentList;
         this.cropList = cropList;

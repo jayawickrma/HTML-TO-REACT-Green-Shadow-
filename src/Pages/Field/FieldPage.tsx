@@ -5,17 +5,18 @@ import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 import { useDispatch, useSelector } from "react-redux";
 import { saveField, updateField, deleteField, FieldRootState, getAllFields } from "../../slices/FieldSlice";
 import FieldModel from "../../Model/FieldModel";
+import Swal from "sweetalert2";
+import "../../css/equipmentPage.css"; // Import the CSS file
 
-// ManageFields Component
 const ManageFields: React.FC = () => {
-    const fields = useSelector((state: FieldRootState) => state.field.fields); // Access fields state
+    const fields = useSelector((state: FieldRootState) => state.field.fields);
     const dispatch = useDispatch();
 
     const [formData, setFormData] = useState<Omit<FieldModel, "fieldCode">>({
-        fieldName: "",
-        fieldLocation: "",
-        fieldExtentSize: "",
-        fieldImage: "", // Now we store base64 string
+        name: "",
+        location: "",
+        extentSize: "",
+        fieldImage: null,
         equipmentList: "",
         cropList: "",
         logList: "",
@@ -25,7 +26,6 @@ const ManageFields: React.FC = () => {
     const [editingField, setEditingField] = useState<FieldModel | null>(null);
     const [imagePopup, setImagePopup] = useState<string | null>(null);
 
-    // Table columns definition
     const columns = [
         { title: "Field Code", dataIndex: "fieldCode", key: "fieldCode" },
         { title: "Field Name", dataIndex: "name", key: "fieldName" },
@@ -38,22 +38,28 @@ const ManageFields: React.FC = () => {
             render: (image: string | null) =>
                 image ? (
                     <img
-                        src={image}  // Base64 string used here directly
+                        src={image} // Base64 string used here directly
                         alt="Field Image"
                         style={{ width: "50px", height: "50px", cursor: "pointer" }}
-                        onClick={() => setImagePopup(image)}  // Trigger the popup to show the image in larger size
+                        onClick={() => setImagePopup(`data:image/png;base64,${image}`)} // Trigger the popup to show the image in larger size
                     />
                 ) : (
                     <span>No image</span>
                 ),
         },
-        { title: "Equipment List", dataIndex: "EquipmentFieldDetails", key: "equipmentList",
+        {
+            title: "Equipment List",
+            dataIndex: "EquipmentFieldDetails",
+            key: "equipmentList",
             render: (equipment: { equipmentCode: number }[]) =>
-                equipment?.length > 0 ? equipment.map(equipment => equipment.equipmentCode).join(", ") : "N/A",
+                equipment?.length > 0 ? equipment.map((equipment) => equipment.equipmentCode).join(", ") : "N/A",
         },
-        { title: "Crop List", dataIndex: "CropFieldDetails", key: "cropList",
+        {
+            title: "Crop List",
+            dataIndex: "CropFieldDetails",
+            key: "cropList",
             render: (crops: { cropCode: number }[]) =>
-                crops?.length > 0 ? crops.map(crop => crop.cropCode).join(", ") : "N/A",
+                crops?.length > 0 ? crops.map((crop) => crop.cropCode).join(", ") : "N/A",
         },
         {
             title: "Actions",
@@ -76,10 +82,9 @@ const ManageFields: React.FC = () => {
     ];
 
     useEffect(() => {
-        dispatch(getAllFields()); // Fetch all fields from Redux store
+        dispatch(getAllFields());
     }, [dispatch]);
 
-    // Handle form input change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
         setFormData((prev) => ({
@@ -88,43 +93,60 @@ const ManageFields: React.FC = () => {
         }));
     };
 
-    // Handle file change for image input and convert to base64 string
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64String = reader.result as string;
-                setFormData((prev) => ({
-                    ...prev,
-                    fieldImage: base64String, // Store base64 string for image
-                }));
-            };
-            reader.readAsDataURL(e.target.files[0]); // Convert file to base64
+            const file = e.target.files[0];
+            setFormData((prev) => ({
+                ...prev,
+                fieldImage: file,
+            }));
         }
     };
 
-    // Handle form submission (either add or update field)
     const handleSubmit = () => {
-        const newField = {
-            ...formData,
-            fieldCode: editingField ? editingField.fieldCode : `FLD${fields.length + 1}`,
-        };
+        const formDataObj = new FormData();
+        formDataObj.append("name", formData.name);
+        formDataObj.append("location", formData.location);
+        formDataObj.append("extentSize", formData.extentSize);
+        formDataObj.append("equipmentList", formData.equipmentList);
+        formDataObj.append("cropList", formData.cropList);
+        formDataObj.append("logList", formData.logList);
+
+        if (formData.fieldImage) {
+            formDataObj.append("fieldImage", formData.fieldImage);
+        }
 
         if (editingField) {
-            dispatch(updateField(newField));  // Update the field
+            formDataObj.append("fieldCode", editingField.fieldCode);
+            dispatch(updateField(formDataObj))
+                .then(() => {
+                    Swal.fire("Success!", "Field updated successfully.", "success");
+                    dispatch(getAllFields());
+                    resetForm();
+                })
+                .catch(() => {
+                    Swal.fire("Error!", "Failed to update field.", "error");
+                });
         } else {
-            dispatch(saveField(newField));  // Add the new field
+            formDataObj.append("fieldCode", `FLD${fields.length + 1}`);
+            dispatch(saveField(formDataObj))
+                .then(() => {
+                    Swal.fire("Success!", "Field added successfully.", "success");
+                    dispatch(getAllFields());
+                    resetForm();
+                })
+                .catch(() => {
+                    Swal.fire("Error!", "Failed to add field.", "error");
+                });
         }
-        resetForm(); // Reset the form after submission
     };
 
-    // Reset form to its initial state
     const resetForm = () => {
         setFormData({
-            fieldName: "",
-            fieldLocation: "",
-            fieldExtentSize: "",
-            fieldImage: "", // Reset to empty string
+            name: "",
+            location: "",
+            extentSize: "",
+            fieldImage: null,
             equipmentList: "",
             cropList: "",
             logList: "",
@@ -133,16 +155,33 @@ const ManageFields: React.FC = () => {
         setEditingField(null);
     };
 
-    // Handle Edit action
     const handleEdit = (record: FieldModel) => {
         setEditingField(record);
         setFormData(record);
         setModalOpen(true);
     };
 
-    // Handle Delete action
     const handleDelete = (fieldCode: string) => {
-        dispatch(deleteField(fieldCode)); // Delete the field by its fieldCode
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(deleteField(fieldCode))
+                    .then(() => {
+                        Swal.fire("Deleted!", "Field has been deleted.", "success");
+                        dispatch(getAllFields());
+                    })
+                    .catch(() => {
+                        Swal.fire("Error!", "Failed to delete field.", "error");
+                    });
+            }
+        });
     };
 
     return (
@@ -167,12 +206,14 @@ const ManageFields: React.FC = () => {
                 onSubmit={handleSubmit}
             >
                 <form>
-                    {[{ label: "Field Name", id: "fieldName" },
-                        { label: "Location", id: "fieldLocation" },
-                        { label: "Extent Size (Acres)", id: "fieldExtentSize" },
+                    {[
+                        { label: "Field Name", id: "name" },
+                        { label: "Location", id: "location" },
+                        { label: "Extent Size (Acres)", id: "extentSize" },
                         { label: "Equipment List", id: "equipmentList" },
                         { label: "Crop List", id: "cropList" },
-                        { label: "Log List", id: "logList" }].map(({ label, id }) => (
+                        { label: "Log List", id: "logList" },
+                    ].map(({ label, id }) => (
                         <div className="mb-3" key={id}>
                             <label htmlFor={id} className="form-label">
                                 {label}
