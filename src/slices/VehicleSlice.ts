@@ -1,39 +1,78 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import VehicleModel from "../Model/VehicleModel";
-import { api } from "../Services/api";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { api } from "../Services/api"; // Your API service to make requests
+import  VehicleModel  from "../Model/VehicleModel"; // Your model class for vehicles
 
-interface VehicleState {
-    vehicles: VehicleModel[];
-}
-
-const initialState: VehicleState = {
-    vehicles: [],
+const initialState = {
+    vehicles: [] as VehicleModel[], // State holding the vehicle data
 };
 
 // Fetch all vehicles
-export const getAllVehicles = createAsyncThunk("vehicle/getAll", async () => {
-    const response = await api.get("/vehicle/getAllVehicles");
-    console.log(response.data)
-    return response.data;
-});
+export const getAllVehicles = createAsyncThunk(
+    "vehicle/getAllVehicles",
+    async () => {
+        try {
+            const response = await api.get("vehicle/getAllVehicles");
+            return response.data;
+        } catch (e) {
+            console.error("Failed to fetch vehicles!", e);
+            throw e;
+        }
+    }
+);
 
 // Save a new vehicle
-export const saveVehicle = createAsyncThunk("vehicle/save", async (vehicle: VehicleModel, { dispatch }) => {
-    await api.post("/vehicle/saveVehicle", vehicle);
-    dispatch(getAllVehicles());
-});
+export const saveVehicle = createAsyncThunk(
+    "vehicle/saveVehicle",
+    async (vehicle: VehicleModel, { dispatch }) => {
+        try {
+            const response = await api.post("vehicle/saveVehicle", vehicle, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            dispatch(getAllVehicles()); // Refresh the list after saving
+            return response.data;
+        } catch (e) {
+            console.error("Failed to save vehicle!", e);
+            throw e;
+        }
+    }
+);
 
 // Update vehicle
-export const updateVehicle = createAsyncThunk("vehicle/update", async (vehicle: VehicleModel, { dispatch }) => {
-    await api.put(`/vehicle/updateVehicle/${vehicle.vehicleCode}`, vehicle);
-    dispatch(getAllVehicles());
-});
+export const updateVehicle = createAsyncThunk(
+    "vehicle/updateVehicle",
+    async (vehicle: VehicleModel, { dispatch }) => {
+        try {
+            const response = await api.put(`vehicle/updateVehicle/${vehicle.vehicleCode}`, vehicle, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            dispatch(getAllVehicles()); // Refresh the list after updating
+            return response.data;
+        } catch (e) {
+            console.error("Failed to update vehicle!", e);
+            throw e;
+        }
+    }
+);
 
 // Delete vehicle
-export const deleteVehicle = createAsyncThunk("vehicle/delete", async (vehicleCode: string, { dispatch }) => {
-    await api.delete(`/vehicle/deleteVehicle/${vehicleCode}`);
-    dispatch(getAllVehicles());
-});
+export const deleteVehicle = createAsyncThunk(
+    "vehicle/deleteVehicle",
+    async (vehicleCode: string) => {
+        try {
+            const response = await api.delete(`vehicle/deleteVehicle`,{
+                params:{id: vehicleCode}
+            });
+            return response.data
+        } catch (e) {
+            console.error("Failed to delete vehicle!", e);
+            throw e;
+        }
+    }
+);
 
 const vehicleSlice = createSlice({
     name: "vehicle",
@@ -41,18 +80,33 @@ const vehicleSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            // Fetch all vehicles
             .addCase(getAllVehicles.fulfilled, (state, action) => {
-                state.vehicles = action.payload;
+                state.vehicles = action.payload || [];
             })
+
+            // Save a new vehicle
             .addCase(saveVehicle.fulfilled, (state, action) => {
-                state.vehicles.push(action.meta.arg);
+                if (action.payload) {
+                    state.vehicles.push(action.payload);
+                }
             })
+
+            // Update vehicle
             .addCase(updateVehicle.fulfilled, (state, action) => {
-                const index = state.vehicles.findIndex(v => v.vehicleCode === action.meta.arg.vehicleCode);
-                if (index !== -1) state.vehicles[index] = action.meta.arg;
+                const updatedVehicle = action.payload;
+                const index = state.vehicles.findIndex(
+                    (v) => v.vehicleCode === updatedVehicle.vehicleCode
+                );
+                if (index !== -1) {
+                    state.vehicles[index] = updatedVehicle;
+                }
             })
+
+            // Delete vehicle
             .addCase(deleteVehicle.fulfilled, (state, action) => {
-                state.vehicles = state.vehicles.filter(v => v.vehicleCode !== action.meta.arg);
+                const vehicleCode = action.payload;
+                state.vehicles = state.vehicles.filter((v) => v.vehicleCode !== vehicleCode);
             });
     },
 });

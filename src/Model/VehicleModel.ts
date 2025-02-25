@@ -1,17 +1,26 @@
-class VehicleModel{
+class VehicleModel {
     vehicleCode: string;
-    licencePlateNumber: string;
-    vehicleName: string;
+    licensePlateNumber: string; // Corrected field name
+    name: string;
     category: string;
     fuelType: string;
     remark: string;
     status: string;
-    memberCode: string;
+    memberCode: number;
 
-    constructor(vehicleCode: string, licencePlateNumber: string, vehicleName: string, category: string, fuelType: string, remark: string, status: string, memberCode: string){
+    constructor(
+        vehicleCode: string,
+        licensePlateNumber: string, // Corrected field name
+        name: string,
+        category: string,
+        fuelType: string,
+        remark: string,
+        status: string,
+        memberCode: number
+    ) {
         this.vehicleCode = vehicleCode;
-        this.licencePlateNumber = licencePlateNumber;
-        this.vehicleName = vehicleName;
+        this.licensePlateNumber = licensePlateNumber; // Corrected field name
+        this.name = name;
         this.category = category;
         this.fuelType = fuelType;
         this.remark = remark;
@@ -19,4 +28,5 @@ class VehicleModel{
         this.memberCode = memberCode;
     }
 }
-export default VehicleModel
+
+export default VehicleModel;

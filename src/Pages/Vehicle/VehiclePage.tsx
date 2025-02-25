@@ -1,39 +1,49 @@
 import React, { useEffect, useState } from "react";
-import { Table, Modal, Input, Button } from "antd";
+import { Table, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { saveVehicle, updateVehicle, deleteVehicle, getAllVehicles } from "../../slices/VehicleSlice";
 import VehicleModel from "../../Model/VehicleModel";
 import { RootState } from "../../store/Store";
+import Swal from "sweetalert2";
+import MainModal from "../../Components/Add/AddComponent.tsx";
+import CustomButton from "../../Components/Button/CustomButonComponent.tsx";
 
 const VehicleManagement: React.FC = () => {
     const dispatch = useDispatch();
     const vehicles = useSelector((state: RootState) => state.vehicle.vehicles);
 
     const [formData, setFormData] = useState<Partial<VehicleModel>>({});
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
 
     useEffect(() => {
         dispatch(getAllVehicles());
     }, [dispatch]);
 
-
-// Your columns definition
     const columns = [
         { title: "Vehicle Code", dataIndex: "vehicleCode" },
         { title: "License Plate", dataIndex: "licensePlateNumber" },
         { title: "Name", dataIndex: "name" },
         { title: "Category", dataIndex: "category" },
         { title: "Fuel Type", dataIndex: "fuelType" },
+        { title: "Remark", dataIndex: "remark" },
         { title: "Status", dataIndex: "status" },
-        { title: "Staff ID", dataIndex: "staffId" },
+        { title: "Staff ID", dataIndex: "memberCode" },
         {
             title: "Actions",
             render: (_, record) => (
-                <>
-                    <Button onClick={() => handleEdit(record)} style={{ marginRight: 8 }}>Edit</Button>
-                    <Button danger onClick={() => dispatch(deleteVehicle(record.vehicleCode))}>Delete</Button>
-                </>
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <CustomButton
+                        label="Edit"
+                        className="btn btn-primary btn-sm"
+                        onClick={() => handleEdit(record)}
+                    />
+                    <CustomButton
+                        label="Delete"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(record.vehicleCode)}
+                    />
+                </div>
             ),
         },
     ];
@@ -41,22 +51,110 @@ const VehicleManagement: React.FC = () => {
     const handleEdit = (vehicle: VehicleModel) => {
         setFormData(vehicle);
         setIsEdit(true);
-        setIsModalVisible(true);
+        setIsModalOpen(true);
     };
 
     const handleAdd = () => {
-        setFormData({ vehicleCode: `VEH-${Date.now()}` });
+        setFormData({});
         setIsEdit(false);
-        setIsModalVisible(true);
+        setIsModalOpen(true);
     };
 
     const handleSubmit = () => {
-        if (isEdit) {
-            dispatch(updateVehicle(formData as VehicleModel));
-        } else {
-            dispatch(saveVehicle(formData as VehicleModel));
+        if (
+            !formData.licensePlateNumber ||
+            !formData.name ||
+            !formData.category ||
+            !formData.fuelType ||
+            !formData.remark ||
+            !formData.status ||
+            !formData.memberCode
+        ) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Please fill out all fields.",
+            });
+            return;
         }
-        setIsModalVisible(false);
+
+        if (isEdit) {
+            dispatch(updateVehicle(formData as VehicleModel))
+                .unwrap()
+                .then(() => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: "Vehicle updated successfully!",
+                    });
+                    setIsModalOpen(false);
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: error || "Failed to update vehicle",
+                    });
+                });
+        } else {
+            dispatch(saveVehicle(formData as VehicleModel))
+                .unwrap()
+                .then(() => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: "Vehicle added successfully!",
+                    });
+                    setIsModalOpen(false);
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: error || "Failed to add vehicle",
+                    });
+                });
+        }
+    };
+
+    const handleDelete = (vehicleCode: string) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(deleteVehicle(vehicleCode))
+                    .unwrap()
+                    .then(() => {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Deleted!",
+                            text: "Vehicle deleted successfully.",
+                        });
+                        dispatch(getAllVehicles());
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: error || "Failed to delete vehicle",
+                        });
+                    });
+            }
+        });
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [id]: value,
+        }));
     };
 
     return (
@@ -65,15 +163,39 @@ const VehicleManagement: React.FC = () => {
             <Button type="primary" onClick={handleAdd}>Add Vehicle</Button>
             <Table columns={columns} dataSource={vehicles} rowKey="vehicleCode" />
 
-            <Modal title={isEdit ? "Edit Vehicle" : "Add Vehicle"} open={isModalVisible} onOk={handleSubmit} onCancel={() => setIsModalVisible(false)}>
-                <Input placeholder="Vehicle Code" value={formData.vehicleCode} disabled />
-                <Input placeholder="License Plate" value={formData.licencePlateNumber} onChange={(e) => setFormData({ ...formData, licencePlateNumber: e.target.value })} />
-                <Input placeholder="Vehicle Name" value={formData.vehicleName} onChange={(e) => setFormData({ ...formData, vehicleName: e.target.value })} />
-                <Input placeholder="Category" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} />
-                <Input placeholder="Fuel Type" value={formData.fuelType} onChange={(e) => setFormData({ ...formData, fuelType: e.target.value })} />
-                <Input placeholder="Status" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} />
-                <Input placeholder="Staff ID" value={formData.memberCode} onChange={(e) => setFormData({ ...formData, memberCode: e.target.value })} />
-            </Modal>
+            <MainModal
+                isType={isEdit ? "Edit Vehicle" : "Add Vehicle"}
+                buttonType={isEdit ? "Update Vehicle" : "Save Vehicle"}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSubmit={handleSubmit}
+            >
+                <form>
+                    {[
+                        { label: "License Plate", id: "licensePlateNumber" },
+                        { label: "Vehicle Name", id: "name" },
+                        { label: "Category", id: "category" },
+                        { label: "Fuel Type", id: "fuelType" },
+                        { label: "Remark", id: "remark" },
+                        { label: "Status", id: "status" },
+                        { label: "Staff ID", id: "memberCode" },
+                    ].map(({ label, id }) => (
+                        <div className="mb-3" key={id}>
+                            <label htmlFor={id} className="form-label">
+                                {label}
+                            </label>
+                            <input
+                                type="text"
+                                id={id}
+                                value={(formData as any)[id] || ""}
+                                className="form-control"
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                    ))}
+                </form>
+            </MainModal>
         </div>
     );
 };
