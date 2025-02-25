@@ -20,9 +20,9 @@ const Equipment: React.FC = () => {
 
     const [formData, setFormData] = useState<EquipmentModel>({
         equipmentCode: "", // Will be auto-generated or handled by the backend
-        equipmentName: "",
-        equipmentType: "",
-        equipmentStatus: "Available",
+        name: "",
+        type: "",
+        status: "Available",
         availableCount: "",
         fieldList: [],
     });
@@ -37,15 +37,17 @@ const Equipment: React.FC = () => {
 
     const columns: TableColumnsType<EquipmentModel> = [
         { title: "Equipment Code", dataIndex: "equipmentCode", key: "equipmentCode" },
-        { title: "Equipment Name", dataIndex: "equipmentName", key: "equipmentName" },
-        { title: "Equipment Type", dataIndex: "equipmentType", key: "equipmentType" },
-        { title: "Status", dataIndex: "equipmentStatus", key: "equipmentStatus" },
+        { title: "Equipment Name", dataIndex: "name", key: "name" },
+        { title: "Equipment Type", dataIndex: "type", key: "type" },
+        { title: "Status", dataIndex: "status", key: "status" },
         { title: "Available Count", dataIndex: "availableCount", key: "availableCount" },
         {
             title: "Field List",
-            dataIndex: "fieldList",
+            dataIndex: "EquipmentFieldDetails",
             key: "fieldList",
-            render: (fields: string[]) => (fields?.length > 0 ? fields.join(", ") : "N/A"),
+            render: (fields: { fieldCode: number }[]) =>
+                fields?.length > 0 ? fields.map(field => field.fieldCode).join(", ") : "N/A",
+
         },
         {
             title: "Actions",
@@ -68,7 +70,11 @@ const Equipment: React.FC = () => {
     ];
 
     const handleAdd = () => {
-        dispatch(saveEquipment(formData))
+        const payload = {
+            ...formData,
+            availableCount: parseInt(formData.availableCount), // Convert to number for backend
+        };
+        dispatch(saveEquipment(payload))
             .then(() => {
                 Swal.fire("Success!", "Equipment added successfully.", "success");
                 dispatch(getAllEquipment());
@@ -89,7 +95,11 @@ const Equipment: React.FC = () => {
     const handleUpdate = () => {
         if (!editId) return;
 
-        dispatch(updateEquipment(formData))
+        const payload = {
+            ...formData,
+            availableCount: parseInt(formData.availableCount), // Convert to number for backend
+        };
+        dispatch(updateEquipment(payload))
             .then(() => {
                 Swal.fire("Success!", "Equipment updated successfully.", "success");
                 dispatch(getAllEquipment());
@@ -126,9 +136,9 @@ const Equipment: React.FC = () => {
     const resetForm = () => {
         setFormData({
             equipmentCode: "",
-            equipmentName: "",
-            equipmentType: "",
-            equipmentStatus: "Available",
+            name: "",
+            type: "",
+            status: "Available",
             availableCount: "",
             fieldList: [],
         });
@@ -137,7 +147,7 @@ const Equipment: React.FC = () => {
     };
 
     const handleFieldListChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const fields = e.target.value.split(",").map((field) => field.trim());
+        const fields = e.target.value.split(",").map((field) => parseInt(field.trim()));
         setFormData({ ...formData, fieldList: fields });
     };
 
@@ -169,8 +179,8 @@ const Equipment: React.FC = () => {
                             <input
                                 type="text"
                                 className="form-control"
-                                value={formData.equipmentName}
-                                onChange={(e) => setFormData({ ...formData, equipmentName: e.target.value })}
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 required
                             />
                         </div>
@@ -179,8 +189,8 @@ const Equipment: React.FC = () => {
                             <input
                                 type="text"
                                 className="form-control"
-                                value={formData.equipmentType}
-                                onChange={(e) => setFormData({ ...formData, equipmentType: e.target.value })}
+                                value={formData.type}
+                                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                                 required
                             />
                         </div>
@@ -198,8 +208,8 @@ const Equipment: React.FC = () => {
                             <label className="form-label">Equipment Status</label>
                             <select
                                 className="form-control"
-                                value={formData.equipmentStatus}
-                                onChange={(e) => setFormData({ ...formData, equipmentStatus: e.target.value })}
+                                value={formData.status}
+                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                                 required
                             >
                                 <option value="Available">Available</option>

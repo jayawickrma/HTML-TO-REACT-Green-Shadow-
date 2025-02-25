@@ -92,6 +92,7 @@ const equipmentSlice = createSlice({
             })
             .addCase(deleteEquipment.fulfilled, (state, action) => {
                 const code = action.meta.arg; // Ensure this is a number
+                // @ts-ignore
                 state.equipment = state.equipment.filter((e) => e.equipmentCode !== code);
             })
             .addCase(getAllEquipment.fulfilled, (state, action) => {

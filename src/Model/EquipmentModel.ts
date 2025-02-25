@@ -1,17 +1,24 @@
-export class EquipmentModel{
+export class EquipmentModel {
     equipmentCode: string;
-    equipmentName: string;
-    equipmentType: string;
-    equipmentStatus: string;
-    availableCount:string;
-    fieldList:string[];
+    name: string;
+    type: string;
+    status: string;
+    availableCount: string; // Keep as string for form handling
+    fieldList: number[];
 
-    constructor(code: string, name: string, type: string, status: string, count: string, fields: string[]){
+    constructor(
+        code: string,
+        name: string,
+        type: string,
+        status: string,
+        availableCount: string,
+        fields: number[]
+    ) {
         this.equipmentCode = code;
-        this.equipmentName = name;
-        this.equipmentType = type;
-        this.equipmentStatus = status;
-        this.availableCount = count;
+        this.name = name;
+        this.type = type;
+        this.status = status;
+        this.availableCount = availableCount;
         this.fieldList = fields;
     }
 }
