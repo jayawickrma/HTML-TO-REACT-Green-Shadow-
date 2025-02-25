@@ -58,9 +58,12 @@ export const updateEquipment = createAsyncThunk(
 
 export const deleteEquipment = createAsyncThunk(
     "equipment/deleteEquipment",
-    async (code: string) => {
+    async (equipmentCode: string) => {
         try {
-            return await api.delete(`equipment/deleteEquipment/${code}`);
+            const response = await api.delete(`equipment/deleteEquipment`,{
+                params :{id :equipmentCode},
+            });
+            return response.data
         } catch (e) {
             console.log("Failed to delete equipment!", e);
             throw e;
