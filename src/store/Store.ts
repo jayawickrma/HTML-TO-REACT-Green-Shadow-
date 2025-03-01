@@ -9,7 +9,6 @@ import FieldSlice from "../slices/FieldSlice";
 import TokenSlice from "../slices/TokenSlice";
 import UserSlice from "../slices/UserSlice";
 
-// Create Redux Store
 export const store = configureStore({
     reducer: {
         user: UserSlice,
@@ -23,7 +22,7 @@ export const store = configureStore({
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
-            serializableCheck: false, // Disable serializability warnings
+            serializableCheck: false,
         }),
 });
 
